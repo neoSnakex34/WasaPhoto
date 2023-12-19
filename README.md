@@ -1,4 +1,4 @@
-#  embryo of WASAPHOTO 
+#  a WiP of my WASAPhoto
 
 
 ## Project structure
