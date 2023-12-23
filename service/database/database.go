@@ -33,7 +33,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
@@ -76,16 +75,24 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
-	// Check if table exists. If not, the database is empty, and we need to create the structure
+	// start creating the AppDatabase if needed
+
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='user';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+
 	}
+
+	// // Check if table exists. If not, the database is empty, and we need to create the structure
+	// var tableName string
+	// err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	// if errors.Is(err, sql.ErrNoRows) {
+	// 	sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
+	// 	_, err = db.Exec(sqlStmt)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("error creating database structure: %w", err)
+	// 	}
+	// }
 
 	return &appdbimpl{
 		c: db,

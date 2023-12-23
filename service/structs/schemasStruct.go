@@ -29,9 +29,12 @@ type Photo struct {
 	userId   string    `json:"userId"`
 	like     int       `json:"like"`
 	comments []Comment `json:"comments"`
-	//TODO manage type of date time
-	date       string `json:"date"`
-	photoBytes []byte `json:"photoBytes"`
+
+	//TODO consider manage type of date time here or convert/parse it later from string and viceversa
+	//kinda prone to errors so would be preferred to use a specific type here probably, maybe using a struct
+	//with a string and a time.Time field
+	date       string    `json:"date"`
+	photoBytes PhotoFile `json:"photoBytes"`
 }
 
 type Comment struct {
