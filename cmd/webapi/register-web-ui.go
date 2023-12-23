@@ -9,6 +9,8 @@ import (
 	"io/fs"
 	"net/http"
 	"strings"
+
+	"github.com/neoSnakex34/WasaPhoto/webui"
 )
 
 func registerWebUI(hdl http.Handler) (http.Handler, error) {

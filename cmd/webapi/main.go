@@ -29,9 +29,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/neosnakex34/wasaphoto/service/api"
-	"github.com/neosnakex34/wasaphoto/service/database"
-	"github.com/neosnakex34/wasaphoto/service/globaltime"
+	"github.com/neoSnakex34/WasaPhoto/service/api"
+	"github.com/neoSnakex34/WasaPhoto/service/database"
+	"github.com/neoSnakex34/WasaPhoto/service/globaltime"
 
 	// "git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api"
 	// "git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/neosnakex34/wasaphoto/service/api/reqcontext"
+	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
 	// "git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
 	"net/http"
 
