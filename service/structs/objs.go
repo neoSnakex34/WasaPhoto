@@ -1,4 +1,4 @@
-package api
+package structs
 
 type Identifier struct {
 	Id string `json:"identifier"`
