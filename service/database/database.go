@@ -35,12 +35,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/neoSnakex34/WasaPhoto/service/struct/objs"
+	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	DoLogin(username string) (objs.Identifier, error)
+	DoLogin(username string) (structs.objs.Identifier, error)
 	GetName() (string, error)
 	SetName(name string) error
 
