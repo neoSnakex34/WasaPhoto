@@ -31,7 +31,6 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
-	"WasaPhoto/service/api/struct/objs"
 	"database/sql"
 	"errors"
 	"fmt"
