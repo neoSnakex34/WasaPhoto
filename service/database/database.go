@@ -31,6 +31,7 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
+	"WasaPhoto/service/api/struct/objs"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -38,6 +39,7 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
+	DoLogin(username string) (objs.Identifier, error)
 	GetName() (string, error)
 	SetName(name string) error
 
