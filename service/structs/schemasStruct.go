@@ -21,6 +21,9 @@ type User struct {
 
 }
 
+type PhotoFile struct {
+	photoByteStream []byte `json:"photoByteStream"`
+}
 type Photo struct {
 	photoId  string    `json:"photoId"`
 	userId   string    `json:"userId"`

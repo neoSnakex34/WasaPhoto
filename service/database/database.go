@@ -39,10 +39,28 @@ import (
 )
 
 // AppDatabase is the high level interface for the DB
+// methods are exported ones, hence they are written with capital first letter
 type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)
-	GetName() (string, error)
-	SetName(name string) error
+
+	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
+	SetMyUsername(username string) error
+	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
+
+	FollowUser(userId structs.Identifier) error
+	UnfollowUser(userId structs.Identifier) error
+
+	BanUser(userId structs.Identifier) error
+	UnbanUser(userId structs.Identifier) error
+
+	UploadPhoto(file structs.PhotoFile) (structs.Photo, error)
+	RemovePhoto(photoId structs.Identifier) error
+	CommentPhoto(photoId structs.Identifier, commentBody structs.Comment) error
+	UncommentPhoto(photoId structs.Identifier, commentId structs.Identifier) error
+	LikePhoto(photoId structs.Identifier) error
+	UnlikePhoto(photoId structs.Identifier) error
+
+	//TODO consider adding methods to exract info from structs
 
 	Ping() error
 }

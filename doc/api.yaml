@@ -11,8 +11,7 @@ servers:
 
 
 paths:
-#TODO maybe handle logout directly in api
-  /session/:
+  /session:
     post: 
       tags: 
         - Login 
@@ -28,12 +27,10 @@ paths:
           application/json:
             schema:
               type: object
-              #TODO change it with actual userName
               properties:
                 name: 
                   type: string
                   example: Mario
-                  #TODO change this pattern
                   pattern: '^.*?$'
                   minLength: 3
                   maxLength: 16
@@ -553,7 +550,13 @@ components:
           minimum: 0
           example: 336
 
-
+    PhotoFile:
+      title: photoFile 
+      description: the actual file of the photo, as a stream of bytes 
+      type: string
+      format: binary
+      minLength: 1
+      maxLength: 1048576 #binary 10 megs (2 power of 20),  probably need to add a control for larger images
     
     Photo: 
       title: photo
@@ -590,12 +593,8 @@ components:
           maxLength: 20 
 
         photoBytes:
-          description: the photo file, as a bytestream 
-          type: string
-          format: binary
-          minLength: 1
-          maxLength: 1048576 #binary 10 megs (2 power of 20),  probably need to add a control for larger images 
-
+          $ref: "#/components/schemas/PhotoFile"
+          
     Comment:
       title: comment
       description: a comment on a photo
