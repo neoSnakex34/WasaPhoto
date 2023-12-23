@@ -40,7 +40,7 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	DoLogin(username string) (structs.objs.Identifier, error)
+	DoLogin(username string) (structs.Identifier, error)
 	GetName() (string, error)
 	SetName(name string) error
 
