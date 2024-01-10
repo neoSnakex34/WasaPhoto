@@ -116,7 +116,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         '403':
           $ref: "#/components/responses/Forbidden"
-          description: no rights to change username or username taken
         '500':
           $ref: "#/components/responses/InternalServerError"
   
@@ -528,12 +527,11 @@ components:
       properties: 
         userId: 
           $ref: "#/components/schemas/Identifier"
-          description: unique identifier of the owner of the profile 
         username:
           $ref: "#/components/schemas/UserName"
           #TODO check if i can refer a parameter here and if it has any sense to do it, elsewhere 
           #eithwe define username as a schema or do not use it like that 
-          description: the username of the owner of the profile, actually displayed
+        
         followers:
           description: number of users following the owner of the profile 
           type: integer 
@@ -565,12 +563,10 @@ components:
       properties: 
         photoId: 
           $ref: "#/components/schemas/Identifier"
-          description: unique identifier of a photo 
-        
+
         userId:
           $ref: "#/components/schemas/Identifier"
-          description: the id of the user who uploaded the photo
-        
+
         #consider adding a list of ids connected with the likes
         like: 
           description: number of likes the photo has recieved 
@@ -608,8 +604,7 @@ components:
 
         userId:
           $ref: "#/components/schemas/Identifier"
-          description: the id of the user who uploaded the photo
-       
+
         body:
           description: body of the comment
           type: string
