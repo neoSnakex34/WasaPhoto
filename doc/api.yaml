@@ -12,7 +12,9 @@ servers:
 
 paths:
   /session:
-    post: 
+    post:
+      security: 
+        -  bearerAuth: [] 
       tags: 
         - Login 
       summary: logs in the  user 
@@ -171,7 +173,7 @@ paths:
 
 
       responses: 
-        '201':
+        '200':
           description: user followed succesfully
         '400':
           $ref:
@@ -223,6 +225,8 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
     delete:
+        security: 
+          -  bearerAuth: []
         tags: 
           - Ban 
         summary: unban a user 
@@ -240,7 +244,7 @@ paths:
             $ref: "#/components/responses/InternalServerError"
 
     
-#return here
+  #return here
   /users/{userId}/photos/{photoId}:
     parameters: 
       - $ref: "#/components/parameters/userId"
@@ -442,20 +446,20 @@ components:
   
 
     userId:
-      name: userId
-      required: true
-      in: path
       description: identifier for a single user 
       schema: 
         $ref: "#/components/schemas/Identifier"
+      name: userId
+      in: path
+      required: true
     
     photoId:
-      name: photoId
-      required: true
-      in: path 
       description: identifier for a photo
       schema:
         $ref: "#/components/schemas/Identifier"
+      name: photoId
+      in: path 
+      required: true
       
     commentId:
       name: commentId
@@ -619,4 +623,5 @@ components:
           example: "2023-12-12T09:00:00Z"
           minLength: 20
           maxLength: 20
+
 
