@@ -272,7 +272,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/parameters/photoId"
+                #TODO if it works manage to return photoid
+                $ref: "#/components/schemas/Photo"
         '400':
           $ref:
             "#/components/responses/BadRequest"
