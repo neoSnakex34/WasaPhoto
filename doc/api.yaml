@@ -156,7 +156,7 @@ paths:
 
 
 
-  /users/{userId}/follower/{userId}: 
+  /users/follower/{userId}: 
 
     parameters:
       - $ref: "#/components/parameters/userId"
@@ -202,7 +202,7 @@ paths:
         '500':
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/bans/{userId}: 
+  /users/bans/{userId}: 
     parameters:
       - $ref: "#/components/parameters/userId"
     
@@ -245,7 +245,7 @@ paths:
 
     
   #return here
-  /users/{userId}/photos/{photoId}:
+  /users/photos/{photoId}:
     parameters: 
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
@@ -306,7 +306,7 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/{userId}/photos/{photoId}/comments/{commentId}: 
+  /users/photos/comments/{commentId}: 
     
     parameters: 
       - $ref: "#/components/parameters/userId"
@@ -367,7 +367,7 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/{userId}/photos/{photoId}/likes:
+  /users/photos/{photoId}/likes:
     parameters:
       - $ref: "#/components/parameters/photoId"     
       - $ref: "#/components/parameters/userId"
