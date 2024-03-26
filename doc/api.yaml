@@ -154,10 +154,11 @@ paths:
 
 
   #TODO should i specialize ids in followerId ecc???
-  /users/followers/{userId}: 
+  /users/{userId}/followers/{followerId}: 
 
     parameters:
       - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/followerId"
       #TODO manage names and other attributes if necessary 
 
     put: 
@@ -166,6 +167,7 @@ paths:
       tags:
         - Follow
       summary: follow a user 
+      #TODO change this to be used as a collection of followers (ids stored)
       description: the action of following a user y from user x
       operationId: followUser
 
@@ -183,7 +185,6 @@ paths:
         '500':
           $ref: "#/components/responses/InternalServerError"
 
-  #TODO for ban unban decide if better 201 or 204, choose how to hanlde bans and manage other statuses 
     delete: 
       security:
         - bearerAuth: []
@@ -201,9 +202,10 @@ paths:
         '500':
           $ref: "#/components/responses/InternalServerError"
 
-  /users/bans/{userId}: 
+  /users/{userId}/bans/{bannedId}: 
     parameters:
       - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/bannedId"
     
     put: 
       security:
@@ -453,6 +455,22 @@ components:
       in: path
       required: true
     
+    followerId:
+      description: identifier for a user that follows another
+      schema: 
+        $ref: "#/components/schemas/Identifier"
+      name: followerId 
+      in: path
+      required: true
+
+    bannedId:
+      description: identifier for a banned user by user x 
+      schema: 
+        $ref: "#/components/schemas/Identifier"
+      name: bannedId
+      in: path
+      required: true
+    
     photoId:
       description: identifier for a photo
       schema:
@@ -468,6 +486,8 @@ components:
       description: identifier for a comment, used to retrieve comments
       schema:
         $ref: "#/components/schemas/Identifier"
+    
+      
 
 
 
