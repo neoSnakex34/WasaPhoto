@@ -509,6 +509,8 @@ components:
           type: array 
           items:
             $ref: "#/components/schemas/User"
+          minItems: 0
+          maxItems: 256 #not for real use, just as an example
 
         #TODO should i change this to be more modular 
         #usign ids instead of user objs and making ids a separate schema??
