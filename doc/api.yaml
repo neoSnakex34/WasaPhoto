@@ -20,8 +20,7 @@ paths:
       summary: logs in the  user 
       description: |-
         if the user does not exist it will be created
-        an identifier is returned.
-        if the user exists the user id is returned.
+        else it will be logged in; either way the userId is returned
       operationId: doLogin
       requestBody:
         description: User details 
@@ -48,7 +47,7 @@ paths:
                 properties:
                   identifier:
                     # that should be the userId 
-                    #todo change here if you decide
+                    #TODO change here if you decide
                     # to use anything else 
                     type:  string 
                     example: abcdef1312
@@ -245,7 +244,7 @@ paths:
 
     
   #return here
-  /users/photos/{photoId}:
+  /users/{userId}/photos/{photoId}:
     parameters: 
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
@@ -306,7 +305,7 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/photos/comments/{commentId}: 
+  /users/{userId}/photos/{photoId}/comments/{commentId}: 
     
     parameters: 
       - $ref: "#/components/parameters/userId"
@@ -487,7 +486,7 @@ components:
       title: username
       description: user name associated with userId, part of a user obj
       type: string
-      example: neoSnakex34
+      example: neosnakex34
       pattern: '^[a-z0-9]*?$'
      
 
