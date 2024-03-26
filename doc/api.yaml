@@ -71,7 +71,6 @@ paths:
       responses:
         '200':
           description: user profile retrieved succesfully
-
           content:
             application/json:
               schema:
@@ -155,8 +154,8 @@ paths:
         
 
 
-
-  /users/follower/{userId}: 
+  #TODO should i specialize ids in followerId ecc???
+  /users/followers/{userId}: 
 
     parameters:
       - $ref: "#/components/parameters/userId"
@@ -173,7 +172,8 @@ paths:
 
 
       responses: 
-        '200':
+        #TODO maybe change response type and retrieve userId of the followed 
+        '204':
           description: user followed succesfully
         '400':
           $ref:
@@ -367,7 +367,7 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/photos/{photoId}/likes:
+  /users/photos/{photoId}/likes/{userId}:
     parameters:
       - $ref: "#/components/parameters/photoId"     
       - $ref: "#/components/parameters/userId"
@@ -378,8 +378,8 @@ paths:
       #TODO change arrays of tags like that 
       tags: 
         - Like 
-      summary: adds a like to a photo
-      description: the action of putting a like to a photo from the feed 
+      summary: adds a like to a photo 
+      description: the action of putting a like to a photo from the feed; userId will be the identifier for a like in that context 
       operationId: likePhoto 
       responses: 
         '204':
@@ -625,4 +625,4 @@ components:
           minLength: 20
           maxLength: 20
 
-
+ 
