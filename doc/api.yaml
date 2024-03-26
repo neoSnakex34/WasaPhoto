@@ -4,7 +4,7 @@ info:
   description: |
     API specification for WASAPhoto, University project
     for web and software architecture course. 
-  version: 0.1.0
+  version: 0.2.1
 
 servers:
   - url: http://localhost:8090
@@ -213,13 +213,18 @@ paths:
       tags: 
         - Ban
       summary: ban a user 
-      description: the action of banning a user y from user x 
+      #TODO i shouls probably implements something to retrieve id from username and modularize it...
+      description: the action of banning a user y from user x return username of banned user
       operationId: banUser 
 
       responses: 
-        '204':
+        '201':
           description: user banned succesfully
-        
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/UserName"
+            #JUMP BAN
         '400':
           $ref: "#/components/responses/BadRequest"
         '500':
@@ -535,16 +540,16 @@ components:
         #TODO should i change this to be more modular 
         #usign ids instead of user objs and making ids a separate schema??
         bannedUsers:  
-          description: list of banned users from the current user
+          description: list of banned users (via UserName) from the current user
           type: array 
           items: 
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/UserName"
         
         bannedBy: 
           description: list of us user the current user has been banned to 
           type: array 
           items: 
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/UserName"
   
     UserProfile: 
       title: userProfile
