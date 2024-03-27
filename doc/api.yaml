@@ -9,6 +9,23 @@ info:
 servers:
   - url: http://localhost:8090
 
+tags:
+  - name: "User"
+    description: endpoints for users related operations  
+  - name: "Comments"
+    description: endpoints for comments related operations
+  - name: "Login"
+    description: enpoints for loggin in action 
+  - name: "Photo"
+    description: endpoints for photo related operations
+  - name: "Follow"
+    description: endpoints for follow related operations
+  - name: "Ban"
+    description: endpoints for ban related operations
+  - name: "Like"
+    description: endpoints for like related operations
+
+    
 
 paths:
   /session:
