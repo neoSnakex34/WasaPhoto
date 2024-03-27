@@ -25,7 +25,7 @@ tags:
   - name: "Like"
     description: endpoints for like related operations
 
-    
+
 
 paths:
   /session:
@@ -40,18 +40,12 @@ paths:
         else it will be logged in; either way the userId is returned
       operationId: doLogin
       requestBody:
-        description: User details 
+        description: Username to be used for loggin in  
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name: 
-                  type: string
-                  example: Mario
-                  pattern: '^.*?$'
-                  minLength: 3
-                  maxLength: 16
+              $ref: "#/components/schemas/UserName"
+              
         required: true
 
       responses:
@@ -60,14 +54,8 @@ paths:
           content:
             application/json:
               schema: 
-                type: object
-                properties:
-                  identifier:
-                    # that should be the userId 
-                    #TODO change here if you decide
-                    # to use anything else 
-                    type:  string 
-                    example: abcdef1312
+                #TODO check if i can return the userId here if needed
+                $ref: "#/components/schemas/User" 
         #Do i need other responses? 
   #TODO manage paths 
 
@@ -158,6 +146,7 @@ paths:
             application/json:
               schema:
                 type: array
+                description: list of photos in the stream
                 items:
                   $ref: "#/components/schemas/Photo"
                 minItems: 0 
@@ -523,6 +512,8 @@ components:
       #consider specializing it 
       pattern: "^@[A-Z][0-9]{9}$"
       example: "@U000000001"
+      minLength: 11
+      maxLength: 11
     
     UserName: 
       title: username
@@ -530,6 +521,8 @@ components:
       type: string
       example: neosnakex34
       pattern: '^[a-z0-9]*?$'
+      minLength: 6
+      maxLength: 18
      
 
 
@@ -540,17 +533,18 @@ components:
       properties: 
         #TODO manage required infos 
         userId:
-          description: unique identifier for a single user
-          example: "@U000000001"
+          $ref: "#/components/schemas/Identifier"
+          #description: unique identifier for a single user
 
         username: 
           $ref: "#/components/schemas/UserName"
           
         followers:
-          description: list of users followed by the current user 
+          description: list of usernames followed by the current user 
           type: array 
           items:
-            $ref: "#/components/schemas/User"
+            #changed to avoid circular reference
+            $ref: "#/components/schemas/UserName"
           minItems: 0
           maxItems: 256 #not for real use, just as an example
 
@@ -559,12 +553,16 @@ components:
         bannedUsers:  
           description: list of banned users (via UserName) from the current user
           type: array 
+          minItems: 0
+          maxItems: 256 #not for real use, just as an example. Limited for test purposes
           items: 
             $ref: "#/components/schemas/UserName"
         
         bannedBy: 
           description: list of us user the current user has been banned to 
           type: array 
+          minItems: 0
+          maxItems: 256 #not for real use, just as an example. Limited for test purposes
           items: 
             $ref: "#/components/schemas/UserName"
   
@@ -625,6 +623,8 @@ components:
         comments: 
           description: comments attached to the photo, made by users
           type: array
+          minItems: 0
+          maxItems: 20 #not for real use, just as an example 
           items: 
             $ref: "#/components/schemas/Comment"
         
@@ -646,9 +646,7 @@ components:
       properties:
         #should i really use it? 
         commentId:
-          description: identifier of the comment
-          type: integer
-          example: 9
+          $ref: "#/components/schemas/Identifier"
 
         userId:
           $ref: "#/components/schemas/Identifier"
@@ -658,6 +656,7 @@ components:
           type: string
           minLength: 1
           maxLength: 400
+          pattern: '^.*?$'
           example: "nice one bro"
 
         date:
