@@ -100,7 +100,7 @@ paths:
         - User 
       summary: change the username
       description: used to update the userneme of the current user logged in  
-      operationId: setMyUsername
+      operationId: setMyUserName
       requestBody:
         description: new username to replace old one 
         required: true
