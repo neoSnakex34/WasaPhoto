@@ -572,7 +572,14 @@ components:
           minimum: 0
           example: 336
 
-      #TODO probably handle bans here, else do it only in backend and not in the api (outside of endpoints of course)
+        bannedUsers:
+          description: list of users banned by the user
+          type: array
+          minItems: 0
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/UserName"
+        
         
 
     PhotoFile:
