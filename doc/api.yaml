@@ -572,14 +572,7 @@ components:
           minimum: 0
           example: 336
 
-        bannedUsers:
-          description: list of users banned by the user
-          type: array
-          minItems: 0
-          maxItems: 256
-          items:
-            $ref: "#/components/schemas/UserName"
-        
+      #TODO probably handle bans here, else do it only in backend and not in the api (outside of endpoints of course)
         
 
     PhotoFile:
@@ -654,5 +647,6 @@ components:
           example: "2023-12-12T09:00:00Z"
           minLength: 20
           maxLength: 20
-
+    
+    
  
