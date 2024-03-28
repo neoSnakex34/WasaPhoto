@@ -43,7 +43,7 @@ type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)
 
 	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
-	SetMyUsername(username string) error
+	SetMyUserName(username string) error
 	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
 
 	FollowUser(userId structs.Identifier) error

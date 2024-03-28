@@ -4,19 +4,24 @@ type Identifier struct {
 	Id string `json:"identifier"`
 }
 
+type UserName struct {
+	username string `json:"username"`
+}
+
 type UserProfile struct {
-	userId       string `json:"userId"`
-	username     string `json:"username"`
+	userId       Identifier `json:"userId"`
+	username     UserName `json:"username"`
 	followers    uint32 `json:"followers"`
 	following    uint32 `json:"following"`
 	photoCounter uint32 `json:"photoCounter"`
 }
 
 type User struct {
-	userId      string `json:"userId"`
-	username    string `json:"username"`
-	followers   []User `json:"followers"`
-	bannedUsers []User `json:"bannedUsers"`
+	userId      Identifier `json:"userId"`
+	username    UserName `json:"username"`
+	followers   []UserName `json:"followers"` //this should be username
+	bannedUsers []UserName `json:"bannedUsers"`
+	bannedBy	[]UserName `json:"bannedBy"`
 	//TODO manage following
 
 }
@@ -24,9 +29,10 @@ type User struct {
 type PhotoFile struct {
 	photoByteStream []byte `json:"photoByteStream"`
 }
+
 type Photo struct {
-	photoId  string    `json:"photoId"`
-	userId   string    `json:"userId"`
+	photoId  Identifier    `json:"photoId"`
+	userId   Identifier    `json:"userId"`
 	like     int       `json:"like"`
 	comments []Comment `json:"comments"`
 
@@ -38,8 +44,8 @@ type Photo struct {
 }
 
 type Comment struct {
-	commentId string `json:"commentId"`
-	userId    string `json:"userId"`
+	commentId Identifier `json:"commentId"`
+	userId    Identifier `json:"userId"`
 	body      string `json:"body"`
 	date      string `json:"date"`
 	//TODO manage others
