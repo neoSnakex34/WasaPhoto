@@ -11,17 +11,18 @@ type UserName struct {
 type UserProfile struct {
 	userId       Identifier `json:"userId"`
 	username     UserName `json:"username"`
-	followers    uint32 `json:"followers"`
-	following    uint32 `json:"following"`
+	followerCounter    uint32 `json:"followersCounter"`
+	followingCounter    uint32 `json:"followingCounter"`
 	photoCounter uint32 `json:"photoCounter"`
+	//TODO absolutely manage this
+	bannedUsers []UserName `json:"bannedUsers"`
+
 }
 
 type User struct {
 	userId      Identifier `json:"userId"`
 	username    UserName `json:"username"`
-	followers   []UserName `json:"followers"` //this should be username
-	bannedUsers []UserName `json:"bannedUsers"`
-	bannedBy	[]UserName `json:"bannedBy"`
+	
 	//TODO manage following
 
 }

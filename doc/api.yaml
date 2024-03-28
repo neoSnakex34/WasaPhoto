@@ -539,60 +539,48 @@ components:
         username: 
           $ref: "#/components/schemas/UserName"
           
-        followers:
-          description: list of usernames followed by the current user 
-          type: array 
-          items:
-            #changed to avoid circular reference
-            $ref: "#/components/schemas/UserName"
-          minItems: 0
-          maxItems: 256 #not for real use, just as an example
-
-        #TODO should i change this to be more modular 
-        #usign ids instead of user objs and making ids a separate schema??
-        bannedUsers:  
-          description: list of banned users (via UserName) from the current user
-          type: array 
-          minItems: 0
-          maxItems: 256 #not for real use, just as an example. Limited for test purposes
-          items: 
-            $ref: "#/components/schemas/UserName"
+     
         
-        bannedBy: 
-          description: list of us user the current user has been banned to 
-          type: array 
-          minItems: 0
-          maxItems: 256 #not for real use, just as an example. Limited for test purposes
-          items: 
-            $ref: "#/components/schemas/UserName"
+
   
     UserProfile: 
       title: userProfile
       description: a user profile, providing info about follwers and following, photos and user related stuff
       type: object
       properties: 
+
         userId: 
           $ref: "#/components/schemas/Identifier"
         username:
           $ref: "#/components/schemas/UserName"
-          #TODO check if i can refer a parameter here and if it has any sense to do it, elsewhere 
-          #eithwe define username as a schema or do not use it like that 
         
-        followers:
+        followerCounter:
           description: number of users following the owner of the profile 
           type: integer 
           minimum: 0
           example: 50
-        following:
+
+        followingCounter:
           description: number of users followed by the owner of the profile 
           type: integer 
           minimum: 0
           example: 12
+
         photoCounter: 
           description: number of photos uploaded by the owner of the profile 
           type: integer 
           minimum: 0
           example: 336
+
+        bannedUsers:
+          description: list of users banned by the user
+          type: array
+          minItems: 0
+          maxItems: 256
+          items:
+            $ref: "#/components/schemas/UserName"
+        
+        
 
     PhotoFile:
       title: photoFile 
