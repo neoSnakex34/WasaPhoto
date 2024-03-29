@@ -572,14 +572,7 @@ components:
           minimum: 0
           example: 336
 
-        bannedUsers:
-          description: list of users banned by the user
-          type: array
-          minItems: 0
-          maxItems: 256
-          items:
-            $ref: "#/components/schemas/UserName"
-        
+        #TODO decide wether or not include a list of banned users
         
 
     PhotoFile:
