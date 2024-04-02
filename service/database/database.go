@@ -81,8 +81,52 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='user';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		// change integer with text or something like that to match regex pattern 
-		userTable := `CREATE TABLE users (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL)`
-	}
+		userTable := `CREATE TABLE users (
+			UserId VARCHAR(11) NOT NULL PRIMARY KEY,
+			Username VARCHAR(18) NOT NULL UNIQUE//TODO remember to check elsewhere for the username to be unique
+		
+			)`
+				//TODO is it all?
+				// add photo counte and followercounter probably 
+		
+		//followerid will be a userid  
+		//TODO check if that's correct
+		followerTable := `CREATE TABLE followers (
+			followerId VARCHAR(11) NOT NULL PRIMARY KEY,
+			followedId VARCHAR(11) NOT NULL,
+			FOREIGN KEY followerId REFERENCES userTable(userId),
+		)`
+		
+		bansTable := `CREATE TABLE bans (
+			bannerId VARCHAR(11) NOT NULL PRIMARY KEY,
+			bannedId VARCHAR(11) NOT NULL,
+			FOREIGN KEY bannerId REFERENCES userTable(userId),	
+		)`
+
+		photoTable := `CREATE TABLE photos (
+			photoId VARCHAR(11) NOT NULL PRIMARY KEY, 
+			userId VARCHAR(11) NOT NULL, 
+			photo BLOB, 
+			date TEXT, 
+			FOREIGN KEY userId REFERENCES userTable(userId)
+		)`
+		
+		likeTable := `CREATE TABLE likes (
+			likeId VARCHAR(11) NOT NULL PRIMARY KEY,
+			photoId VARCHAR(11) NOT NULL,
+			FORIEGN KEY likeId REFERENCES userTable(userId)
+			FOREIGN KEY photoId REFERENCES photoTable(photoId)
+		)`
+
+		commentTable := `CREATE TABLE comments (
+			commentId VARCHAR(11) NOT NULL PRIMARY KEY,
+			userId VARCHAR(11) NOT NULL,
+			photoId VARCHAR(11) NOT NULL,
+			body TEXT,
+			FOREIGN KEY userId REFERENCES userTable(userId),
+			FOREIGN KEY photoId REFERENCES photoTable(photoId)
+		)`
+		}
 
 	// // Check if table exists. If not, the database is empty, and we need to create the structure
 	// var tableName string
