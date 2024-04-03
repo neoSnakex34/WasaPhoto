@@ -21,3 +21,6 @@ func (db *appdbimpl) UnbanUser(bannerId, bannedId structs.Identifier) error {
 
 	return nil
 }
+
+//TODO probably need to add a function to check if a user is banned 
+//when building core functionality decide it 

@@ -93,15 +93,19 @@ func New(db *sql.DB) (AppDatabase, error) {
 		//followerid will be a userid  
 		//TODO check if that's correct
 		followerTable := `CREATE TABLE followers (
-			followerId VARCHAR(11) NOT NULL PRIMARY KEY,
+			followerId VARCHAR(11) NOT NULL,
 			followedId VARCHAR(11) NOT NULL,
-			FOREIGN KEY (followerId, followedId) REFERENCES users(userId, userId),
+			PRIMARY KEY (followerId, followedId),
+			FOREIGN KEY followerId REFERENCES users(userId),
+			FOREIGN KEY followedId REFERENCES users(userId)
 		)`
 		
 		bansTable := `CREATE TABLE bans (
-			bannerId VARCHAR(11) NOT NULL PRIMARY KEY,
+			bannerId VARCHAR(11) NOT NULL,
 			bannedId VARCHAR(11) NOT NULL,
-			FOREIGN KEY (bannerId, bannedId) REFERENCES users(userId, userId),	
+			PRIMARY KEY (bannerId, bannedId),
+			FOREIGN KEY (bannerId) REFERENCES users(userId),
+			FOREIGN KEY (bannedId) REFERENCES users(userId)	
 		)`
 
 		photoTable := `CREATE TABLE photos (
