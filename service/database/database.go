@@ -126,7 +126,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY userId REFERENCES userTable(userId),
 			FOREIGN KEY photoId REFERENCES photoTable(photoId)
 		)`
-		}
+
+		//TODO this would be executed one by one with dedicated errors probably
+		//TODO check if i need to check for errors even here (function returns error if something goes wrong)
+		runCreateQueries(db, userTable, followerTable, bansTable, photoTable, likeTable, commentTable)
+		
+	}
 
 	// // Check if table exists. If not, the database is empty, and we need to create the structure
 	// var tableName string
@@ -144,6 +149,18 @@ func New(db *sql.DB) (AppDatabase, error) {
 	}, nil
 }
 
+func runCreateQueries(db *sql.DB, queries ...string) error {
+	for _, query := range queries {
+		_, err := db.Exec(query)
+
+		if err != nil {
+			return fmt.Errorf("error creating database table: %w", err)
+		}
+	}
+	return nil
+}
+
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
 }
+
