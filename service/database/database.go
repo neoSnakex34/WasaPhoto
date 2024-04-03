@@ -95,13 +95,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 		followerTable := `CREATE TABLE followers (
 			followerId VARCHAR(11) NOT NULL PRIMARY KEY,
 			followedId VARCHAR(11) NOT NULL,
-			FOREIGN KEY (followerId, followedId) REFERENCES userTable(userId, userId),
+			FOREIGN KEY (followerId, followedId) REFERENCES users(userId, userId),
 		)`
 		
 		bansTable := `CREATE TABLE bans (
 			bannerId VARCHAR(11) NOT NULL PRIMARY KEY,
 			bannedId VARCHAR(11) NOT NULL,
-			FOREIGN KEY (bannerId, bannedId) REFERENCES userTable(userId, userId),	
+			FOREIGN KEY (bannerId, bannedId) REFERENCES users(userId, userId),	
 		)`
 
 		photoTable := `CREATE TABLE photos (
@@ -109,14 +109,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 			userId VARCHAR(11) NOT NULL, 
 			photo BLOB, 
 			date TEXT, 
-			FOREIGN KEY userId REFERENCES userTable(userId)
+			FOREIGN KEY userId REFERENCES users(userId)
 		)`
 		
 		likeTable := `CREATE TABLE likes (
 			likeId VARCHAR(11) NOT NULL PRIMARY KEY,
 			photoId VARCHAR(11) NOT NULL,
-			FORIEGN KEY likeId REFERENCES userTable(userId)
-			FOREIGN KEY photoId REFERENCES photoTable(photoId)
+			FORIEGN KEY likeId REFERENCES users(userId)
+			FOREIGN KEY photoId REFERENCES photos(photoId)
 		)`
 
 		commentTable := `CREATE TABLE comments (
@@ -124,8 +124,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			userId VARCHAR(11) NOT NULL,
 			photoId VARCHAR(11) NOT NULL,
 			body TEXT,
-			FOREIGN KEY userId REFERENCES userTable(userId),
-			FOREIGN KEY photoId REFERENCES photoTable(photoId)
+			FOREIGN KEY userId REFERENCES users(userId),
+			FOREIGN KEY photoId REFERENCES photos(photoId)
 		)`
 
 		//TODO this would be executed one by one with dedicated errors probably
