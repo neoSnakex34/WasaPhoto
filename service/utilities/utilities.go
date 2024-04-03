@@ -9,7 +9,7 @@ import (
 func GenerateIdentifier (actor char) (structs.Identifier, nil) {
 	const len = 9 
 	const validChars = "0123456789"
-	var actorChar;
+	var actorChar string;
 
 	switch actor {
 		case 'U':
@@ -34,7 +34,7 @@ func GenerateIdentifier (actor char) (structs.Identifier, nil) {
 		randomChunk[i] = validChars[rand.Intn(len(validChars))]
 	}
 
-	randomStringChunk string = string(randomChunk)
+	randomStringChunk := string(randomChunk)
 	
 	generatedId := Identifier[ identifier: '@'+ actorChar + randomStringChunk]
 	
