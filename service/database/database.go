@@ -84,7 +84,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		// change integer with text or something like that to match regex pattern 
 		userTable := `CREATE TABLE users (
 			UserId VARCHAR(11) NOT NULL PRIMARY KEY,
-			Username VARCHAR(18) NOT NULL UNIQUE//TODO remember to check elsewhere for the username to be unique
+			Username VARCHAR(18) NOT NULL UNIQUE
 		
 			)`
 				//TODO is it all?
@@ -95,13 +95,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 		followerTable := `CREATE TABLE followers (
 			followerId VARCHAR(11) NOT NULL PRIMARY KEY,
 			followedId VARCHAR(11) NOT NULL,
-			FOREIGN KEY followerId REFERENCES userTable(userId),
+			FOREIGN KEY (followerId, followedId) REFERENCES userTable(userId, userId),
 		)`
 		
 		bansTable := `CREATE TABLE bans (
 			bannerId VARCHAR(11) NOT NULL PRIMARY KEY,
 			bannedId VARCHAR(11) NOT NULL,
-			FOREIGN KEY bannerId REFERENCES userTable(userId),	
+			FOREIGN KEY (bannerId, bannedId) REFERENCES userTable(userId, userId),	
 		)`
 
 		photoTable := `CREATE TABLE photos (
