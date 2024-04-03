@@ -34,6 +34,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
@@ -81,16 +82,16 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='user';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		// change integer with text or something like that to match regex pattern 
+		// change integer with text or something like that to match regex pattern
 		userTable := `CREATE TABLE users (
-			UserId VARCHAR(11) NOT NULL PRIMARY KEY,
-			Username VARCHAR(18) NOT NULL UNIQUE
+			userId VARCHAR(11) NOT NULL PRIMARY KEY,
+			username VARCHAR(18) NOT NULL UNIQUE
 		
 			)`
-				//TODO is it all?
-				// add photo counte and followercounter probably 
-		
-		//followerid will be a userid  
+		//TODO is it all?
+		// add photo counte and followercounter probably
+
+		//followerid will be a userid
 		//TODO check if that's correct
 		followerTable := `CREATE TABLE followers (
 			followerId VARCHAR(11) NOT NULL,
@@ -99,7 +100,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY followerId REFERENCES users(userId),
 			FOREIGN KEY followedId REFERENCES users(userId)
 		)`
-		
+
 		bansTable := `CREATE TABLE bans (
 			bannerId VARCHAR(11) NOT NULL,
 			bannedId VARCHAR(11) NOT NULL,
@@ -115,7 +116,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			date TEXT, 
 			FOREIGN KEY userId REFERENCES users(userId)
 		)`
-		
+
 		likeTable := `CREATE TABLE likes (
 			likeId VARCHAR(11) NOT NULL PRIMARY KEY,
 			photoId VARCHAR(11) NOT NULL,
@@ -135,9 +136,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 		//TODO this would be executed one by one with dedicated errors probably
 		//TODO check if i need to check for errors even here (function returns error if something goes wrong)
 		runCreateQueries(db, userTable, followerTable, bansTable, photoTable, likeTable, commentTable)
-		
-	}
 
+	}
 
 	return &appdbimpl{
 		c: db,
@@ -158,4 +158,3 @@ func runCreateQueries(db *sql.DB, queries ...string) error {
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
 }
-
