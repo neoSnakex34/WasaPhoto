@@ -1,6 +1,5 @@
 
-package Utilities
-
+package main
 //main to test utilities .go
 import "fmt"
 func main() {
