@@ -33,12 +33,13 @@ package database
 import (
 	"database/sql"
 	"errors"
-
+	"fmt"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
 // AppDatabase is the high level interface for the DB
 // methods are exported ones, hence they are written with capital first letter
+// TODO modify the methods to match the requirements
 type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)
 
