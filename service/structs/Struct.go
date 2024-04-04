@@ -46,6 +46,7 @@ type Photo struct {
 type Comment struct {
 	commentId Identifier `json:"commentId"`
 	userId    Identifier `json:"userId"`
+	photoId   Identifier `json:"photoId"`
 	body      string     `json:"body"`
 	date      string     `json:"date"`
 	//TODO manage others

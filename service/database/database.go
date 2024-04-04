@@ -128,7 +128,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			commentId VARCHAR(11) NOT NULL PRIMARY KEY,
 			userId VARCHAR(11) NOT NULL,
 			photoId VARCHAR(11) NOT NULL,
-			body TEXT,
+			body TEXT, 
+			date TEXT,
 			FOREIGN KEY userId REFERENCES users(userId),
 			FOREIGN KEY photoId REFERENCES photos(photoId)
 		)`

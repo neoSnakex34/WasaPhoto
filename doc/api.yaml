@@ -631,7 +631,10 @@ components:
 
         userId:
           $ref: "#/components/schemas/Identifier"
-
+        
+        photoId: 
+          $ref: "#/components/schemas/Identifier"
+          
         body:
           description: body of the comment
           type: string
