@@ -37,7 +37,7 @@ func (db *appdbimpl) checkUserExists(username structs.UserName) (bool, structs.I
 }
 
 // TODO generalize for any id
-func (db *appdbimpl) validId(id structs.Identifier) (bool, err) {
+func (db *appdbimpl) validId(id structs.Identifier) (bool, error) {
 
 	var count int
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE userId = ?`, id).Scan(&count)
@@ -72,22 +72,20 @@ func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, err
 			return userId, nil
 
 		} else if exist == false {
-
+			//loop until a valid user or error is found
 			for (idIsValid == false) && (err == nil) {
 				idIsValid, err = db.validId(userId)
+				//TODO warning with this assegnation, it could break all
 				tmpId, _ := utilities.GenerateIdentifier("U") //here error can be ignored since we are automatically using a valid actor
 				userId = tmpId
 			}
 
 			if err != nil {
 				return structs.Identifier{}, err
-			} else {
-				return userId, nil
-
 			}
-
 		}
 
 	}
+	return userId, nil
 
 }
