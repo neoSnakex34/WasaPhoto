@@ -61,7 +61,7 @@ type AppDatabase interface {
 	LikePhoto(photoId structs.Identifier) error
 	UnlikePhoto(photoId structs.Identifier) error
 
-	//TODO consider adding methods to exract info from structs
+	// TODO consider adding methods to exract info from structs
 
 	Ping() error
 }
@@ -88,11 +88,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 			username VARCHAR(18) NOT NULL UNIQUE
 		
 			)`
-		//TODO is it all?
+		// TODO is it all?
 		// add photo counte and followercounter probably
 
-		//followerid will be a userid
-		//TODO check if that's correct
+		// followerid will be a userid
+		// TODO check if that's correct
 		followerTable := `CREATE TABLE followers (
 			followerId VARCHAR(11) NOT NULL,
 			followedId VARCHAR(11) NOT NULL,
@@ -133,8 +133,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY photoId REFERENCES photos(photoId)
 		)`
 
-		//TODO this would be executed one by one with dedicated errors probably
-		//TODO check if i need to check for errors even here (function returns error if something goes wrong)
+		// TODO this would be executed one by one with dedicated errors probably
+		// TODO check if i need to check for errors even here (function returns error if something goes wrong)
 		runCreateQueries(db, userTable, followerTable, bansTable, photoTable, likeTable, commentTable)
 
 	}
