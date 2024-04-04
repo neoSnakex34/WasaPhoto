@@ -8,25 +8,49 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/utilities"
 )
 
-func checkUserExists(username structs.UserName) (bool, structs.Identifier,  error) {
-	var userInTable bool; 
-	var id structs.Identifier = structs.Identifier{}
+//TODO i dont think that using errors to mask others is a good idea in debugging
+//implement those only if you did enough testing
+//var LoginError = errors.New("an error occured during login")
+
+// TODO generalize for any id MAYBE
+func (db *appdbimpl) checkUserExists(username structs.UserName) (bool, structs.Identifier, error) {
+	var userInTable bool
+	var userId structs.Identifier = structs.Identifier{}
+	var id string
 	// first we check if user is in the database querying his row (given that username is unique)
-	err := db.c.QueryRow("SELECT userId FROM users WHERE username = ?", username).Scan(&userId)
-	
+	err := db.c.QueryRow("SELECT userId FROM users WHERE username = ?", username).Scan(&id)
+
 	if errors.Is(err, sql.ErrNoRows) {
 		userInTable = false
 		err = nil //else it will fail control in next function, very important to be checked !
 
 	} else if err != nil {
-		return false, id, err
+		return false, userId, err
 	} else {
-		//TODO this could be prone to bugs, if something goes south check it out 
+		//so the user exist
+		//TODO this could be prone to bugs, if something goes south check it out
 		userInTable = true
-		id = structs.Identifier{Id: id}
+		userId = structs.Identifier{Id: id}
 	}
 
-	return userInTable, id, nil
+	return userInTable, userId, nil
+}
+
+// TODO generalize for any id
+func (db *appdbimpl) validId(id structs.Identifier) (bool, err) {
+
+	var count int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE userId = ?`, id).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	if count == 0 {
+		return false, nil
+	}
+
+	return true, nil
+
 }
 
 func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, error) {
@@ -34,59 +58,35 @@ func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, err
 	var userId structs.Identifier
 	idIsValid := false
 
-	exist, userId, err := checkUserExists(username)
+	exist, userId, err := db.checkUserExists(username)
 
 	//if any error is found i return it (TODO handle)
 	if err != nil {
+		//check if you need to throw the login error or not
 		return structs.Identifier{}, err
+
 	} else {
-		//else if the user exist i have to login 
+		//else if the user exist i have to login
 		if exist == true {
+			//login
 			return userId, nil
-			//login 
+
 		} else if exist == false {
-			//create new user
-			//loop until a valid userId is generated
-		}
 
-	}
+			for (idIsValid == false) && (err == nil) {
+				idIsValid, err = db.validId(userId)
+				tmpId, _ := utilities.GenerateIdentifier("U") //here error can be ignored since we are automatically using a valid actor
+				userId = tmpId
+			}
 
-	// qui dopo devi togliere tutto 
-	if errors.Is(err, sql.ErrNoRows) {
-
-		for idIsValid == false{
-			//then user does not exist on the system
-			//we need to create a new user
-			userId, err = utilities.GenerateIdentifier("U")
 			if err != nil {
 				return structs.Identifier{}, err
+			} else {
+				return userId, nil
+
 			}
 
-			var count int
-			//check if id is unique (valid)
-			err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE userId = ?`, userId).Scan(&count)
-			//TODO print this count anywhere to check if it is working
-			if err != nil{
-				if errors.Is(err, sql.ErrNoRows) {
-				//the id was not found
-				//we can insert the new user
-				//TODO INSERT USER
-				} else {
-					return structs.Identifier{}, err
-				}
-			
-			}else{
-				//the id was found
-				//we need to generate a new one
-				//log this on console for statistic purposes on collisions 
-				//TODO make this thing an extern function to loop until a valid userId is generated
-			
-			}
 		}
-
-	} 
-
-
 
 	}
 
