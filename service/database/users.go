@@ -90,8 +90,7 @@ func (db *appdbimpl) SetMyUserName(newUsername structs.UserName, userId structs.
 			return err
 
 		case "U":
-			// TODO update
-			_, err := db.c.Exec("INTO users (username, userId) VALUES (?, ?)", newUsername, userId)
+			_, err := db.c.Exec(`UPDATE users SET username = ? WHERE userId = ?`, newUsername, userId)
 			return err
 		default:
 			return errors.New("error in parsing mode or invalid mode for userame operation")
