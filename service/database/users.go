@@ -10,7 +10,7 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/utilities"
 )
 
-//T ODO i dont think that using errors to mask others is a good idea in debugging
+// TODO i dont think that using errors to mask others is a good idea in debugging
 // implement those only if you did enough testing
 // var LoginError = errors.New("an error occured during login")
 
@@ -48,7 +48,7 @@ func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, err
 
 			// here i actually create the user by setting is username in N mode
 			// setting username for the first time is part of the action of generating the userId
-			// that it has been verified in the for (while) loop on line 79
+			// that it has been verified in the for (while) loop on line 38
 			db.SetMyUserName(username, userId, "N")
 		}
 
@@ -105,8 +105,7 @@ func (db *appdbimpl) SetMyUserName(newUsername structs.UserName, userId structs.
 
 // TODO getmystream and getmyuserprofile
 
-// ========== private func
-
+// ========== private functions from here
 func (db *appdbimpl) createUser(username structs.UserName, userId structs.Identifier) error {
 
 	_, err := db.c.Exec("INSERT INTO users (username, userId) VALUES (?, ?)", username, userId)
