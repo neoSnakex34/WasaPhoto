@@ -8,7 +8,6 @@ import (
 	"errors"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
-	"github.com/neoSnakex34/WasaPhoto/service/utilities"
 )
 
 // TODO i dont think that using errors to mask others is a good idea in debugging
@@ -39,7 +38,7 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 			for (idIsValid == false) && (err == nil) {
 				idIsValid, err = db.validId(userId, "U")
 				// TODO warning with this assignation, it could break everything
-				tmpId, _ := utilities.GenerateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
+				tmpId, _ := GenerateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
 				userId = tmpId.Id
 			}
 
