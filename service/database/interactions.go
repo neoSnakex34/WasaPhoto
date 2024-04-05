@@ -15,7 +15,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 	var isValidId bool = false
 	// photoId and userId are already verified when firstly created, note that unmasking the use of a function like this
-	// may led to some serious bugs if someone manages to use CommentPhoto with an invalid id
+	// may lead to some serious bugs if someone manages to use CommentPhoto with an invalid id
 	var newCommentId structs.Identifier
 	var err error
 
@@ -35,6 +35,13 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	// TODO keep the date inference after the validId loop
 	commentDate := time.Now().Format(time.RFC3339)
 
+	// insert comment in db
+	_, err = db.c.Exec(`INSERT INTO comments (commentId, userId, photoId, body, date) VALUES (?, ?, ?, ?, ?)`, newCommentId.Id, requestorUserId.Id, commentedPhotoId.Id, body, commentDate)
+
+	if err != nil {
+		return structs.Comment{}, err
+	}
+
 	newComment := structs.Comment{
 		CommentId: newCommentId,
 		UserId:    requestorUserId,
@@ -43,4 +50,14 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 		Date:      commentDate,
 	}
 	return newComment, nil
+}
+
+func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
+
+	// TODO check if you need to filter who can do it
+	_, err := db.c.Exec(`DELETE FROM comments WHERE commentId = ?`, commentId.Id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -42,14 +42,14 @@ import (
 // AppDatabase is the high level interface for the DB
 // methods are exported ones, hence they are written with capital first letter
 type AppDatabase interface {
-	DoLogin(username string) (structs.Identifier, error)
+	DoLogin(username string) (structs.Identifier, error) // done
 	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
-	SetMyUserName(newUsername string, userId string, mode string) error
+	SetMyUserName(newUsername string, userId string, mode string) error // done
 
 	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
 
-	FollowUser(userId structs.Identifier) error
-	UnfollowUser(userId structs.Identifier) error
+	FollowUser(userId structs.Identifier, followedId structs.Identifier) error   // done
+	UnfollowUser(userId structs.Identifier, followerId structs.Identifier) error // done
 
 	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error
 	UnbanUser(userId structs.Identifier) error
