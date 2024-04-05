@@ -38,14 +38,14 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
+// FIXME change signatures to match implemented ones, check openapi for consistency
 // AppDatabase is the high level interface for the DB
 // methods are exported ones, hence they are written with capital first letter
-// TODO modify the methods to match the requirements
 type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)
-
 	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
-	SetMyUserName(username string) error
+	SetMyUserName(newUsername string, userId string, mode string) error
+
 	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
 
 	FollowUser(userId structs.Identifier) error
@@ -56,8 +56,10 @@ type AppDatabase interface {
 
 	UploadPhoto(file structs.PhotoFile) (structs.Photo, error)
 	RemovePhoto(photoId structs.Identifier) error
+
 	CommentPhoto(photoId structs.Identifier, commentBody structs.Comment) error
 	UncommentPhoto(photoId structs.Identifier, commentId structs.Identifier) error
+
 	LikePhoto(photoId structs.Identifier) error
 	UnlikePhoto(photoId structs.Identifier) error
 
