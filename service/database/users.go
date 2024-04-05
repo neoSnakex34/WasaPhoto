@@ -1,7 +1,8 @@
 package database
 
 // FIXME most likely everything inside a struct must be unpacked to be used successfully in queries, i have to handle it
-
+// TODO the fixme just above was checked and now everything i use except return statement in dologin is a plain string (instead of a wrapper struct)
+// doing such thing is useful in queries but since those structs are useful
 import (
 	"database/sql"
 	"errors"
@@ -14,9 +15,9 @@ import (
 // implement those only if you did enough testing
 // var LoginError = errors.New("an error occured during login")
 
-func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, error) {
+func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 
-	var userId structs.Identifier
+	var userId string
 	idIsValid := false
 
 	exist, userId, err := db.checkUserExists(username)
@@ -30,16 +31,16 @@ func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, err
 		// else if the user exist i have to login
 		if exist == true {
 			// login
-			return userId, nil
+			return structs.Identifier{Id: userId}, nil
 
 		} else if exist == false {
 
 			// loop until a valid user or error is found
 			for (idIsValid == false) && (err == nil) {
-				idIsValid, err = db.validId(userId)
-				// TODO warning with this assegnation, it could break everything
+				idIsValid, err = db.validId(userId, "U")
+				// TODO warning with this assignation, it could break everything
 				tmpId, _ := utilities.GenerateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
-				userId = tmpId
+				userId = tmpId.Id
 			}
 
 			if err != nil {
@@ -53,11 +54,11 @@ func (db *appdbimpl) DoLogin(username structs.UserName) (structs.Identifier, err
 		}
 
 	}
-	return userId, nil
+	return structs.Identifier{Id: userId}, nil
 
 }
 
-func (db *appdbimpl) SetMyUserName(newUsername structs.UserName, userId structs.Identifier, mode string) error {
+func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode string) error {
 
 	// TODO all this cheks must be lowercase, also i need an efficient way to loop over errors till
 	// a valid name pops up
@@ -105,33 +106,16 @@ func (db *appdbimpl) SetMyUserName(newUsername structs.UserName, userId structs.
 // TODO getmystream and getmyuserprofile
 
 // ========== private functions from here
-func (db *appdbimpl) createUser(username structs.UserName, userId structs.Identifier) error {
+func (db *appdbimpl) createUser(username string, userId string) error {
 
 	_, err := db.c.Exec("INSERT INTO users (username, userId) VALUES (?, ?)", username, userId)
 	return err
 }
 
-// TODO maybe generalize for any id
-func (db *appdbimpl) validId(id structs.Identifier) (bool, error) {
-
-	var count int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE userId = ?`, id).Scan(&count)
-	if err != nil {
-		return false, err
-	}
-
-	if count == 0 {
-		return false, nil
-	}
-
-	return true, nil
-
-}
-
 // TODO generalize for any id MAYBE
-func (db *appdbimpl) checkUserExists(username structs.UserName) (bool, structs.Identifier, error) {
+func (db *appdbimpl) checkUserExists(username string) (bool, string, error) {
 	var userInTable bool
-	var userId structs.Identifier = structs.Identifier{}
+	// var userId structs.Identifier = structs.Identifier{}
 	var id string
 	// first we check if user is in the database querying his row (given that username is unique)
 	err := db.c.QueryRow(`SELECT userId FROM users WHERE username = ?`, username).Scan(&id)
@@ -141,13 +125,13 @@ func (db *appdbimpl) checkUserExists(username structs.UserName) (bool, structs.I
 		err = nil // else it will fail control in next function, very important to be checked !
 
 	} else if err != nil {
-		return false, userId, err
+		return false, id, err
 	} else {
 		// so the user exist
-		// TODO this could be prone to bugs, if something goes south check it out
+		// todo this could be prone to bugs, if something goes south check it out
 		userInTable = true
-		userId = structs.Identifier{Id: id}
+		// userId = structs.Identifier{Id: id}
 	}
 
-	return userInTable, userId, nil
+	return userInTable, id, nil
 }

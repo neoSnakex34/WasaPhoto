@@ -6,7 +6,9 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// IMPORTANT likeid = linkingUser;
+// IMPORTANT likeid = userid of linkingUser;
+
+// ======= verification operations
 
 // ======= comments operations
 func (db *appdbimpl) CommentPhoto(photoId structs.Identifier, userId structs.Identifier) (structs.Comment, error) {
