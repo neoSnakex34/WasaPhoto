@@ -4,7 +4,7 @@ info:
   description: |
     API specification for WASAPhoto, University project
     for web and software architecture course. 
-  version: 0.2.1
+  version: 1.0.0
 
 servers:
   - url: http://localhost:8090
@@ -337,7 +337,7 @@ paths:
         content:
           application/json:
             schema: 
-              $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/CommentBody"
             
       responses:
         '201':
@@ -619,7 +619,15 @@ components:
 
         photoBytes:
           $ref: "#/components/schemas/PhotoFile"
-          
+         
+    CommentBody: 
+      description: body of the comment
+      type: string
+      minLength: 1
+      maxLength: 400
+      pattern: '^.*?$'
+      example: "nice one bro"
+
     Comment:
       title: comment
       description: a comment on a photo
@@ -636,12 +644,7 @@ components:
           $ref: "#/components/schemas/Identifier"
           
         body:
-          description: body of the comment
-          type: string
-          minLength: 1
-          maxLength: 400
-          pattern: '^.*?$'
-          example: "nice one bro"
+          $ref: "#/components/schemas/CommentBody"
 
         date:
           description: date of the comment
