@@ -51,14 +51,14 @@ type AppDatabase interface {
 	FollowUser(userId structs.Identifier, followedId structs.Identifier) error   // done
 	UnfollowUser(userId structs.Identifier, followerId structs.Identifier) error // done
 
-	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error
-	UnbanUser(userId structs.Identifier) error
+	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error // done
+	UnbanUser(userId structs.Identifier) error                              // done
 
 	UploadPhoto(file structs.PhotoFile) (structs.Photo, error)
 	RemovePhoto(photoId structs.Identifier) error
 
-	CommentPhoto(photoId structs.Identifier, commentBody structs.Comment) error
-	UncommentPhoto(photoId structs.Identifier, commentId structs.Identifier) error
+	CommentPhoto(photoId structs.Identifier, commentBody structs.Comment) error    // done
+	UncommentPhoto(photoId structs.Identifier, commentId structs.Identifier) error // done
 
 	LikePhoto(photoId structs.Identifier) error
 	UnlikePhoto(photoId structs.Identifier) error

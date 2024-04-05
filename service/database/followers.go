@@ -27,6 +27,7 @@ func (db *appdbimpl) FollowUser(userId structs.Identifier, followerdId structs.I
 		return errors.New("user is already followed")
 	}
 
+	println("user successfully followed")
 	return nil
 }
 

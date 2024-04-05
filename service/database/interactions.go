@@ -8,8 +8,6 @@ import (
 
 // IMPORTANT likeid = userid of linkingUser;
 
-// ======= verification operations
-
 // ======= comments operations
 func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) {
 
@@ -61,3 +59,5 @@ func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
 	}
 	return nil
 }
+
+// ======= likes operations
