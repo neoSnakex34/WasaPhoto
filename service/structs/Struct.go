@@ -14,8 +14,9 @@ type UserProfile struct {
 	FollowerCounter  uint32     `json:"followersCounter"`
 	FollowingCounter uint32     `json:"followingCounter"`
 	PhotoCounter     uint32     `json:"photoCounter"`
-	//TODO absolutely manage this
-	BannedUsers []UserName `json:"bannedUsers"`
+	//TODO absolutely manage this in openapi
+	UploadedPhotos []Photo    `json:"uploadedPhotos"`
+	BannedUsers    []UserName `json:"bannedUsers"`
 }
 
 type User struct {

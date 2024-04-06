@@ -8,11 +8,12 @@ import (
 )
 
 func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error {
+
 	var counter int
 	var err error
 
 	// check if user is arleady banned
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		err = db.addBan(bannerId.Id, bannedId.Id)
@@ -32,6 +33,7 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 }
 
 func (db *appdbimpl) UnbanUser(bannerId, bannedId structs.Identifier) error {
+
 	_, err := db.c.Exec("DELETE FROM bans WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId)
 	if err != nil {
 		return err

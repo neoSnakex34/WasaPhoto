@@ -42,9 +42,9 @@ import (
 // AppDatabase is the high level interface for the DB
 // methods are exported ones, hence they are written with capital first letter
 type AppDatabase interface {
-	DoLogin(username string) (structs.Identifier, error) // done
+	DoLogin(username string) (structs.Identifier, error) // done // TODO wrap string in identifier ecc and use accessory funcs
 	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
-	SetMyUserName(newUsername string, userId string, mode string) error // done
+	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
 
 	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
 
@@ -57,11 +57,11 @@ type AppDatabase interface {
 	UploadPhoto(file structs.PhotoFile) (structs.Photo, error)
 	RemovePhoto(photoId structs.Identifier) error
 
-	CommentPhoto(photoId structs.Identifier, commentBody structs.Comment) error    // done
-	UncommentPhoto(photoId structs.Identifier, commentId structs.Identifier) error // done
+	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) // done
+	UncommentPhoto(commentId structs.Identifier) error                                                                          // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done
 
-	LikePhoto(photoId structs.Identifier) error
-	UnlikePhoto(photoId structs.Identifier) error
+	LikePhoto(userId structs.Identifier, photoId structs.Identifier) error
+	UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error
 
 	// TODO consider adding methods to exract info from structs
 
@@ -120,7 +120,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		)`
 
 		likeTable := `CREATE TABLE likes (
-			likeId VARCHAR(11) NOT NULL PRIMARY KEY,
+			likerId VARCHAR(11) NOT NULL PRIMARY KEY,
 			photoId VARCHAR(11) NOT NULL,
 			FORIEGN KEY likeId REFERENCES users(userId)
 			FOREIGN KEY photoId REFERENCES photos(photoId)
