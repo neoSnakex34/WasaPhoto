@@ -11,6 +11,7 @@ import (
 // IMPORTANT likeid = userid of linkingUser;
 
 // ======= comments operations
+// FIXME add comments to comments list in photo struct
 func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) {
 
 	var isValidId bool = false

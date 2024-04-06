@@ -275,16 +275,16 @@ paths:
         content:
           image/png: 
             schema: 
-              $ref: "#/components/schemas/Photo"
+              $ref: "#/components/schemas/PhotoFile"
         required: true
 
       responses:
         '201':
-          description: photo uploaded succesfully
+          description: photo uploaded succesfully, returns the photoId
           content:
             application/json:
               schema:
-                #TODO if it works manage to return photoid
+                # TODO if it works manage to return photoid, not sure if is a good idea
                 $ref: "#/components/schemas/Photo"
         '400':
           $ref:
@@ -344,7 +344,9 @@ paths:
           description: comment left succesfully
           content:
             application/json:
-              schema: 
+              schema:
+                # FIXME shold i return the commentId?
+                # check the backend 
                 $ref: "#/components/schemas/Comment"
         '400':
           $ref:

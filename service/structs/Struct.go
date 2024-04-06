@@ -27,9 +27,9 @@ type User struct {
 
 }
 
-type PhotoFile struct {
-	PhotoByteStream []byte `json:"photoByteStream"`
-}
+// type PhotoFile struct {
+// 	PhotoByteStream []byte `json:"photoByteStream"`
+// }
 
 type Photo struct {
 	PhotoId  Identifier `json:"photoId"`
@@ -40,8 +40,8 @@ type Photo struct {
 	//TODO consider manage type of date time here or convert/parse it later from string and viceversa
 	//kinda prone to errors so would be preferred to use a specific type here probably, maybe using a struct
 	//with a string and a time.Time field
-	Date       string    `json:"date"`
-	PhotoBytes PhotoFile `json:"photoBytes"`
+	Date       string `json:"date"`
+	PhotoBytes []byte `json:"photoBytes"`
 }
 
 type Comment struct {

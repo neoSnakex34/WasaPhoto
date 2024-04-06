@@ -1,6 +1,6 @@
 package database
 
-// TODO generaliziong validId may have led to a series of bugs in users.go, is anything is broken go check dependencies
+// [ ] generaliziong validId may have led to a series of bugs in users.go, is anything is broken go check dependencies
 // between the two files
 
 import (
@@ -33,7 +33,7 @@ func GenerateIdentifier(actor string) (structs.Identifier, error) {
 	}
 
 	if actorChar == "E" {
-		return structs.Identifier{}, errors.New("Provided invalid actor type string") //TODO handle where needed to be handled
+		return structs.Identifier{}, errors.New("Provided invalid actor type string") // [ ] handle where needed to be handled
 	}
 
 	rand.Seed(time.Now().UnixNano())

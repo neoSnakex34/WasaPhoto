@@ -54,16 +54,14 @@ type AppDatabase interface {
 	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error // done
 	UnbanUser(userId structs.Identifier) error                              // done
 
-	UploadPhoto(file structs.PhotoFile) (structs.Photo, error)
+	UploadPhoto(file []byte, uploaderUserId structs.Identifier) (structs.Photo, error)
 	RemovePhoto(photoId structs.Identifier) error
 
 	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) // done
 	UncommentPhoto(commentId structs.Identifier) error                                                                          // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done
 
-	LikePhoto(userId structs.Identifier, photoId structs.Identifier) error
-	UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error
-
-	// TODO consider adding methods to exract info from structs
+	LikePhoto(userId structs.Identifier, photoId structs.Identifier) error   // done
+	UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error // done
 
 	Ping() error
 }
@@ -90,7 +88,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			username VARCHAR(18) NOT NULL UNIQUE
 		
 			)`
-		// TODO is it all?
+		// TODO is it all for users?
 		// add photo counte and followercounter probably
 
 		// followerid will be a userid
@@ -114,7 +112,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		photoTable := `CREATE TABLE photos (
 			photoId VARCHAR(11) NOT NULL PRIMARY KEY, 
 			userId VARCHAR(11) NOT NULL, 
-			photo BLOB, 
+			photoPath TEXT, 
 			date TEXT, 
 			FOREIGN KEY userId REFERENCES users(userId)
 		)`
@@ -151,6 +149,7 @@ func runCreateQueries(db *sql.DB, queries ...string) error {
 	for _, query := range queries {
 		_, err := db.Exec(query)
 
+		// TODO change this
 		if err != nil {
 			return fmt.Errorf("error creating database table: %w", err)
 		}
