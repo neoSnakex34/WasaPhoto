@@ -576,7 +576,7 @@ components:
 
         #TODO decide wether or not include a list of banned users
         
-
+    # FIXME check consistency here
     PhotoFile:
       title: photoFile 
       description: the actual file of the photo, as a stream of bytes 
