@@ -42,10 +42,10 @@ import (
 // AppDatabase is the high level interface for the DB
 // methods are exported ones, hence they are written with capital first letter
 type AppDatabase interface {
-	DoLogin(username string) (structs.Identifier, error) // done // TODO wrap string in identifier ecc and use accessory funcs
-	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
+	DoLogin(username string) (structs.Identifier, error)                // done // TODO wrap string in identifier ecc and use accessory funcs
 	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
 
+	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
 	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
 
 	FollowUser(userId structs.Identifier, followedId structs.Identifier) error   // done
@@ -54,8 +54,8 @@ type AppDatabase interface {
 	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error // done
 	UnbanUser(userId structs.Identifier) error                              // done
 
-	UploadPhoto(file []byte, uploaderUserId structs.Identifier) (structs.Photo, error)
-	RemovePhoto(photoId structs.Identifier) error
+	UploadPhoto(file []byte, uploaderUserId structs.Identifier) (structs.Photo, error) // done
+	RemovePhoto(photoId structs.Identifier) error                                      // done
 
 	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) // done
 	UncommentPhoto(commentId structs.Identifier) error                                                                          // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done

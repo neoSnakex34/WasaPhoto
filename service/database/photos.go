@@ -1,23 +1,26 @@
 package database
 
 import (
+	"os"
 	"time"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-const path string = "photofiles/"
+const Folder string = "photofiles/"
 
 // generate the identifier for the photo
 // save the photofile path in the database
 // save the photo in the database and create a new photo struct
 // TODO decide when to use photostruct and comment struct in interactions
+// FIXME will fronted give backend uploadphoto the file as a byte stream?
 func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier) (structs.Photo, error) {
 
 	var isValidId bool = false
 	var newPhotoId structs.Identifier
 	var err error
-
+	var photoPath string
+	var uploaderId string = upoloaderUserId.Id
 	// generate a new photo valid id
 	for isValidId == false && err == nil {
 
@@ -30,8 +33,10 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		return structs.Photo{}, err
 	}
 
+	photoPath = folder + uploaderId + "/" + newPhotoId.Id + ".jpg"
+
 	// FIRST save the photo file in the filesystem
-	err = db.savePhotoFile(file)
+	err = savePhotoFile(file, photoPath)
 	if err != nil {
 		return structs.Photo{}, err
 	}
@@ -44,7 +49,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		Like:      0,                   // defaults not saved in the database
 		Comments:  []structs.Comment{}, // defaults not saved in the database
 		Date:      date,
-		PhotoPath: path + newPhotoId.Id + ".jpg",
+		PhotoPath: photoPath,
 		// PhotoBytes: file,
 	}
 
@@ -57,13 +62,38 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	return newPhoto, nil
 }
 
-func (db *appdbimpl) savePhotoFile(file []byte) error {
+func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error {
+	removedPhotoId := photoId.Id
+	removerUserId := userId.Id
+	photoPath := folder + removerUserId + "/" + removedPhotoId + ".jpg"
+	var err error
+	err = db.removePhotoFromTable(removedPhotoId)
+	if err != nil {
+		return err
+	}
+	err = deletePhotoFile(photoPath)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
+func savePhotoFile(file []byte, path string) error {
+	err := os.WriteFile(path, file, 0644) // permission may fail on linux but since this is distributed via docker it should be fine
+	return err
+}
+
+func deletePhotoFile(path string) error {
+	err := os.Remove(path)
+	return err
+}
+
+func (db *appdbimpl) removePhotoFromTable(photoId string) error {
+	_, err := db.c.Exec(`DELETE FROM photos WHERE photoId = ?`, photoId)
+	return err
 }
 
 func (db *appdbimpl) insertPhotoInTable(photoId string, userId string, date string, path string) error {
-
 	_, err := db.c.Exec(`INSERT INTO photos (photoId, userId, photoPath, date) VALUES (?, ?, ?, ?)`, photoId, userId, path, date)
 	return err
-
 }

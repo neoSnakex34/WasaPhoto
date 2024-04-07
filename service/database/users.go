@@ -6,6 +6,8 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"os"
+	"path/filepath"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
@@ -103,6 +105,45 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 }
 
 // TODO getmystream and getmyuserprofile
+// FIXME when removing, adding photos and folloerts counters should be updated
+// probably i can add a refreshUserProfile function that updates all the counters
+func (db *appdbimpl) GetUserProfile(userId structs.Identifier) (structs.UserProfile, error) {
+
+	id := userId.Id
+	var username string
+	var followerCounter int
+	var followingCounter int
+	var photoCounter int
+
+	// [ ] add photo list
+	var photoList []string
+
+	usernameQuery := `SELECT username FROM users WHERE userId = ?`
+	followerCounterQuery := `SELECT COUNT(*) FROM followers WHERE followedId = ?`
+	followingCounterQuery := `SELECT COUNT(*) FROM followers WHERE followerId = ?`
+
+	err := db.retriveProfileQueries(usernameQuery, followerCounterQuery, followingCounterQuery)
+	if err != nil {
+		return structs.UserProfile{}, err
+	}
+
+	// photo count via os directory counter
+	photoCounter, photoList, err = getPhotoCountAndList(id)
+	if err != nil {
+		return structs.UserProfile{}, err
+	}
+
+	profileRetrieved := structs.UserProfile{
+		UserId:           userId,
+		Username:         username,
+		FollowerCounter:  followerCounter,
+		FollowingCounter: followingCounter,
+		PhotoCounter:     photoCounter,
+		UploadedPhotos:   photoList,
+	}
+
+	return profileRetrieved, nil
+}
 
 // ========== private functions from here
 func (db *appdbimpl) createUser(username string, userId string) error {
@@ -133,4 +174,31 @@ func (db *appdbimpl) checkUserExists(username string) (bool, string, error) {
 	}
 
 	return userInTable, id, nil
+}
+
+func (db *appdbimpl) retriveProfileQueries(queries ...string) error {
+	for _, query := range queries {
+		_, err := db.c.Exec(query)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func getPhotoCountAndList(userId string) (int, []string, error) {
+	path := Folder + userId + "/"
+	photoFsDirs, err := os.ReadDir(path)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	photoCount := len(photoFsDirs)
+
+	var photoList []string
+	for _, photo := range photoFsDirs {
+		photoList = append(photoList, filepath.Join(path, photo.Name()))
+	}
+
+	return photoCount, photoList, nil
 }

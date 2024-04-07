@@ -574,6 +574,7 @@ components:
           minimum: 0
           example: 336
 
+        # TODO add a list of photos 
         #TODO decide wether or not include a list of banned users
         
     # FIXME check consistency here
@@ -582,6 +583,7 @@ components:
       description: the actual file of the photo, as a stream of bytes 
       type: string
       format: binary
+      # TODO this constraint does not apply on backend yet
       minLength: 1
       maxLength: 1048576 #binary 10 megs (2 power of 20),  probably need to add a control for larger images
     

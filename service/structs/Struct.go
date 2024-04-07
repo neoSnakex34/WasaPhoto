@@ -4,19 +4,19 @@ type Identifier struct {
 	Id string `json:"identifier"`
 }
 
-type UserName struct {
-	PlainUsername string `json:"username"`
-}
+// type UserName struct {
+// 	PlainUsername string `json:"username"`
+// }
 
 type UserProfile struct {
 	UserId           Identifier `json:"userId"`
-	Username         UserName   `json:"username"`
-	FollowerCounter  uint32     `json:"followersCounter"`
-	FollowingCounter uint32     `json:"followingCounter"`
-	PhotoCounter     uint32     `json:"photoCounter"`
+	Username         string     `json:"username"`
+	FollowerCounter  int        `json:"followersCounter"`
+	FollowingCounter int        `json:"followingCounter"`
+	PhotoCounter     int        `json:"photoCounter"`
 	//TODO absolutely manage this in openapi
-	UploadedPhotos []Photo    `json:"uploadedPhotos"`
-	BannedUsers    []UserName `json:"bannedUsers"`
+	UploadedPhotos []string `json:"uploadedPhotos"` // list of paths to photos
+	// BannedUsers    []UserName `json:"bannedUsers"`
 }
 
 type User struct {
