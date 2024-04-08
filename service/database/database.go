@@ -46,7 +46,7 @@ type AppDatabase interface {
 	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
 
 	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error) // done
-	GetMyStream(userId structs.Identifier) ([]string, error)               // decide wether to return list of paths or list of photos structs
+	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)        // decide wether to return list of paths or list of photos structs
 
 	FollowUser(userId structs.Identifier, followedId structs.Identifier) error   // done
 	UnfollowUser(userId structs.Identifier, followerId structs.Identifier) error // done

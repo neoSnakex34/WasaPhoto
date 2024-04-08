@@ -2,6 +2,7 @@ package database
 
 import (
 	"os"
+	"sort"
 	"time"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
@@ -41,7 +42,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		return structs.Photo{}, err
 	}
 
-	date := time.Now().Format(time.RFC3339)
+	date := time.Now().UTC().Format(time.RFC3339)
 	// SECONDLY create the photo struct
 	newPhoto := structs.Photo{
 		PhotoId: newPhotoId,
@@ -67,7 +68,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error {
 	removedPhotoId := photoId.Id
 	removerUserId := userId.Id
-	// TODO for now the control on user right in removing photo is done elsewhere
+	// TODO for now the control on user right in removing photo is done elsewhere e.g. via frontend (must handle it in backend)
 	// FIXME remember to handle it
 	photoPath := Folder + removerUserId + "/" + removedPhotoId + ".jpg"
 	var err error
@@ -150,13 +151,24 @@ func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]str
 		tmpPhotos = append(tmpPhotos, photos)
 	}
 
-	// now stream will be a plain list of photos (no list of lists)
+	// now stream will be an unsorted plain list of photos (no list of lists)
 	for _, tmpList := range tmpPhotos {
 		stream = append(stream, tmpList...)
 	}
 
 	// sort stream by date, i need to parse date with Time type
 	// TODO
+	sort.SliceStable(stream, func(i int, j int) bool {
+		// FIXME should probably handle errors here
+		// decide in debugging whether or not enabling error
+		// handling here
+		date1, _ := time.Parse(time.RFC3339, stream[i].Date)
+		date2, _ := time.Parse(time.RFC3339, stream[j].Date)
 
-	return nil, nil
+		return date1.Before(date2)
+
+	})
+	// CHECK if stream is sorted and err is actually nil then return err and not nil
+	return stream, nil
+
 }

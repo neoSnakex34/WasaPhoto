@@ -34,7 +34,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	}
 
 	// TODO keep the date inference after the validId loop
-	commentDate := time.Now().Format(time.RFC3339)
+	commentDate := time.Now().UTC().Format(time.RFC3339)
 
 	err = db.addComment(newCommentId.Id, requestorUserId.Id, commentedPhotoId.Id, body, commentDate)
 	// insert comment in db

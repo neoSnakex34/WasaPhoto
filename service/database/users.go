@@ -146,7 +146,7 @@ func (db *appdbimpl) GetUserProfile(userId structs.Identifier) (structs.UserProf
 }
 
 // TODO sort photosbydate
-func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]string, error) {
+func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, error) {
 
 	// first i obtain a followerlist
 	var followerIdList []string
@@ -155,11 +155,14 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]string, error) {
 		return nil, err
 	}
 
-	// using the follower list i run queries to get the photo paths list
-	// i will do this in a getStreamInfo function, here i wikl
-	var photoPathList []string
+	streamOfPhotoStructs, err := db.getSortedStreamOfPhotos(followerIdList)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	// photo struct will be returned, in order to use it in frontend i need to parse the path
+	// and retrieve the actual photo
+	return streamOfPhotoStructs, nil
 }
 
 // ========== private functions from here
