@@ -45,17 +45,17 @@ type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)                // done // TODO wrap string in identifier ecc and use accessory funcs
 	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
 
-	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error)
-	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)
+	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error) // done
+	GetMyStream(userId structs.Identifier) ([]string, error)               // decide wether to return list of paths or list of photos structs
 
 	FollowUser(userId structs.Identifier, followedId structs.Identifier) error   // done
 	UnfollowUser(userId structs.Identifier, followerId structs.Identifier) error // done
 
-	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error // done
-	UnbanUser(userId structs.Identifier) error                              // done
+	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error           // done
+	UnbanUser(bannerUserId structs.Identifier, bannedUserId structs.Identifier) error // done
 
 	UploadPhoto(file []byte, uploaderUserId structs.Identifier) (structs.Photo, error) // done
-	RemovePhoto(photoId structs.Identifier) error                                      // done
+	RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error           // done
 
 	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) // done
 	UncommentPhoto(commentId structs.Identifier) error                                                                          // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done
@@ -97,8 +97,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			followerId VARCHAR(11) NOT NULL,
 			followedId VARCHAR(11) NOT NULL,
 			PRIMARY KEY (followerId, followedId),
-			FOREIGN KEY followerId REFERENCES users(userId),
-			FOREIGN KEY followedId REFERENCES users(userId)
+			FOREIGN KEY (followerId) REFERENCES users(userId),
+			FOREIGN KEY (followedId) REFERENCES users(userId)
 		)`
 
 		bansTable := `CREATE TABLE bans (
@@ -114,14 +114,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 			userId VARCHAR(11) NOT NULL, 
 			photoPath TEXT, 
 			date TEXT, 
-			FOREIGN KEY userId REFERENCES users(userId)
+			FOREIGN KEY (userId) REFERENCES users(userId)
 		)`
 
 		likeTable := `CREATE TABLE likes (
 			likerId VARCHAR(11) NOT NULL PRIMARY KEY,
 			photoId VARCHAR(11) NOT NULL,
-			FORIEGN KEY likeId REFERENCES users(userId)
-			FOREIGN KEY photoId REFERENCES photos(photoId)
+			FORIEGN KEY (likeId) REFERENCES users(userId)
+			FOREIGN KEY (photoId) REFERENCES photos(photoId)
 		)`
 
 		commentTable := `CREATE TABLE comments (
@@ -130,8 +130,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 			photoId VARCHAR(11) NOT NULL,
 			body TEXT, 
 			date TEXT,
-			FOREIGN KEY userId REFERENCES users(userId),
-			FOREIGN KEY photoId REFERENCES photos(photoId)
+			FOREIGN KEY (userId) REFERENCES users(userId),
+			FOREIGN KEY (photoId) REFERENCES photos(photoId)
 		)`
 
 		// TODO this would be executed one by one with dedicated errors probably

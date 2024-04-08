@@ -32,7 +32,7 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 
 }
 
-func (db *appdbimpl) UnbanUser(bannerId, bannedId structs.Identifier) error {
+func (db *appdbimpl) UnbanUser(bannerId structs.Identifier, bannedId structs.Identifier) error {
 
 	_, err := db.c.Exec("DELETE FROM bans WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId)
 	if err != nil {

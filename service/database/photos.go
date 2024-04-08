@@ -33,7 +33,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		return structs.Photo{}, err
 	}
 
-	photoPath = folder + uploaderId + "/" + newPhotoId.Id + ".jpg"
+	photoPath = Folder + uploaderId + "/" + newPhotoId.Id + ".jpg"
 
 	// FIRST save the photo file in the filesystem
 	err = savePhotoFile(file, photoPath)
@@ -62,10 +62,14 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	return newPhoto, nil
 }
 
+// [ ] check you built the path correctly
+// maybe add a little func to build it
 func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error {
 	removedPhotoId := photoId.Id
 	removerUserId := userId.Id
-	photoPath := folder + removerUserId + "/" + removedPhotoId + ".jpg"
+	// TODO for now the control on user right in removing photo is done elsewhere
+	// FIXME remember to handle it
+	photoPath := Folder + removerUserId + "/" + removedPhotoId + ".jpg"
 	var err error
 	err = db.removePhotoFromTable(removedPhotoId)
 	if err != nil {
@@ -96,4 +100,13 @@ func (db *appdbimpl) removePhotoFromTable(photoId string) error {
 func (db *appdbimpl) insertPhotoInTable(photoId string, userId string, date string, path string) error {
 	_, err := db.c.Exec(`INSERT INTO photos (photoId, userId, photoPath, date) VALUES (?, ?, ?, ?)`, photoId, userId, path, date)
 	return err
+}
+
+// TODO complete me
+func (db *appdbimpl) getStreamPhotoListForUser(followerIdsForUser []string) ([]string, error) {
+	// for each follower i should retrieve a (photopath, date) in order to build the stream
+	// since i will need to sort the stream by date, i should return a complex struct instead of []string
+	// and the access datas
+
+	return nil, nil
 }

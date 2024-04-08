@@ -58,3 +58,27 @@ func (db *appdbimpl) removeFollow(followerId string, followedId string) error {
 	_, err := db.c.Exec(`DELETE FROM followers WHERE followerId = ? AND followedId = ?`, followerId, followedId)
 	return err
 }
+
+// [ ] improve and test this
+func (db *appdbimpl) getFollowerList(followedId string) ([]string, error) {
+
+	var followerList []string
+	var followerId string
+	rows, err := db.c.Query(`SELECT followerId FROM followers WHERE followedId = ?`, followedId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+
+		err = rows.Scan(&followerId)
+		if err != nil {
+			return nil, err
+		}
+		followerList = append(followerList, followerId)
+	}
+
+	return followerList, nil
+
+}

@@ -145,6 +145,22 @@ func (db *appdbimpl) GetUserProfile(userId structs.Identifier) (structs.UserProf
 	return profileRetrieved, nil
 }
 
+// TODO sort photosbydate
+func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]string, error) {
+
+	// first i obtain a followerlist
+	var followerIdList []string
+	followerIdList, err := db.getFollowerList(userId.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// using the follower list i run queries to get the photo paths list
+	var photoPathList []string
+
+	return nil, nil
+}
+
 // ========== private functions from here
 func (db *appdbimpl) createUser(username string, userId string) error {
 

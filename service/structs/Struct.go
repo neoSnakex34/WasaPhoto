@@ -21,7 +21,7 @@ type UserProfile struct {
 
 type User struct {
 	UserId   Identifier `json:"userId"`
-	Username UserName   `json:"username"`
+	Username string     `json:"username"`
 
 	//TODO manage following
 
