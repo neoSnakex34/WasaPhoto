@@ -156,6 +156,7 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]string, error) {
 	}
 
 	// using the follower list i run queries to get the photo paths list
+	// i will do this in a getStreamInfo function, here i wikl
 	var photoPathList []string
 
 	return nil, nil

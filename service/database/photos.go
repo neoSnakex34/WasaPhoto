@@ -44,10 +44,10 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	date := time.Now().Format(time.RFC3339)
 	// SECONDLY create the photo struct
 	newPhoto := structs.Photo{
-		PhotoId:   newPhotoId,
-		UserId:    upoloaderUserId,
-		Like:      0,                   // defaults not saved in the database
-		Comments:  []structs.Comment{}, // defaults not saved in the database
+		PhotoId: newPhotoId,
+		UserId:  upoloaderUserId,
+		// Like:      0,                   // defaults not saved in the database
+		// Comments:  []structs.Comment{}, // defaults not saved in the database
 		Date:      date,
 		PhotoPath: photoPath,
 		// PhotoBytes: file,
@@ -102,11 +102,61 @@ func (db *appdbimpl) insertPhotoInTable(photoId string, userId string, date stri
 	return err
 }
 
+func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string) ([]structs.Photo, error) {
+	var photos []structs.Photo
+	var userId string = plainUploaderId
+	var photoId string
+	var date string
+	var photoPath string
+
+	// query to retrieve info
+	rows, err := db.c.Query(`SELECT photoId, userId, date, photoPath FROM photos WHERE userId = ?`, plainUploaderId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		// user id is the same for all photos at every call, but for now is re assigned
+		err = rows.Scan(&photoId, &userId, &date, &photoPath)
+		if err != nil {
+			return nil, err
+		}
+		photo := structs.Photo{
+			PhotoId:   structs.Identifier{Id: photoId},
+			UserId:    structs.Identifier{Id: userId},
+			Date:      date,
+			PhotoPath: photoPath,
+		}
+		photos = append(photos, photo)
+	}
+
+	return photos, err
+}
+
 // TODO complete me
-func (db *appdbimpl) getStreamPhotoListForUser(followerIdsForUser []string) ([]string, error) {
-	// for each follower i should retrieve a (photopath, date) in order to build the stream
+func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]structs.Photo, error) { // TODO Note it returns a stream of photos, that needs to be displayed by obtaining info from the structs
+	// for each follower i should retrieve a (photo slice) in order to build the stream
 	// since i will need to sort the stream by date, i should return a complex struct instead of []string
 	// and the access datas
+
+	var stream []structs.Photo
+	var tmpPhotos [][]structs.Photo
+	for _, followerId := range followerIdsForUser {
+		photos, err := db.getPhotosByUploaderId(followerId)
+		if err != nil {
+			return nil, err
+		}
+		tmpPhotos = append(tmpPhotos, photos)
+	}
+
+	// now stream will be a plain list of photos (no list of lists)
+	for _, tmpList := range tmpPhotos {
+		stream = append(stream, tmpList...)
+	}
+
+	// sort stream by date, i need to parse date with Time type
+	// TODO
 
 	return nil, nil
 }

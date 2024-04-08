@@ -32,10 +32,10 @@ type User struct {
 // }
 
 type Photo struct {
-	PhotoId  Identifier `json:"photoId"`
-	UserId   Identifier `json:"userId"`
-	Like     int        `json:"like"`
-	Comments []Comment  `json:"comments"`
+	PhotoId Identifier `json:"photoId"`
+	UserId  Identifier `json:"userId"`
+	// Like     int        `json:"like"`
+	// Comments []Comment  `json:"comments"`
 
 	//TODO consider manage type of date time here or convert/parse it later from string and viceversa
 	//kinda prone to errors so would be preferred to use a specific type here probably, maybe using a struct
@@ -51,4 +51,9 @@ type Comment struct {
 	Body      string     `json:"body"`
 	Date      string     `json:"date"`
 	//TODO manage others
+}
+
+type StreamInfo struct {
+	PhotoPaths []string
+	Date       string
 }
