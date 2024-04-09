@@ -324,7 +324,7 @@ paths:
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
       - $ref: "#/components/parameters/commentId"
-    put: 
+    post: 
       security:
         - bearerAuth: []
       tags:
@@ -380,7 +380,7 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
-
+  # userId will be the liker
   /users/photos/{photoId}/likes/{userId}:
     parameters:
       - $ref: "#/components/parameters/photoId"     
