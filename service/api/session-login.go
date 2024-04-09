@@ -23,6 +23,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	// should i check it here?
 	defer r.Body.Close()
 
+	// TODO handle bad request
 	userId, err := rt.db.DoLogin(username)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

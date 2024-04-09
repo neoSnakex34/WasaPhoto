@@ -100,7 +100,7 @@ paths:
       tags: 
         - User 
       summary: change the username
-      description: used to update the userneme of the current user logged in  
+      description: used to update the userneme or setting it for the current user logged in  
       operationId: setMyUserName
       requestBody:
         description: new username to replace old one 
