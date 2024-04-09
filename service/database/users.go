@@ -15,7 +15,7 @@ import (
 // TODO i dont think that using errors to mask others is a good idea in debugging
 // implement those only if you did enough testing
 // var LoginError = errors.New("an error occured during login")
-
+// FIXME log error in console in order to unmask badrequest ecc in apis
 func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 
 	var userId string

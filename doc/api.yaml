@@ -54,10 +54,11 @@ paths:
           content:
             application/json:
               schema: 
-                #TODO check if i can return the userId here if needed
                 $ref: "#/components/schemas/User" 
         #Do i need other responses? 
-  #TODO manage paths 
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+
 
   /users/{userId}/profile: 
     get: 
