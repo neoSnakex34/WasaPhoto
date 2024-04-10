@@ -87,10 +87,12 @@ paths:
           $ref: "#/components/responses/NotFound"
         '500': 
           $ref: "#/components/responses/InternalServerError"
-
+    
+  # FIXME use put for updating and return 201 and post for creating and return 200
+  # this should be modified in service too if you decide to do it
   /users/{userId}/username:
   
-    description: username specific field of the user, can be set 
+    description: username specific field of the user, can be set or updated
     parameters:
       - $ref: "#/components/parameters/userId"
       
@@ -103,7 +105,7 @@ paths:
       description: used to update the userneme or setting it for the current user logged in  
       operationId: setMyUserName
       requestBody:
-        description: new username to replace old one 
+        description: a username to be set
         required: true
         content:
           text/plain:
@@ -111,12 +113,13 @@ paths:
               $ref: "#/components/schemas/UserName"
 
       responses:
-        '200':
-          description: username changed succesfully
-          content: 
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/User"
+        '204':
+          description: username set succesfully
+          # description: username changed succesfully
+          # content: 
+          #   application/json:
+          #     schema: 
+          #       $ref: "#/components/schemas/User"
 
         '400':
           $ref: "#/components/responses/BadRequest"

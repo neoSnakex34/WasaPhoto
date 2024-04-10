@@ -88,6 +88,7 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 		case "N":
 			// this could probably be the worst design i could ever imagine
 			// TODO evaluate if fixing it is worth the effort
+			// this creates the user in db
 			err := db.createUser(newUsername, userId)
 			return err
 
