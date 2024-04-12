@@ -12,7 +12,8 @@ import (
 func applyCORSHandler(h http.Handler) http.Handler {
 	return handlers.CORS(
 		handlers.AllowedHeaders([]string{
-			//TODO check if you need different headers
+			// TODO check if you need different headers
+			// as on april 2024 you actually don't
 			"content-type", "authorization",
 		}),
 		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}),
