@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"regexp"
 
@@ -24,21 +25,41 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r http.Request, ps httpr
 	// check if user is allowed
 	authorization := r.Header.Get("Authorization")
 	if userId != authorization {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 
-	// retrieve username from body
+	var newUsername string
 
-	// check new username is valid (unicity will be checked in db)
+	// retrieve username from body
+	err := json.NewDecoder(r.Body).Decode(&newUsername)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	// [x]check new username is valid (unicity will be checked in db, is it a good idea? )
+	if !checkRegexNewUsername(newUsername) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// now call db to set username
+	err = rt.db.SetMyUserName(newUsername, userId, "U")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occurred during db calls in setting username: ", err)
+		return
+	}
 
 }
 
-func checkRegexNewUsername(username string) (bool, error) {
+func checkRegexNewUsername(username string) bool {
 	usernameRegex := "^[a-z0-9]*?$"
 	matched, err := regexp.MatchString(usernameRegex, username)
 	if err != nil {
-		return false, err
+		return false
 	}
-	return matched, nil
+	return matched
 }
