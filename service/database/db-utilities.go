@@ -57,13 +57,17 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	// FIXME since single char are unicode byte
 	// even if i am sure that those are utf8 1byte chars
 	// it is probably better to check them using the appropriate comparator
+	println("id: ", id)
+	// FIXME this is a check thhat works only if the id already exists
+	// if mode != "N" {
+	// 	var idMode string = string(id[1])
 
-	var idMode string = string(id[1])
+	// 	// first check is modecheck is mode is matched we proceed else we abort
+	// 	if idMode != mode {
+	// 		return false, invalidIdMode
+	// 	}
 
-	// first check is modecheck is mode is matched we proceed else we abort
-	if idMode != mode {
-		return false, invalidIdMode
-	}
+	// }
 
 	var count int
 	var err error = nil

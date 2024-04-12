@@ -22,39 +22,49 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	idIsValid := false
 
 	exist, userId, err := db.checkUserExists(username)
-
+	println("user exist: ", exist)
 	// if any error is found i return it (TODO handle)
 	if err != nil {
 		// check if you need to throw the login error or not
 		return structs.Identifier{}, err
+	}
 
-	} else {
-		// else if the user exist i have to login
-		if exist == true {
-			// login
-			return structs.Identifier{Id: userId}, nil
+	// else if the user exist i have to login
+	if exist {
+		// login
+		println("user exist!")
+		return structs.Identifier{Id: userId}, nil
 
-		} else if exist == false {
+	} else if !exist {
 
-			// loop until a valid user or error is found
-			for (idIsValid == false) && (err == nil) {
-				idIsValid, err = db.validId(userId, "U")
-				// TODO warning with this assignation, it could break everything
-				tmpId, _ := GenerateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
-				userId = tmpId.Id
-			}
+		// loop until a valid user or error is found
+		for (!idIsValid) && (err == nil) {
+			println("im here now // debugging")
+			idIsValid, err = db.validId(userId, "U")
 
-			if err != nil {
-				return structs.Identifier{}, err
-			}
+			// println("id: ", userId)
 
-			// here i actually create the user by setting is username in N mode
-			// setting username for the first time is part of the action of generating the userId
-			// that it has been verified in the for (while) loop on line 38
-			db.SetMyUserName(username, userId, "N")
+			// TODO warning with this assignation, it could break everything
+			tmpId, _ := GenerateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
+
+			// println("tmpId: ", tmpId.Id)
+
+			userId = tmpId.Id
+
+			// println("userId: ", userId)
 		}
 
+		if err != nil {
+			return structs.Identifier{}, err
+		}
+		println("im out")
+		// here i actually create the user by setting is username in N mode
+		// setting username for the first time is part of the action of generating the userId
+		// that it has been verified in the for (while) loop on line 38
+		println(userId, " ", username)
+		db.SetMyUserName(username, userId, "N")
 	}
+
 	return structs.Identifier{Id: userId}, nil
 
 }
@@ -63,6 +73,8 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 
 	// TODO all this cheks must be lowercase, also i need an efficient way to loop over errors till
 	// a valid name pops up
+
+	println("entered setmyusername")
 
 	var count int
 	var valid bool = false
@@ -73,7 +85,12 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	//  i check if newUsername is taken
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
 
-	if errors.Is(err, sql.ErrNoRows) && count == 0 {
+	println("err: ", err)
+
+	if count == 0 {
+
+		println("username is valid")
+
 		valid = true
 	} else {
 		if err != nil {
@@ -81,18 +98,19 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 		}
 	}
 
-	if valid == true {
+	if valid {
 
 		switch mode {
 
 		case "N":
-			// this could probably be the worst design i could ever imagine
-			// TODO evaluate if fixing it is worth the effort
-			// this creates the user in db
+
 			err := db.createUser(newUsername, userId)
 			return err
 
 		case "U":
+
+			println("updating username")
+
 			_, err := db.c.Exec(`UPDATE users SET username = ? WHERE userId = ?`, newUsername, userId)
 			return err
 		default:
@@ -170,6 +188,7 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, er
 func (db *appdbimpl) createUser(username string, userId string) error {
 
 	_, err := db.c.Exec("INSERT INTO users (username, userId) VALUES (?, ?)", username, userId)
+	println("user created")
 	return err
 }
 
