@@ -28,6 +28,8 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r http.Request, ps httpr
 		return
 	}
 
+	// retrieve username from body
+
 	// check new username is valid (unicity will be checked in db)
 
 }
