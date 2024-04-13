@@ -21,8 +21,8 @@ func (rt *_router) Handler() http.Handler {
 	// rt.router.GET("/users/:userId/stream", rt.wrap(rt.getMyStream))
 
 	// // ban related routes
-	// rt.router.PUT("/users/:userId/bans/:bannedId", rt.wrap(rt.banUser))
-	// rt.router.DELETE("/users/:userId/bans/:bannedId", rt.wrap(rt.unbanUser))
+	rt.router.PUT("/users/:userId/bans/:bannedId", rt.wrap(rt.banUser))
+	rt.router.DELETE("/users/:userId/bans/:bannedId", rt.wrap(rt.unbanUser))
 
 	// // follow related routes
 	rt.router.PUT("/users/:userId/follows/:followerId", rt.wrap(rt.followUser))

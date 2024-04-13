@@ -1,9 +1,7 @@
 package database
 
 import (
-	"database/sql"
-	"errors"
-
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
@@ -14,17 +12,18 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 
 	// check if user is arleady banned
 	err = db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
-	if errors.Is(err, sql.ErrNoRows) {
 
+	if err != nil {
+		return err
+	} else if counter > 0 {
+		return customErrors.ErrAlreadyBanned
+	} else if counter == 0 { // redundand check just to be paranoid
+		// here i ban
 		err = db.addBan(bannerId.Id, bannedId.Id)
-
 		if err != nil {
 			return err
 		}
-	} else if err != nil {
-		return err
-	} else {
-		return errors.New("user is already banned")
+
 	}
 
 	println("user successfully banned")
@@ -34,11 +33,20 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 
 func (db *appdbimpl) UnbanUser(bannerId structs.Identifier, bannedId structs.Identifier) error {
 
-	_, err := db.c.Exec("DELETE FROM bans WHERE bannerId = ? AND bannedId = ?", bannerId, bannedId)
+	var counter int
+	var err error
+	err = db.c.QueryRow(`COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
+
 	if err != nil {
 		return err
+	} else if counter == 0 {
+		return customErrors.ErrNotBanned
+	} else if counter > 0 {
+		err = db.removeBan(bannerId.Id, bannedId.Id)
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 

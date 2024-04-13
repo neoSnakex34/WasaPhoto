@@ -215,10 +215,10 @@ paths:
         '500':
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/bans/{bannedId}: 
+  /users/{userId}/bans/{bannerId}: 
     parameters:
       - $ref: "#/components/parameters/userId"
-      - $ref: "#/components/parameters/bannedId"
+      - $ref: "#/components/parameters/bannerId"
     
     put: 
       security:
@@ -240,6 +240,8 @@ paths:
             #JUMP BAN
         '400':
           $ref: "#/components/responses/BadRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
         '500':
           $ref: "#/components/responses/InternalServerError"
 
@@ -255,10 +257,11 @@ paths:
         responses: 
           '204':
             description: user unbanned succesfully
-          
           '400':
             $ref:
               "#/components/responses/BadRequest"
+          '403':
+            $ref: "#/components/responses/Forbidden"
           '500':
             $ref: "#/components/responses/InternalServerError"
 
@@ -483,8 +486,8 @@ components:
       in: path
       required: true
 
-    bannedId:
-      description: identifier for a banned user by user x 
+    bannerId:
+      description: identifier for a follower banning another  
       schema: 
         $ref: "#/components/schemas/Identifier"
       name: bannedId
