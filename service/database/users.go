@@ -90,8 +90,8 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	if count == 0 {
 
 		println("username is valid")
-
 		valid = true
+
 	} else {
 		if err != nil {
 			return err
