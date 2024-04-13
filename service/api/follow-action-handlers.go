@@ -47,7 +47,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while following user")
+		ctx.Logger.Error("an error occured while following user: ", err)
 		return
 	}
 
@@ -73,7 +73,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	authorization := r.Header.Get("Authorization")
 	if followerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
-		ctx.Logger.Error("user is not allowed to unfollow; probably due to a ban")
+		ctx.Logger.Error("user is not allowed to unfollow")
 		return
 	}
 
@@ -84,7 +84,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while unfollowing user")
+		ctx.Logger.Error("an error occured while unfollowing user: ", err)
 		return
 	}
 

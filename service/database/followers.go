@@ -1,15 +1,25 @@
 package database
 
 import (
+	"errors"
+
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-func (db *appdbimpl) FollowUser(userId structs.Identifier, followedId structs.Identifier) error {
+func (db *appdbimpl) FollowUser(followerId structs.Identifier, followedId structs.Identifier) error {
 	var counter int
-	var err error
+
 	// check if user is arleady followed by userId
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ? AND followedId = ?`, userId.Id, followedId.Id).Scan(&counter)
+	err := db.CheckBan(followedId.Id, followerId.Id) // opposite of following
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		println("user is banned cannot follow") // TODO log this in api
+		return err
+	} else if err != nil {
+		return err
+	}
+
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ? AND followedId = ?`, followerId.Id, followedId.Id).Scan(&counter)
 
 	println("counter: ", counter)
 
@@ -22,7 +32,7 @@ func (db *appdbimpl) FollowUser(userId structs.Identifier, followedId structs.Id
 	} else if counter == 0 {
 
 		// then is followable add a func addfollow
-		err = db.addFollow(userId.Id, followedId.Id)
+		err = db.addFollow(followerId.Id, followedId.Id)
 
 		if err != nil {
 			// if this is not hit it will return nil at end of function than user is succesfully
@@ -33,18 +43,26 @@ func (db *appdbimpl) FollowUser(userId structs.Identifier, followedId structs.Id
 	return nil                            // check if this can be nil
 }
 
-func (db *appdbimpl) UnfollowUser(followerId structs.Identifier, follwedId structs.Identifier) error {
+func (db *appdbimpl) UnfollowUser(followerId structs.Identifier, followedId structs.Identifier) error {
 	// check if user is actually followed by userId
 	var counter int
-	var err error
 
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ? AND followedId = ?`, followerId.Id, follwedId.Id).Scan(&counter)
+	// check if user is banned
+	err := db.CheckBan(followedId.Id, followerId.Id)
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		println("user is banned cannot unfollow") // TODO log this in api
+		return err
+	} else if err != nil {
+		return err
+	}
+
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ? AND followedId = ?`, followerId.Id, followedId.Id).Scan(&counter)
 	if err != nil {
 		return err
 	} else if counter == 0 {
 		return customErrors.ErrNotFollowing
 	} else {
-		err = db.removeFollow(followerId.Id, follwedId.Id)
+		err = db.removeFollow(followerId.Id, followedId.Id)
 	}
 
 	println("user successfully unfollowed") // TODO log this in api

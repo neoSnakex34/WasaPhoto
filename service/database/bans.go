@@ -35,7 +35,7 @@ func (db *appdbimpl) UnbanUser(bannerId structs.Identifier, bannedId structs.Ide
 
 	var counter int
 	var err error
-	err = db.c.QueryRow(`COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -65,3 +65,19 @@ func (db *appdbimpl) removeBan(bannerId string, bannedId string) error {
 
 // TODO probably need to add a function to check if a user is banned
 // when building core functionality decide it
+func (db *appdbimpl) CheckBan(bannerId string, bannedId string) error {
+	var counter int
+
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
+
+	println("in checkban counter: ", counter)
+
+	if err != nil {
+		return err
+	} else if counter == 0 {
+		return nil
+	} else if counter > 0 {
+		return customErrors.ErrIsBanned
+	}
+	return nil
+}

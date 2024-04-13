@@ -63,7 +63,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	authorization := r.Header.Get("Authorization")
 	if bannerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
-		ctx.Logger.Error("user is not allowed to unban") ]
+		ctx.Logger.Error("user is not allowed to unban")
 		// this could happen only if an unlogged user tries to unban someone
 		// cause frontend will encapsulate possibility of unbanning someone
 		// giving the possibility only to logged user
@@ -79,7 +79,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while unbanning user")
+		ctx.Logger.Error("an error occured while unbanning user: ", err)
 		return
 	}
 
