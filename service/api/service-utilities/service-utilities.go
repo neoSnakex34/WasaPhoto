@@ -1,4 +1,4 @@
-package utilityfunc
+package serviceutilities
 
 import "regexp"
 

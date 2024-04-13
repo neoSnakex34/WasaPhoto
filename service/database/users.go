@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 
+	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
@@ -86,13 +88,21 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
 
 	println("err: ", err)
+	matched := serviceutilities.CheckRegexNewUsername(newUsername)
 
-	if count == 0 {
+	if count == 0 && matched {
 
 		println("username is valid")
 		valid = true
 
 	} else {
+		if !matched {
+			err = customErrors.ErrInvalidRegexUsername
+			println("username is not valid", err)
+			return err
+		}
+
+		// if any other error occurred i return it
 		if err != nil {
 			return err
 		}
@@ -113,6 +123,7 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 
 			_, err := db.c.Exec(`UPDATE users SET username = ? WHERE userId = ?`, newUsername, userId)
 			return err
+
 		default:
 			return errors.New("error in parsing mode or invalid mode for userame operation")
 

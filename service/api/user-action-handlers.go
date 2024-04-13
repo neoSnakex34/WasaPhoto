@@ -6,7 +6,8 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
-	"github.com/neoSnakex34/WasaPhoto/service/api/utilityfunc"
+	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 )
 
 // stream username in U mode (in db it calls only for n mode) set and getprofile
@@ -50,9 +51,10 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	println("newUsername: ", newUsername)
 
 	// [x]check new username is valid (unicity will be checked in db, is it a good idea? )
-	if !utilityfunc.CheckRegexNewUsername(newUsername) {
+	if !serviceutilities.CheckRegexNewUsername(newUsername) {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("new username is not valid")
+		err = customErrors.ErrInvalidRegexUsername
+		ctx.Logger.Error("new username is not valid", err)
 		return
 	}
 	// TODO ERRORS if name exists
