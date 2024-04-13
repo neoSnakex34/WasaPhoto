@@ -53,7 +53,7 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	// [x]check new username is valid (unicity will be checked in db, is it a good idea? )
 	if !serviceutilities.CheckRegexNewUsername(newUsername) {
 		w.WriteHeader(http.StatusBadRequest)
-		err = customErrors.ErrInvalidRegexUsername
+		err = customErrors.ErrInvalidRegexUsername // this is done here and not in return of checkregexnewusername cause checkregexnewusername has bool as return
 		ctx.Logger.Error("new username is not valid", err)
 		return
 	}

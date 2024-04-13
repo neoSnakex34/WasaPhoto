@@ -150,7 +150,7 @@ paths:
             application/json:
               schema:
                 type: array
-                description: list of photos in the stream
+                description: list of photos in the stream #TODO change
                 items:
                   $ref: "#/components/schemas/Photo"
                 minItems: 0 
@@ -167,8 +167,8 @@ paths:
   /users/{userId}/followers/{followerId}: 
 
     parameters:
-      - $ref: "#/components/parameters/userId"
-      - $ref: "#/components/parameters/followerId"
+      - $ref: "#/components/parameters/userId" #followed by followerId
+      - $ref: "#/components/parameters/followerId" #followed 
       #TODO manage names and other attributes if necessary 
 
     put: 
@@ -209,6 +209,9 @@ paths:
         '400':
           $ref:
             "#/components/responses/BadRequest"
+        '403':
+          $ref: 
+            "#/components/responses/Forbidden"
         '500':
           $ref: "#/components/responses/InternalServerError"
 

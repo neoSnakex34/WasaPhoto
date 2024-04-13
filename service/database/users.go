@@ -64,6 +64,9 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		// setting username for the first time is part of the action of generating the userId
 		// that it has been verified in the for (while) loop on line 38
 		println(userId, " ", username)
+		// [ ] GIVEN that here will be called setMyUsername regex check will be done after generating id, it is not slow but neither is
+		// efficient or clean
+		// i should modify that
 		db.SetMyUserName(username, userId, "N")
 	}
 
