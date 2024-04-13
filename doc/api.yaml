@@ -267,10 +267,9 @@ paths:
 
     
   #return here
-  /users/{userId}/photos/{photoId}:
+  /users/{userId}/photos:
     parameters: 
       - $ref: "#/components/parameters/userId"
-      - $ref: "#/components/parameters/photoId"
     post: 
       security:
         - bearerAuth: []
@@ -295,7 +294,7 @@ paths:
             application/json:
               schema:
                 # TODO if it works manage to return photoid, not sure if is a good idea
-                $ref: "#/components/schemas/Photo"
+                $ref: "#/components/parameters/photoId"
         '400':
           $ref:
             "#/components/responses/BadRequest"
@@ -305,6 +304,11 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
+  /users/{userId}/photos/{photoId}:
+    parameters:
+      - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/photoId"
+      
     delete:
       security:
         - bearerAuth: []
@@ -328,12 +332,12 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/{userId}/photos/{photoId}/comments/{commentId}: 
+  /users/{userId}/photos/{photoId}/comments: 
     
     parameters: 
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
-      - $ref: "#/components/parameters/commentId"
+
     post: 
       security:
         - bearerAuth: []
@@ -367,6 +371,11 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
+  /users/{userId}/photos/{photoId}/comments/{commentId}:
+    parameters:
+      - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/photoId"
+      - $ref: "#/components/parameters/commentId"
 
     delete:
       security:
@@ -391,6 +400,7 @@ paths:
             "#/components/responses/InternalServerError"
 
   # userId will be the liker
+  # FIXME this is a bad design
   /users/photos/{photoId}/likes/{userId}:
     parameters:
       - $ref: "#/components/parameters/photoId"     
@@ -469,7 +479,6 @@ components:
   
   parameters:
   
-
     userId:
       description: identifier for a single user 
       schema: 
@@ -487,10 +496,10 @@ components:
       required: true
 
     bannerId:
-      description: identifier for a follower banning another  
+      description: identifier for a user banning another  
       schema: 
         $ref: "#/components/schemas/Identifier"
-      name: bannedId
+      name: bannerId
       in: path
       required: true
     
