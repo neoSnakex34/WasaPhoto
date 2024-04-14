@@ -11,7 +11,7 @@ import (
 )
 
 // TODO change this to be in home of user
-const Folder string = "./service/photofiles/"
+const Folder string = "/tmp/wasaphoto/photofiles/"
 
 // generate the identifier for the photo
 // save the photofile path in the database
