@@ -1,12 +1,12 @@
 package database
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"sort"
 	"time"
 
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
@@ -71,8 +71,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error {
 	removedPhotoId := photoId.Id
 	removerUserId := userId.Id
-	// TODO for now the control on user right in removing photo is done elsewhere e.g. via frontend (must handle it in backend)
-	// FIXME remember to handle it
+
 	approximatePhotoPath := Folder + removerUserId + "/" + removedPhotoId + ".*" // removes agnostically the image (without format) since ids are unique
 	matchingPhoto, err := filepath.Glob(approximatePhotoPath)
 	if err != nil {
@@ -80,11 +79,11 @@ func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Iden
 	}
 
 	if len(matchingPhoto) == 0 {
-		return os.ErrNotExist // TODO specialize it in PHOTO DOES NOT EXIST
+		return customErrors.ErrPhotoDoesNotExist
 	}
 
 	if len(matchingPhoto) > 1 {
-		return errors.New("multiple photos with the same id") // TODO customerror NOTE it is impossible this happens
+		return customErrors.ErrCriticDuplicatedId
 	}
 
 	photoPath := matchingPhoto[0]
@@ -100,10 +99,8 @@ func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Iden
 	return nil
 }
 
+// path will be the final path
 func savePhotoFile(file []byte, path string) error {
-
-	// path will be the final path
-
 	// retrieve the directory
 	dir := filepath.Dir(path)
 	// build the directory if it does not exist (it doesn't first time cause there will be a directory for every user)

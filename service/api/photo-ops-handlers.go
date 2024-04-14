@@ -2,19 +2,22 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
 	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
+// TODO test more and check this implementations
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	//TODO
 
-	userId := structs.Identifier{ps.ByName("userId")}
+	userId := structs.Identifier{Id: ps.ByName("userId")}
 
 	if userId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -29,7 +32,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// FIXME add a check for photofile dimension max 10meg
 	photoFile, err := io.ReadAll(r.Body)
 	if err != nil {
 		// [ ] check this and provide a better error
@@ -44,7 +46,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Error("photo file is not a valid image format")
 		return
 	}
-	println("format: ", format)
 
 	// check file size
 	var maxSize int = 1048576 // 2 power of 20 times 10
@@ -69,4 +70,38 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusCreated)
 	ctx.Logger.Info("photo uploaded successfully")
 	json.NewEncoder(w).Encode(photo.PhotoId.Id)
+}
+
+func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	photoId := structs.Identifier{Id: ps.ByName("photoId")}
+	userId := structs.Identifier{Id: ps.ByName("userId")}
+
+	if photoId.Id == "" || userId.Id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("photoId or userId has not been provided")
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+	if userId.Id != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed to delete photo")
+		return
+	}
+
+	err := rt.db.RemovePhoto(photoId, userId)
+
+	if errors.Is(err, customErrors.ErrPhotoDoesNotExist) {
+		w.WriteHeader(http.StatusNotFound)
+		ctx.Logger.Error("photo does not exist")
+		return
+	} else if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occured while deleting photo: ", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	ctx.Logger.Info("photo deleted successfully")
+
 }
