@@ -29,7 +29,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/:userId/follows/:followerId", rt.wrap(rt.unfollowUser))
 
 	// // photo related routes
-	// rt.router.POST("/users/:userId/photos/:photoId", rt.wrap(rt.uploadPhoto))
+	rt.router.POST("/users/:userId/photos", rt.wrap(rt.uploadPhoto))
 	// rt.router.DELETE("/users/:userId/photos/:photoId", rt.wrap(rt.deletePhoto))
 
 	// // comment related routes

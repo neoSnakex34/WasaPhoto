@@ -1,19 +1,20 @@
 package api
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
+	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	//TODO
-	var userId structs.Identifier // uploader user id
 
-	userId = structs.Identifier{ps.ByName("userId")}
+	userId := structs.Identifier{ps.ByName("userId")}
 
 	if userId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -37,14 +38,35 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	format, err := serviceutilities.CheckFileType(photoFile)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("photo file is not a valid image format")
+		return
+	}
+	println("format: ", format)
+
 	// check file size
-	var maxSize int = (2 ^ 20) * 10
+	var maxSize int = 1048576 // 2 power of 20 times 10
 	if len(photoFile) > maxSize {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("photo file is too big, max size is 10MB")
 		return
 	}
 
-	// TODO maybe check file type
+	// call db
+	photo, err := rt.db.UploadPhoto(photoFile, userId, format)
+	if err != nil {
+		// TODO check this error and log better
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occured while uploading photo: ", err)
+		return
+	}
+	// FIXME a whole photo with all details is returned, at the moment we only need the photoId
+	// probably needs to be changed
 
+	// return photoId
+	w.WriteHeader(http.StatusCreated)
+	ctx.Logger.Info("photo uploaded successfully")
+	json.NewEncoder(w).Encode(photo.PhotoId.Id)
 }

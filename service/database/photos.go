@@ -1,22 +1,25 @@
 package database
 
 import (
+	"errors"
 	"os"
+	"path/filepath"
 	"sort"
 	"time"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-const Folder string = "photofiles/"
+// TODO change this to be in home of user
+const Folder string = "./service/photofiles/"
 
 // generate the identifier for the photo
 // save the photofile path in the database
 // save the photo in the database and create a new photo struct
 // TODO decide when to use photostruct and comment struct in interactions
 // FIXME will fronted give backend uploadphoto the file as a byte stream?
-func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier) (structs.Photo, error) {
-
+func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) (structs.Photo, error) {
+	println(os.Getwd())
 	var isValidId bool = false
 	var newPhotoId structs.Identifier
 	var err error
@@ -34,7 +37,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		return structs.Photo{}, err
 	}
 
-	photoPath = Folder + uploaderId + "/" + newPhotoId.Id + ".jpg"
+	photoPath = Folder + uploaderId + "/" + newPhotoId.Id + "." + format
 
 	// FIRST save the photo file in the filesystem
 	err = savePhotoFile(file, photoPath)
@@ -70,8 +73,22 @@ func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Iden
 	removerUserId := userId.Id
 	// TODO for now the control on user right in removing photo is done elsewhere e.g. via frontend (must handle it in backend)
 	// FIXME remember to handle it
-	photoPath := Folder + removerUserId + "/" + removedPhotoId + ".jpg"
-	var err error
+	approximatePhotoPath := Folder + removerUserId + "/" + removedPhotoId + ".*" // removes agnostically the image (without format) since ids are unique
+	matchingPhoto, err := filepath.Glob(approximatePhotoPath)
+	if err != nil {
+		return err
+	}
+
+	if len(matchingPhoto) == 0 {
+		return os.ErrNotExist // TODO specialize it in PHOTO DOES NOT EXIST
+	}
+
+	if len(matchingPhoto) > 1 {
+		return errors.New("multiple photos with the same id") // TODO customerror NOTE it is impossible this happens
+	}
+
+	photoPath := matchingPhoto[0]
+
 	err = db.removePhotoFromTable(removedPhotoId)
 	if err != nil {
 		return err
@@ -84,7 +101,18 @@ func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Iden
 }
 
 func savePhotoFile(file []byte, path string) error {
-	err := os.WriteFile(path, file, 0644) // permission may fail on linux but since this is distributed via docker it should be fine
+
+	// path will be the final path
+
+	// retrieve the directory
+	dir := filepath.Dir(path)
+	// build the directory if it does not exist (it doesn't first time cause there will be a directory for every user)
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(path, file, 0644) // permission may fail on linux but since this is distributed via docker it should be fine
 	return err
 }
 
