@@ -90,6 +90,7 @@ func New(cfg Config) (Router, error) {
 type _router struct {
 	router *httprouter.Router
 
+	// [ ] remember to log with this things you now "log" with println
 	// baseLogger is a logger for non-requests contexts, like goroutines or background tasks not started by a request.
 	// Use context logger if available (e.g., in requests) instead of this logger.
 	baseLogger logrus.FieldLogger
