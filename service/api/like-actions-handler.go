@@ -18,6 +18,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// TODO handle banned like
 	authorization := r.Header.Get("Authorization")
 	if likerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
@@ -34,4 +35,33 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	w.WriteHeader(http.StatusOK)
 	ctx.Logger.Info("photo liked successfully")
+}
+
+func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	photoId := structs.Identifier{Id: ps.ByName("photoId")}
+	likerId := structs.Identifier{Id: ps.ByName("likerId")}
+
+	if photoId.Id == "" || likerId.Id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("photoId or likerId has not been provided")
+		return
+	}
+
+	// TODO handle banned unlike
+	authorization := r.Header.Get("Authorization")
+	if likerId.Id != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed to unlike photo") // not loggeed in
+		return
+	}
+
+	err := rt.db.UnlikePhoto(photoId, likerId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occured while unliking the photo: ", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	ctx.Logger.Info("photo unliked successfully")
 }

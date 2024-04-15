@@ -38,7 +38,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// // like related routes
 	rt.router.PUT("/users/:userId/photos/:photoId/likes/:likerId", rt.wrap(rt.likePhoto))
-	// rt.router.DELETE("/users/:userId/photos/:photoId/likes/:likerId", rt.wrap(rt.unlikePhoto))
+	rt.router.DELETE("/users/:userId/photos/:photoId/likes/:likerId", rt.wrap(rt.unlikePhoto))
 
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)

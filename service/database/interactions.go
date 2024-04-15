@@ -81,6 +81,7 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 	var err error
 
 	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
+	println("photo is liked: ", photoIsLiked)
 	if err == nil && !photoIsLiked {
 		// TODO add like
 		err = db.addLike(userId.Id, photoId.Id)
@@ -107,7 +108,7 @@ func (db *appdbimpl) UnlikePhoto(userId structs.Identifier, photoId structs.Iden
 	return err
 }
 func (db *appdbimpl) addLike(requestorUserId string, likedPhotoId string) error {
-	_, err := db.c.Exec(`INSERT INTO likes (likerId, photoId) VALUES (?, ?)`, likedPhotoId, requestorUserId)
+	_, err := db.c.Exec(`INSERT INTO likes (likerId, photoId) VALUES (?, ?)`, requestorUserId, likedPhotoId)
 	return err
 }
 

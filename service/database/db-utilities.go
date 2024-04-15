@@ -94,7 +94,7 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	return false, customErrors.ErrInvalidId
 }
 
-// FIXME where should i use it
+// Deprecated: this function will not probably be used
 func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
 	var plainUploaderId string
 	err := db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, photoId).Scan(&plainUploaderId)
