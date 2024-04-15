@@ -4,7 +4,7 @@ info:
   description: |
     API specification for WASAPhoto, University project
     for web and software architecture course. 
-  version: 1.0.0
+  version: 1.0.1
 
 servers:
   - url: http://localhost:8090
@@ -379,11 +379,12 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
-  /users/{userId}/photos/{photoId}/comments/{commentId}:
+  /users/{userId}/photos/{photoId}/comments/{commentingId}/{commentId}:
     parameters:
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
       - $ref: "#/components/parameters/commentId"
+      - $ref: "#/components/parameters/commentingId"
 
     delete:
       security:
