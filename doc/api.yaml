@@ -83,6 +83,8 @@ paths:
 
         '400':
           $ref: "#/components/responses/BadRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden" # if banned or no auth 
         '404':
           $ref: "#/components/responses/NotFound"
         '500': 
@@ -618,9 +620,17 @@ components:
           minimum: 0
           example: 336
 
-        # TODO add a list of photos 
-        #TODO decide wether or not include a list of banned users
+        photos: 
+          description: list of photos uploaded by the user
+          type: array
+          minItems: 0
+          maxItems: 20
+          items: 
+            $ref: "#/components/schemas/Photo"
         
+        # [ ] what about banned users should i something to retrieve them?
+
+
     # FIXME check consistency here
     PhotoFile:
       title: photoFile 

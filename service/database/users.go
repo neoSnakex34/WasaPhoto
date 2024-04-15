@@ -137,25 +137,42 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	return err
 }
 
-// TODO getmystream and getmyuserprofile
-// FIXME when removing, adding photos and folloerts counters should be updated
 // probably i can add a refreshUserProfile function that updates all the counters
-func (db *appdbimpl) GetUserProfile(userId structs.Identifier) (structs.UserProfile, error) {
+func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) {
 
-	id := userId.Id
+	id := profileUserId.Id
+	requestor := requestorUserId.Id
+	// check requestor banned by profile user
+	err := db.checkBan(id, requestor)
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		println("requestor is banned by user") // TODO log this in api
+		return structs.UserProfile{}, err
+	} else if err != nil {
+		return structs.UserProfile{}, err
+	}
+
 	var username string
 	var followerCounter int
 	var followingCounter int
 	var photoCounter int
 
-	// [ ] add photo list
+	// [x] add photo list
 	var photoList []string
 
-	usernameQuery := `SELECT username FROM users WHERE userId = ?`
-	followerCounterQuery := `SELECT COUNT(*) FROM followers WHERE followedId = ?`
-	followingCounterQuery := `SELECT COUNT(*) FROM followers WHERE followerId = ?`
+	// queries func
+	username, err = db.getUsernameByUserId(id)
+	if err != nil {
+		return structs.UserProfile{}, err
+	}
 
-	err := db.retriveProfileQueries(usernameQuery, followerCounterQuery, followingCounterQuery)
+	// follower count
+	followerCounter, err = db.getFollowersCounterByUserId(id)
+	if err != nil {
+		return structs.UserProfile{}, err
+	}
+
+	// following count
+	followingCounter, err = db.getFollowingCounterByUserId(id)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
@@ -167,7 +184,7 @@ func (db *appdbimpl) GetUserProfile(userId structs.Identifier) (structs.UserProf
 	}
 
 	profileRetrieved := structs.UserProfile{
-		UserId:           userId,
+		UserId:           profileUserId,
 		Username:         username,
 		FollowerCounter:  followerCounter,
 		FollowingCounter: followingCounter,
@@ -233,14 +250,22 @@ func (db *appdbimpl) checkUserExists(username string) (bool, string, error) {
 	return userInTable, id, nil
 }
 
-func (db *appdbimpl) retriveProfileQueries(queries ...string) error {
-	for _, query := range queries {
-		_, err := db.c.Exec(query)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+func (db *appdbimpl) getUsernameByUserId(plainUserId string) (string, error) {
+	var username string
+	err := db.c.QueryRow(`SELECT username FROM users WHERE userId = ?`, plainUserId).Scan(&username)
+	return username, err
+}
+
+func (db *appdbimpl) getFollowersCounterByUserId(plainUserId string) (int, error) {
+	var followers int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followedId = ?`, plainUserId).Scan(&followers)
+	return followers, err
+}
+
+func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error) {
+	var following int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ?`, plainUserId).Scan(&following)
+	return following, err
 }
 
 func getPhotoCountAndList(userId string) (int, []string, error) {

@@ -44,8 +44,8 @@ type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)                // done // TODO wrap string in identifier ecc and use accessory funcs
 	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
 
-	GetUserProfile(userId structs.Identifier) (structs.UserProfile, error) // done
-	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)        // decide wether to return list of paths or list of photos structs
+	GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) // done
+	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)                                                   // decide wether to return list of paths or list of photos structs
 
 	FollowUser(userId structs.Identifier, followedId structs.Identifier) error   // done
 	UnfollowUser(userId structs.Identifier, followerId structs.Identifier) error // done
@@ -87,11 +87,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			username VARCHAR(18) NOT NULL UNIQUE
 		
 			)`
-		// TODO is it all for users?
-		// add photo counte and followercounter probably
 
-		// followerid will be a userid
-		// TODO check if that's correct
 		followerTable := `CREATE TABLE followers (
 			followerId VARCHAR(11) NOT NULL,
 			followedId VARCHAR(11) NOT NULL,

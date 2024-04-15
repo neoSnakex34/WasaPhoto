@@ -17,7 +17,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:userId/username", rt.wrap(rt.setMyUsername))
 
 	// userProfile and stream related routes
-	// rt.router.GET("/users/:userId/profile", rt.wrap(rt.getUserProfile))
+	rt.router.GET("/users/:userId/profile", rt.wrap(rt.getUserProfile))
 	rt.router.GET("/users/:userId/stream", rt.wrap(rt.getMyStream))
 
 	// // ban related routes
@@ -34,6 +34,8 @@ func (rt *_router) Handler() http.Handler {
 
 	// // comment related routes
 	// userid is the uploader user id
+	// TODO custom header will ease this mess dunno if it is a good idea tho
+	// FIXME
 	rt.router.POST("/users/:userId/photos/:photoId/comments/:commentingId", rt.wrap(rt.commentPhoto))
 	rt.router.DELETE("/users/:userId/photos/:photoId/comments/:commentingId/:commentId", rt.wrap(rt.uncommentPhoto))
 

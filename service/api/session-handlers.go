@@ -39,6 +39,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 }
 
+// FIXME LIMIT DISPLAY TO 20 in db side or here, will ease frontend and respect api design
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := structs.Identifier{Id: ps.ByName("userId")}
@@ -69,5 +70,37 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusOK)
 	ctx.Logger.Info("stream retrieved")
 	json.NewEncoder(w).Encode(photos)
+
+}
+
+func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	requestorUserId := structs.Identifier{Id: r.Header.Get("Requestor")}
+	profileUserId := structs.Identifier{Id: ps.ByName("userId")}
+
+	if requestorUserId.Id == "" || profileUserId.Id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("one of the ids has not been provided")
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+	if requestorUserId.Id != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("userId cannot retrieve profile")
+		return
+	}
+
+	// TODO not found handle?
+
+	profile, err := rt.db.GetUserProfile(profileUserId, requestorUserId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	ctx.Logger.Info("profile retrieved")
+	json.NewEncoder(w).Encode(profile)
 
 }
