@@ -1,10 +1,10 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"time"
 
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
@@ -81,7 +81,7 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 	var err error
 
 	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
-	if err == nil && photoIsLiked == false {
+	if err == nil && !photoIsLiked {
 		// TODO add like
 		err = db.addLike(userId.Id, photoId.Id)
 		// if err now is nil will be returned nil at the end of the function
@@ -92,19 +92,22 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 
 func (db *appdbimpl) UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error {
 
-	var photoIsLiked bool
 	var err error
 
-	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
-	if err == nil && photoIsLiked == true {
-		// TODO remove like
+	liked, err := db.alreadyLiked(userId.Id, photoId.Id)
+	if errors.Is(err, customErrors.ErrPhotoAlreadyLikedByUser) && liked {
+
 		err = db.removeLike(userId.Id, photoId.Id)
+	} else if err != nil {
+		return err
+	} else if !liked {
+		return customErrors.ErrPhotoNotLikedByUser
 	}
+
 	return err
 }
-
 func (db *appdbimpl) addLike(requestorUserId string, likedPhotoId string) error {
-	_, err := db.c.Exec(`INSERT INTO likes (likerId, photoId) VALUES (?, ?)`, requestorUserId, likedPhotoId)
+	_, err := db.c.Exec(`INSERT INTO likes (likerId, photoId) VALUES (?, ?)`, likedPhotoId, requestorUserId)
 	return err
 }
 
@@ -115,16 +118,12 @@ func (db *appdbimpl) removeLike(requestorUserId string, likedPhotoId string) err
 
 func (db *appdbimpl) alreadyLiked(requestorUserId string, likedPhotoId string) (bool, error) {
 	var counter int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE userId = ? AND photoId = ?`, requestorUserId, likedPhotoId).Scan(&counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, requestorUserId, likedPhotoId).Scan(&counter)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-
-	} else if err == nil && counter > 0 {
-		return true, nil
+		return false, err
+	} else if counter > 0 {
+		return true, customErrors.ErrPhotoAlreadyLikedByUser
 	}
-
-	return false, err
+	return false, nil
 
 }

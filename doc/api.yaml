@@ -401,10 +401,11 @@ paths:
 
   # userId will be the liker
   # FIXME this is a bad design
-  /users/photos/{photoId}/likes/{userId}:
+  /users/{userId}/photos/{photoId}/likes/{likerId}:
     parameters:
       - $ref: "#/components/parameters/photoId"     
       - $ref: "#/components/parameters/userId"
+      - $ref: "#/components/parameters/likerId"
     
     put: 
       security:
@@ -423,6 +424,8 @@ paths:
             "#/components/responses/BadRequest"
         '403':
           $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: "#/components/responses/NotFound" 
         '500':
           $ref: 
             "#/components/responses/InternalServerError"
@@ -516,6 +519,14 @@ components:
       required: true
       in: path 
       description: identifier for a comment, used to retrieve comments
+      schema:
+        $ref: "#/components/schemas/Identifier"
+    
+    likerId:
+      name: likerId
+      required: true
+      in: path
+      description: identifier for a user that likes a photo (it represents the actual like)
       schema:
         $ref: "#/components/schemas/Identifier"
     

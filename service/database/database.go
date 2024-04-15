@@ -33,7 +33,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
@@ -80,7 +79,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	// start creating the AppDatabase if needed
 
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='user';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		// change integer with text or something like that to match regex pattern
 		userTable := `CREATE TABLE users (
@@ -118,10 +117,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 		)`
 
 		likeTable := `CREATE TABLE likes (
-			likerId VARCHAR(11) NOT NULL PRIMARY KEY,
+			likerId VARCHAR(11) NOT NULL,
 			photoId VARCHAR(11) NOT NULL,
-			FORIEGN KEY (likeId) REFERENCES users(userId)
+			FOREIGN KEY (likerId) REFERENCES users(userId)
 			FOREIGN KEY (photoId) REFERENCES photos(photoId)
+			PRIMARY KEY (likerId, photoId)
 		)`
 
 		commentTable := `CREATE TABLE comments (
@@ -147,11 +147,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 func runCreateQueries(db *sql.DB, queries ...string) error {
 	for _, query := range queries {
+		println("creating table: ", query)
 		_, err := db.Exec(query)
 
 		// TODO change this
 		if err != nil {
-			return fmt.Errorf("error creating database table: %w", err)
+			println("error creating table: ", query, err)
+			return err
 		}
 	}
 	return nil

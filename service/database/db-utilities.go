@@ -1,18 +1,15 @@
 package database
 
-// [ ] generaliziong validId may have led to a series of bugs in users.go, is anything is broken go check dependencies
+// [x] generaliziong validId may have led to a series of bugs in users.go, is anything is broken go check dependencies
 // between the two files
 
 import (
-	"errors"
 	"math/rand"
 	"time"
 
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
-
-var invalidIdMode = errors.New("invalid id mode")
-var invalidId = errors.New("invalid id")
 
 // as stated in api.yaml the identifier is a string of lenght 11 @X000000000
 // actor will be mode of the id (U P C)
@@ -33,7 +30,7 @@ func GenerateIdentifier(actor string) (structs.Identifier, error) {
 	}
 
 	if actorChar == "E" {
-		return structs.Identifier{}, errors.New("Provided invalid actor type string") // [ ] handle where needed to be handled
+		return structs.Identifier{}, customErrors.ErrInvalidIdMode
 	}
 
 	rand.Seed(time.Now().UnixNano())
@@ -68,7 +65,6 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	// 	}
 
 	// }
-
 	var count int
 	var err error = nil
 
@@ -84,7 +80,7 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 		err = db.c.QueryRow(`SELECT COUNT(*) FROM comments WHERE commentId = ?`, id).Scan(&count)
 
 	default:
-		err = invalidIdMode
+		err = customErrors.ErrInvalidIdMode
 	}
 
 	if err != nil {
@@ -95,6 +91,12 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 		return true, nil
 	}
 
-	return false, invalidId
+	return false, customErrors.ErrInvalidId
+}
 
+// FIXME where should i use it
+func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
+	var plainUploaderId string
+	err := db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, photoId).Scan(&plainUploaderId)
+	return structs.Identifier{Id: plainUploaderId}, err
 }
