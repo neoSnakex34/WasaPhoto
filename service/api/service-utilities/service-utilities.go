@@ -5,6 +5,7 @@ import (
 	"regexp"
 )
 
+// TODO move folder in service and fix dependencies
 // [ ] IMPORTANT this should be implemented in login also !!!!
 // FIXME
 func CheckRegexNewUsername(username string) bool {

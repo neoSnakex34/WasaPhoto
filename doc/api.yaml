@@ -332,11 +332,12 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/{userId}/photos/{photoId}/comments: 
+  /users/{userId}/photos/{photoId}/comments/{commentingId}: 
     
     parameters: 
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
+      - $ref: "#/components/parameters/commentingId"
 
     post: 
       security:
@@ -365,6 +366,8 @@ paths:
         '400':
           $ref:
             "#/components/responses/BadRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
         '403':
           $ref: "#/components/responses/Forbidden"
         '500':
@@ -522,6 +525,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
     
+    commentingId:
+      name: commentingId
+      required: true
+      in: path
+      description: identifier for a user that comments a photo
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     likerId:
       name: likerId
       required: true

@@ -1,5 +1,6 @@
 package structs
 
+// FIXME check json tags
 type Identifier struct {
 	Id string `json:"identifier"`
 }
@@ -44,13 +45,18 @@ type Photo struct {
 	PhotoPath string `json:"photoPath"` // FIXME May be incosistent with openapi
 }
 
+// HANDLE THIS TAGS
 type Comment struct {
 	CommentId Identifier `json:"commentId"`
-	UserId    Identifier `json:"userId"`
+	UserId    Identifier `json:"userId"` // commenter id
 	PhotoId   Identifier `json:"photoId"`
-	Body      string     `json:"body"`
-	Date      string     `json:"date"`
+	Body      string
+	Date      string `json:"date"`
 	//TODO manage others
+}
+
+type BodyRequest struct {
+	Body string `json:"body"`
 }
 
 type StreamInfo struct {
