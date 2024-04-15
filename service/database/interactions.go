@@ -20,9 +20,12 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	var newCommentId structs.Identifier
 	var err error
 
-	for isValidId == false && err == nil {
+	for !isValidId && err == nil {
 
 		newCommentId, err = GenerateIdentifier("C")
+		if err != nil {
+			return structs.Comment{}, err
+		}
 		isValidId, err = db.validId(newCommentId.Id, "C")
 
 	}
@@ -44,11 +47,11 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	}
 
 	newComment := structs.Comment{
-		CommentId: newCommentId,
-		UserId:    requestorUserId,
-		PhotoId:   commentedPhotoId,
-		Body:      body,
-		Date:      commentDate,
+		CommentId:        newCommentId,
+		CommentingUserId: requestorUserId,
+		PhotoId:          commentedPhotoId,
+		Body:             body,
+		Date:             commentDate,
 	}
 	return newComment, nil
 }

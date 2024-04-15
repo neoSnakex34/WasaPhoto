@@ -69,7 +69,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// return photoId
 	w.WriteHeader(http.StatusCreated)
 	ctx.Logger.Info("photo uploaded successfully")
-	json.NewEncoder(w).Encode(photo.PhotoId.Id)
+	json.NewEncoder(w).Encode(photo)
 }
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

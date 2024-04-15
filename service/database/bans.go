@@ -62,22 +62,3 @@ func (db *appdbimpl) removeBan(bannerId string, bannedId string) error {
 	_, err := db.c.Exec(`DELETE FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId)
 	return err
 }
-
-// TODO probably need to add a function to check if a user is banned
-// when building core functionality decide it
-func (db *appdbimpl) CheckBan(bannerId string, bannedId string) error {
-	var counter int
-
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
-
-	println("in checkban counter: ", counter)
-
-	if err != nil {
-		return err
-	} else if counter == 0 {
-		return nil
-	} else if counter > 0 {
-		return customErrors.ErrIsBanned
-	}
-	return nil
-}

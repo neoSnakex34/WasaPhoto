@@ -49,6 +49,25 @@ func GenerateIdentifier(actor string) (structs.Identifier, error) {
 
 }
 
+// TODO probably need to add a function to check if a user is banned
+// when building core functionality decide it
+func (db *appdbimpl) CheckBan(bannerId string, bannedId string) error {
+	var counter int
+
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
+
+	println("in checkban counter: ", counter)
+
+	if err != nil {
+		return err
+	} else if counter == 0 {
+		return nil
+	} else if counter > 0 {
+		return customErrors.ErrIsBanned
+	}
+	return nil
+}
+
 // mode can be U P or C any other is invalid (capital letters only)
 func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	// FIXME since single char are unicode byte

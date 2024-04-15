@@ -49,3 +49,32 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	json.NewEncoder(w).Encode(comment)
 
 }
+
+func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	commentId := structs.Identifier{Id: ps.ByName("commentId")}
+	commentingUserId := structs.Identifier{Id: ps.ByName("commentingId")}
+
+	if commentId.Id == "" || commentingUserId.Id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("commentId or commentingUserId has not been provided")
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+	if commentingUserId.Id != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed to uncomment photo") // not logged in
+		return
+	}
+
+	err := rt.db.UncommentPhoto(commentId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occured while uncommenting the photo: ", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	ctx.Logger.Info("photo uncommented successfully")
+
+}

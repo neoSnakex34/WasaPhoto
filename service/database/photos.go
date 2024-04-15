@@ -26,9 +26,13 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	var photoPath string
 	var uploaderId string = upoloaderUserId.Id
 	// generate a new photo valid id
-	for isValidId == false && err == nil {
+	for !isValidId && err == nil {
 
 		newPhotoId, err = GenerateIdentifier("P")
+		if err != nil {
+			return structs.Photo{}, err
+		}
+
 		isValidId, err = db.validId(newPhotoId.Id, "P")
 
 	}
@@ -48,8 +52,8 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	date := time.Now().UTC().Format(time.RFC3339)
 	// SECONDLY create the photo struct
 	newPhoto := structs.Photo{
-		PhotoId: newPhotoId,
-		UserId:  upoloaderUserId,
+		PhotoId:        newPhotoId,
+		UploaderUserId: upoloaderUserId,
 		// Like:      0,                   // defaults not saved in the database
 		// Comments:  []structs.Comment{}, // defaults not saved in the database
 		Date:      date,
@@ -149,10 +153,10 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string) ([]structs.Ph
 			return nil, err
 		}
 		photo := structs.Photo{
-			PhotoId:   structs.Identifier{Id: photoId},
-			UserId:    structs.Identifier{Id: userId},
-			Date:      date,
-			PhotoPath: photoPath,
+			PhotoId:        structs.Identifier{Id: photoId},
+			UploaderUserId: structs.Identifier{Id: userId},
+			Date:           date,
+			PhotoPath:      photoPath,
 		}
 		photos = append(photos, photo)
 	}
