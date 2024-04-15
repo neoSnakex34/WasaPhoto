@@ -184,6 +184,9 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, er
 	// first i obtain a followerlist
 	var followerIdList []string
 	followerIdList, err := db.getFollowerList(userId.Id)
+
+	println("followerIdList: ", followerIdList)
+
 	if err != nil {
 		return nil, err
 	}

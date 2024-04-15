@@ -18,7 +18,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// userProfile and stream related routes
 	// rt.router.GET("/users/:userId/profile", rt.wrap(rt.getUserProfile))
-	// rt.router.GET("/users/:userId/stream", rt.wrap(rt.getMyStream))
+	rt.router.GET("/users/:userId/stream", rt.wrap(rt.getMyStream))
 
 	// // ban related routes
 	rt.router.PUT("/users/:userId/bans/:bannerId", rt.wrap(rt.banUser))

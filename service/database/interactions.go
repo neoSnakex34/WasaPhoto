@@ -20,6 +20,20 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	var newCommentId structs.Identifier
 	var err error
 
+	// check ban
+	userUploaderId, err := db.getUploaderByPhotoId(commentedPhotoId)
+	if err != nil {
+		return structs.Comment{}, err
+	}
+
+	// check ban
+	err = db.checkBan(userUploaderId.Id, requestorUserId.Id)
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		return structs.Comment{}, err
+	} else if err != nil {
+		return structs.Comment{}, err
+	}
+
 	for !isValidId && err == nil {
 
 		newCommentId, err = GenerateIdentifier("C")
@@ -58,9 +72,27 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 // TODO make this an external function removeComment to maintain the consistency
 func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
-	// FIXME comments does not need to be checked if they exist but error must be handled when trying to delete a non existent comment
 
-	err := db.removeComment(commentId.Id)
+	// get uplader id
+	uploaderId, err := db.getUploaderByCommentId(commentId)
+	if err != nil {
+		return err
+	}
+
+	commenterId, err := db.getCommenterByCommentId(commentId)
+	if err != nil {
+		return err
+	}
+
+	// check ban
+	err = db.checkBan(uploaderId.Id, commenterId.Id)
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		return err // TODO log
+	} else if err != nil {
+		return err
+	}
+
+	err = db.removeComment(commentId.Id)
 	if err != nil {
 		return err
 	}
@@ -83,6 +115,21 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 	var photoIsLiked bool
 	var err error
 
+	// retrieve uploader of the photo
+	uploaderId, err := db.getUploaderByPhotoId(photoId)
+	if err != nil {
+		return err
+	}
+
+	// check ban
+	err = db.checkBan(uploaderId.Id, userId.Id)
+	// FIXME try to make this a lil more fancy...
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		return err
+	} else if err != nil {
+		return err
+	}
+
 	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
 	println("photo is liked: ", photoIsLiked)
 	if err == nil && !photoIsLiked {
@@ -95,8 +142,21 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 }
 
 func (db *appdbimpl) UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error {
-
 	var err error
+
+	// retrieve uploader of the photo
+	uploaderId, err := db.getUploaderByPhotoId(photoId)
+	if err != nil {
+		return err
+	}
+
+	// check ban
+	err = db.checkBan(uploaderId.Id, userId.Id)
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		return err
+	} else if err != nil {
+		return err
+	}
 
 	liked, err := db.alreadyLiked(userId.Id, photoId.Id)
 	if errors.Is(err, customErrors.ErrPhotoAlreadyLikedByUser) && liked {

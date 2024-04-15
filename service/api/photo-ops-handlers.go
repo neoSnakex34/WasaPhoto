@@ -48,7 +48,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// check file size
-	var maxSize int = 1048576 // 2 power of 20 times 10
+	var maxSize int = 10485760 // 2 power of 20 times 10
 	if len(photoFile) > maxSize {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("photo file is too big, max size is 10MB")

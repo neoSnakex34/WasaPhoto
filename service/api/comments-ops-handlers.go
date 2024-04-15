@@ -2,25 +2,27 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	userId := structs.Identifier{Id: ps.ByName("commentingId")} // FIXME consistency via db
+	commentingUserId := structs.Identifier{Id: ps.ByName("commentingId")} // FIXME consistency via db
 	photoId := structs.Identifier{Id: ps.ByName("photoId")}
 
-	if userId.Id == "" || photoId.Id == "" {
+	if commentingUserId.Id == "" || photoId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("userId or photoId has not been provided")
 		return
 	}
 
 	authorization := r.Header.Get("Authorization")
-	if userId.Id != authorization {
+	if commentingUserId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to comment photo") // not logged in
 		return
@@ -37,8 +39,12 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	commentBody := commentBodyReq.Body
 
 	// TODO fix this, check return for consistency etc etc
-	comment, err := rt.db.CommentPhoto(photoId, userId, commentBody)
-	if err != nil {
+	comment, err := rt.db.CommentPhoto(photoId, commentingUserId, commentBody)
+	if errors.Is(err, customErrors.ErrIsBanned) {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is banned and cannot comment photo")
+		return
+	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while commenting the photo: ", err)
 		return

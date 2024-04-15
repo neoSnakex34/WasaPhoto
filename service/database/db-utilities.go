@@ -51,7 +51,7 @@ func GenerateIdentifier(actor string) (structs.Identifier, error) {
 
 // TODO probably need to add a function to check if a user is banned
 // when building core functionality decide it
-func (db *appdbimpl) CheckBan(bannerId string, bannedId string) error {
+func (db *appdbimpl) checkBan(bannerId string, bannedId string) error {
 	var counter int
 
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
@@ -113,9 +113,26 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	return false, customErrors.ErrInvalidId
 }
 
-// Deprecated: this function will not probably be used
 func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
 	var plainUploaderId string
-	err := db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, photoId).Scan(&plainUploaderId)
+	err := db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, photoId.Id).Scan(&plainUploaderId)
+	return structs.Identifier{Id: plainUploaderId}, err
+}
+
+func (db *appdbimpl) getCommenterByCommentId(commentId structs.Identifier) (structs.Identifier, error) {
+	var plainCommenterId string
+	err := db.c.QueryRow(`SELECT userId FROM comments WHERE commentId = ?`, commentId.Id).Scan(&plainCommenterId)
+	return structs.Identifier{Id: plainCommenterId}, err
+}
+
+func (db *appdbimpl) getUploaderByCommentId(commentId structs.Identifier) (structs.Identifier, error) {
+	var plainPhotoId string
+	err := db.c.QueryRow(`SELECT photoId FROM comments WHERE commentId = ?`, commentId.Id).Scan(&plainPhotoId)
+	if err != nil {
+		return structs.Identifier{}, err
+	}
+	var plainUploaderId string
+	err = db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&plainUploaderId)
+
 	return structs.Identifier{Id: plainUploaderId}, err
 }

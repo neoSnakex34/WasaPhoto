@@ -9,7 +9,7 @@ var ErrCriticDuplicatedId = errors.New("duplicated id multiple actors with the s
 
 var ErrAlreadyFollowing = errors.New("already following")
 var ErrNotFollowing = errors.New("not following")
-var ErrIsBanned = errors.New("cannot follow, user is banned")
+var ErrIsBanned = errors.New("cannot interact, user is banned")
 
 var ErrAlreadyBanned = errors.New("already banned")
 var ErrNotBanned = errors.New("not banned")
