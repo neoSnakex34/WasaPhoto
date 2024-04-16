@@ -194,7 +194,7 @@ func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]str
 		date1, _ := time.Parse(time.RFC3339, stream[i].Date)
 		date2, _ := time.Parse(time.RFC3339, stream[j].Date)
 
-		return date1.Before(date2)
+		return date2.Before(date1)
 
 	})
 	// CHECK if stream is sorted and err is actually nil then return err and not nil

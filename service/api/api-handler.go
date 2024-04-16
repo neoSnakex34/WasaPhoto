@@ -25,7 +25,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/:userId/bans/:bannerId", rt.wrap(rt.unbanUser))
 
 	// // follow related routes
-	rt.router.PUT("/users/:userId/follows/:followerId", rt.wrap(rt.followUser))
+	rt.router.PUT("/users/:userId/follows/:followerId", rt.wrap(rt.followUser)) // FIXME follows should be better as followers
 	rt.router.DELETE("/users/:userId/follows/:followerId", rt.wrap(rt.unfollowUser))
 
 	// // photo related routes
