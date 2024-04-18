@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
@@ -17,14 +19,21 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	err := json.NewDecoder(r.Body).Decode(&username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error(err)
+		ctx.Logger.Error("could not fetch username: ", err)
 		return
 	}
 
 	defer r.Body.Close()
 
 	userId, err := rt.db.DoLogin(username)
-	if err != nil {
+	if errors.Is(customErrors.ErrInvalidRegexUsername, err) {
+		w.WriteHeader(http.StatusBadRequest)
+		// TODO log all the errors in frontend like this
+		// FIXME very important
+		w.Write([]byte("username is not valid, should use only lowercase letters and number, and be between 3 and 12 characters long"))
+		ctx.Logger.Error("username regular expression not matched")
+		return
+	} else if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong with login", err)
 		return

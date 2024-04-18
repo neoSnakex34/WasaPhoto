@@ -7,6 +7,7 @@
             return {
                 errMsg: null,
                 username: "",
+                userId: ""
             }
         },
 
@@ -20,15 +21,21 @@
                         }
                     
                     })
-                    console.log(response.data.identifier)
+                    let userId = response.data.identifier
+                    // console.log(response.data.identifier)
                     // TODO go to homepage (or profile here)
 
-                    //
+                    // alert with the identifier
+                    alert(`Welcome to WasaPHOTO, this is your id: ${userId}`)
+
                     this.$axios.defaults.headers.common['Authorization'] = `${response.data.identifier}`
 
                 } catch(e) {
-
-                }
+                    if (e.response.status === 400) {
+                        this.errMsg = `Invalid username ${e.response.data}`
+                        alert(this.errMsg)
+                    }
+                  }
             }
             },
             mounted(){
@@ -38,33 +45,16 @@
 </script>
 
 <template>
-  <div class ="input-group">
-    <input type="text" id="username" v-model="username" class="form-contorl" placeholder="username">
-      <div>
-        <button class ="btn" type="button" @click="doLogin">Log me in!</button>
-      </div> 
+  <div class="d-flex justify-content-center flex-column align-items-center">
+    <img class="mt-4 align-items-center" src="../assets/icons/w-button-icon.svg" alt="" width="80" height="80">
+    <p class="h4 mt-3 mb-3 fw-bold">LOGIN</p>
+    <div class="container" style ="width: 50%;">
+      <form class="d-flex flex-column form-signin">
+        <input type="text" id="username" v-model="username" class="form-control" placeholder="Enter your username">
+        <button class="btn btn-primary mt-2" @click="doLogin">Let's go</button>
+      </form>
+    </div>
   </div>
 </template>
 
-<style scoped>
-  .container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-
-  }
-
-  .input-group {
-    display: flex;
-    align-items: center;
-  }
-
-  .btn {
-    margin-top: 10px;
-    margin-left: 10px;
-    align-items: center;
-    background: black;
-    color: blue;
-  }
-</style>
+<style></style>

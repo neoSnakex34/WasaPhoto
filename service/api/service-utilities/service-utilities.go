@@ -12,7 +12,7 @@ func CheckRegexNewUsername(username string) bool {
 
 	println("regex call")
 
-	usernameRegex := "^[a-z0-9]*?$"
+	usernameRegex := "^[a-z0-9]{3,12}?$"
 	matched, err := regexp.MatchString(usernameRegex, username)
 	if err != nil {
 		return false

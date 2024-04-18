@@ -67,7 +67,12 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		// [ ] GIVEN that here will be called setMyUsername regex check will be done after generating id, it is not slow but neither is
 		// efficient or clean
 		// i should modify that
-		db.SetMyUserName(username, userId, "N")
+		err = db.SetMyUserName(username, userId, "N")
+		// added this check cause it would login with invalid id in frontend
+		// resulting in a brocken  backend
+		if err != nil {
+			return structs.Identifier{}, err
+		}
 	}
 
 	return structs.Identifier{Id: userId}, nil

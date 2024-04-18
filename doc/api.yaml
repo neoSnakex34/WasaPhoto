@@ -570,8 +570,8 @@ components:
       type: string
       example: neosnakex34
       pattern: '^[a-z0-9]*?$'
-      minLength: 6
-      maxLength: 18
+      minLength: 3 
+      maxLength: 12
      
 
 
