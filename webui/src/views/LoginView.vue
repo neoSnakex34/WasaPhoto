@@ -46,8 +46,11 @@
 
 <template>
   <div class="d-flex justify-content-center flex-column align-items-center">
-    <img class="mt-4 align-items-center" src="../assets/icons/w-button-icon.svg" alt="" width="80" height="80">
-    <p class="h4 mt-3 mb-3 fw-bold">LOGIN</p>
+    <div class="d-flex justify-content-center flex-column align-items-center" style="width: 40%"> 
+   	  <svg class="feather mt-0" style="width: 15%; height: 15%;"><use href="/feather-sprite-v4.29.0.svg#camera"/></svg>
+    </div>
+    <!-- <img class="mt-4 align-items-center" src="../assets/icons/w-button-icon.svg" alt="" width="80" height="80"> -->
+    <p class="h4 mb-2 fw-bold">LOGIN</p>
     <div class="container" style ="width: 50%;">
       <form class="d-flex flex-column form-signin">
         <input type="text" id="username" v-model="username" class="form-control" placeholder="Enter your username">
