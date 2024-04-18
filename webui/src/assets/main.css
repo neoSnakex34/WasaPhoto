@@ -58,3 +58,7 @@
 	stroke-linejoin: round;
 	fill: none;
 }
+
+.w-80 {
+	width: 80%;
+}

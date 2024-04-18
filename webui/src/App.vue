@@ -16,7 +16,7 @@ export default {}
 
 	<div class="container-fluid">
 		<div class="row">
-			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" v-if="$route.name !== 'login'">
 				<div class="position-sticky pt-3 sidebar-sticky">
 					<h6 class="sidebar-heading d-flex justify-content-center align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
 						<span>sections</span>
@@ -37,8 +37,8 @@ export default {}
 					</ul>
 				</div>
 			</nav>
-
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+			<main :class="$route.name === 'login' ? 'w-80 mx-auto'  : 'col-md-9 ms-sm-auto col-lg-10 px-md-4'">
+			<!-- <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4"> -->
 				<RouterView />
 			</main>
 		</div>

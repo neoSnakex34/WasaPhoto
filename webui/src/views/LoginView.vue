@@ -1,7 +1,12 @@
 
 <script> 
+    import ErrorMsg from '../components/ErrorMsg.vue'
+    
     export default{
-        components: {} ,
+      props: ['msg'],
+        components: {
+          ErrorMsg
+        } ,
         data: function(){
 
             return {
@@ -38,6 +43,9 @@
                   }
             }
             },
+            closeErrorMsg(){
+                this.errMsg = null
+            },
             mounted(){
                 // TODO check what does mounted do 
             }
@@ -46,6 +54,7 @@
 
 <template>
   <div class="d-flex justify-content-center flex-column align-items-center">
+    <!-- <ErrorMsg v-if="errMsg" :msg="errMsg"></ErrorMsg> -->
     <div class="d-flex justify-content-center flex-column align-items-center" style="width: 40%"> 
    	  <svg class="feather mt-0" style="width: 15%; height: 15%;"><use href="/feather-sprite-v4.29.0.svg#camera"/></svg>
     </div>
@@ -53,11 +62,13 @@
     <p class="h4 mb-2 fw-bold">LOGIN</p>
     <div class="container" style ="width: 50%;">
       <form class="d-flex flex-column form-signin">
-        <input type="text" id="username" v-model="username" class="form-control" placeholder="Enter your username">
+        <input type="text" id="username" v-model="username" class="form-control" placeholder="username" @input="closeErrorMsg">
         <button class="btn btn-primary mt-2" @click="doLogin">Let's go</button>
       </form>
     </div>
   </div>
+
+  
 </template>
 
 <style></style>
