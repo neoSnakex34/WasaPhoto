@@ -19,6 +19,7 @@ export default {
 				this.some_data = response.data;
 			} catch (e) {
 				this.errormsg = e.toString();
+
 			}
 			this.loading = false;
 		},
@@ -39,26 +40,29 @@ export default {
 
 <template>
 	<div>
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h1">{{ this.username }}'s WasaPHOTO</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-4">
-					<button type="button" class="btn btn-primary btn-lg" @click="refresh">
-						Refresh
-					</button>
-					<button type="button" class="btn btn-danger btn-lg" @click="doLogout">
-						Logout
-					</button>
-				</div>
-				<!-- <div class="btn-group me-2">
-					<button type="button" class="btn btn-sm" @click="newItem">
-						Upload
-					</button>
-				</div> -->
+		
+		<div class="d-flex r input-group pb-4 pt-4 border-bottom">
+			<input type="text" id="findUser" v-model="findUser" class="form-control form-control-lg rounded" placeholder="search"/>
+  			<div class="d-flex justify-content-between">
+				<input class="form-control form-control-lg ms-3 me-2" type="file" id="formFile">
+				<button class="btn btn-primary btn-lg rounded-pill fw-bold">Upload</button>
 			</div>
 		</div>
 
-		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<div class="d-flex justify-content-between align-items-center pt-2 pb-2  border-bottom">
+			<h1 class="h2"><strong>{{ this.username }}</strong>'s feed</h1>
+				<div>
+					<button type="button" class="btn btn-success btn-lg fw-bold rounded-pill" @click="refresh">
+						Refresh
+					</button>
+					
+				</div>
+			
+			
+		</div>
+
+
+		<!-- <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg> -->
 	</div>
 </template>
 

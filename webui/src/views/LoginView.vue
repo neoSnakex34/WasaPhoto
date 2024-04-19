@@ -31,7 +31,8 @@
                     localStorage.setItem('username', this.username)
 
                     // [ ] go to homepage (or profile here)
-                    this.$router.push('/')
+                    this.$router.push('/home')
+    
                     // alert with the identifier
                     // alert(`Welcome to WasaPHOTO, this is your id: ${userId}`)
 
