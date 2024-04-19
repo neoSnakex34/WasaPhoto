@@ -30,7 +30,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		w.WriteHeader(http.StatusBadRequest)
 		// TODO log all the errors in frontend like this
 		// FIXME very important
-		w.Write([]byte("username is not valid, should use only lowercase letters and number, and be between 3 and 12 characters long"))
+		w.Write([]byte("INVALID USERNAME: use only lowercase letters and numbers; min 3, max 12 chars."))
 		ctx.Logger.Error("username regular expression not matched")
 		return
 	} else if err != nil {
