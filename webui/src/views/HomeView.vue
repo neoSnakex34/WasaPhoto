@@ -1,9 +1,12 @@
 <script>
+import Photo from '../components/Photo.vue'
+
 export default {
 	data: function() {
 		return {
 			username: localStorage.getItem('username'),
 			userId: localStorage.getItem('userId'),
+			stream: [], // TODO
 			errormsg: null,
 			loading: false,
 			some_data: null,
@@ -41,24 +44,19 @@ export default {
 <template>
 	<div>
 		
-		<div class="d-flex r input-group pb-4 pt-4 border-bottom">
-			<input type="text" id="findUser" v-model="findUser" class="form-control form-control-lg rounded" placeholder="search"/>
-  			<div class="d-flex justify-content-between">
-				<input class="form-control form-control-lg ms-3 me-2" type="file" id="formFile">
-				<button class="btn btn-primary btn-lg rounded-pill fw-bold">Upload</button>
-			</div>
-		</div>
-
-		<div class="d-flex justify-content-between align-items-center pt-2 pb-2  border-bottom">
-			<h1 class="h2"><strong>{{ this.username }}</strong>'s feed</h1>
-				<div>
-					<button type="button" class="btn btn-success btn-lg fw-bold rounded-pill" @click="refresh">
-						Refresh
-					</button>
-					
+		<!-- <div class="d-flex r input-group pb-4 pt-4 border-bottom"> -->
+			<!-- <input type="text" id="findUser" v-model="findUser" class="form-control form-control-lg rounded" placeholder="search"/> -->
+  			<div class="container pb-4 pt-4 border-bottom" style="width: 70%">
+				<div class="d-flex input-group align-items-center">
+  					<input class="form-control form-control-lg rounded" id="formFile" type="file" accept="image/png, image/jpeg">
+				
+					<button class="btn btn-primary btn-lg rounded-pill fw-bold ms-2" type="button" id="button-addon2">Upload</button>
 				</div>
-			
-			
+			</div>
+		
+
+		<div class="d-flex justify-content-center align-items-center pt-2 pb-2  border-bottom">
+			<h1 class="h2"><strong>{{ this.username }}</strong>'s feed</h1>
 		</div>
 
 
