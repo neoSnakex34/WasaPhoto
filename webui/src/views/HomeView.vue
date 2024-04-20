@@ -71,6 +71,14 @@ export default {
 				likes="0"
 				liked="false"
 			 	/>
+
+			<Photo
+				:src="'rei.jpg'"
+				uploader="rei"
+				date="2021-10-10"
+				likes="0"
+				liked="false"
+			 	/>
 		
 		</div>
 
