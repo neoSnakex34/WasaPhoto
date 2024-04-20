@@ -41,6 +41,14 @@ export default {}
 								My Profile
 							</RouterLink>
 						</li>
+						<li class="nav-item">
+							<RouterLink to="/search" class="nav-link">
+								<svg class="feather">
+									<use href="/feather-sprite-v4.29.0.svg#search" />
+								</svg>
+								Search	
+							</RouterLink>
+						</li>
 					</ul>
 					<div class="mt-auto mb-4">
 						<h6

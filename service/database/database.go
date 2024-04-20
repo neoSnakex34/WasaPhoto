@@ -44,6 +44,7 @@ type AppDatabase interface {
 	DoLogin(username string) (structs.Identifier, error)                // done // TODO wrap string in identifier ecc and use accessory funcs
 	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
 
+	GetUserList() ([]structs.User, error)                                                                             // done
 	GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) // done
 	GetMyStream(userId structs.Identifier) ([]structs.Photo, error)                                                   // decide wether to return list of paths or list of photos structs
 

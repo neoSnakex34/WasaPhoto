@@ -15,7 +15,7 @@ export default {
         }
     },
     mounted(){
-        alert(this.src)
+        // alert(this.src)
     },
     
 }

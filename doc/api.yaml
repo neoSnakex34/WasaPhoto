@@ -55,10 +55,38 @@ paths:
             application/json:
               schema: 
                 $ref: "#/components/schemas/User" 
-        #Do i need other responses? 
+
+        '403':
+          $ref: "#/components/responses/Forbidden"
+ 
         '500':
           $ref: "#/components/responses/InternalServerError"
 
+  /users:
+
+    get: 
+      security:
+        - bearerAuth: []
+      tags: 
+        - User
+      summary: retrieves all users
+      description: returns a list of all users registered on the platform
+      operationId: getUserList
+      responses:
+        '200':
+          description: list of all users retrieved succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+                minItems: 0
+                
+                
+        # TODO manage other responses
+        '500':
+          $ref: "#/components/responses/InternalServerError"
 
   /users/{userId}/profile: 
     get: 

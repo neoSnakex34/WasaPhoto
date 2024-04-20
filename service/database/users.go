@@ -200,6 +200,29 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	return profileRetrieved, nil
 }
 
+func (db *appdbimpl) GetUserList() ([]structs.User, error) {
+
+	var userList []structs.User
+
+	rows, err := db.c.Query(`SELECT userId, username FROM users`)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var userId string
+		var username string
+		err = rows.Scan(&userId, &username)
+		if err != nil {
+			return nil, err
+		}
+
+		userList = append(userList, structs.User{UserId: structs.Identifier{Id: userId}, Username: username})
+	}
+
+	return userList, nil
+}
+
 // TODO sort photosbydate
 func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, error) {
 

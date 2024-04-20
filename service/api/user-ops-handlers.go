@@ -67,3 +67,25 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 }
+
+func (rt *_router) getListOfUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// retrieve by header the requestor
+	reqId := r.Header.Get("Requestor")
+
+	authorization := r.Header.Get("Authorization")
+	if authorization != reqId {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed to get list of users")
+		return
+	}
+
+	users, err := rt.db.GetUserList()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occurred during db calls in getting list of users: ", err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(users)
+
+}

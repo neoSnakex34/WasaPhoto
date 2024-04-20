@@ -15,6 +15,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// user related routes
 	rt.router.PUT("/users/:userId/username", rt.wrap(rt.setMyUsername))
+	rt.router.GET("/users", rt.wrap(rt.getListOfUsers))
 
 	// userProfile and stream related routes
 	rt.router.GET("/users/:userId/profile", rt.wrap(rt.getUserProfile))

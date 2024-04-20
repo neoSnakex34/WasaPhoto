@@ -52,9 +52,9 @@ export default {
 			<!-- <input type="text" id="findUser" v-model="findUser" class="form-control form-control-lg rounded" placeholder="search"/> -->
   			<div class="container pb-4 pt-4 border-bottom" style="width: 70%">
 				<div class="d-flex input-group align-items-center">
-  					<input class="form-control form-control-lg rounded" id="formFile" type="file" accept="image/png, image/jpeg">
+  					<input class="form-control form-control-lg rounded-end-0" id="formFile" type="file" accept="image/png, image/jpeg">
 				
-					<button class="btn btn-primary btn-lg rounded-pill fw-bold ms-2" type="button" id="button-addon2">Upload</button>
+					<button class="btn btn-primary btn-lg  rounded-start-0 fw-bold" type="button" id="button-addon2">Upload</button>
 				</div>
 			</div>
 		
