@@ -2,7 +2,7 @@
 <script>
     export default{
         // TODO comment id will not be visualized, just used to remove 
-        props: ['commentId', 'body','username', 'commentingId', 'date']
+        props: ["commentingId", "username", "body", "date"], // add others 
     }
 </script>
 

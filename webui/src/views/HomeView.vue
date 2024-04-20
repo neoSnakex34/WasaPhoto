@@ -1,8 +1,12 @@
 <script>
-import Photo from '../components/Photo.vue'
+import Photo from '../components/Photo.vue';
 
 export default {
+	components: {
+		Photo
+	},
 	data: function() {
+		
 		return {
 			username: localStorage.getItem('username'),
 			userId: localStorage.getItem('userId'),
@@ -59,6 +63,16 @@ export default {
 			<h1 class="h2"><strong>{{ this.username }}</strong>'s feed</h1>
 		</div>
 
+		<div class="container pt-4 pb-4" style="width: 60%;">
+			<Photo
+				:src="'rei.jpg'"
+				uploader="rei"
+				date="2021-10-10"
+				likes="0"
+				liked="false"
+			 	/>
+		
+		</div>
 
 		<!-- <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg> -->
 	</div>
