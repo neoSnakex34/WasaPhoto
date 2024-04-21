@@ -67,7 +67,7 @@
     <p class="h3 mb-2 fw-bold">LOGIN</p>
     <div class="container mt-4" style ="min-width: 400px; min-height: 50px; width: 50%; height: 60%;">
       <form class="d-flex flex-column form-signin">
-        <input type="text" id="username" title="only lowercase alphanumeric, min3 max12" v-model="username" class="form-control form-control-lg" placeholder="username" @input="closeErrorMsg">
+        <input type="text" title="only lowercase alphanumeric, min3 max12" v-model="username" class="form-control form-control-lg" placeholder="username">
         <button class="btn btn-primary mt-2 fw-bold btn-lg" @click="doLogin">Let's go</button>
       </form>
     </div>

@@ -23,7 +23,7 @@ export default {
 			this.errormsg = null;
 			try {
 				let response = await this.$axios.get("/");
-				this.some_data = response.data;
+				// this.some_data = response.data;
 			} catch (e) {
 				this.errormsg = e.toString();
 

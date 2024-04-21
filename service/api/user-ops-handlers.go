@@ -36,17 +36,16 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	println("has authorization")
-
 	var newUsername string
 
 	// retrieve username from body
 	err := json.NewDecoder(r.Body).Decode(&newUsername)
 	if err != nil {
+		ctx.Logger.Error("an error occurred during decoding username: ", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	defer r.Body.Close()
+	// defer r.Body.Close()
 
 	println("newUsername: ", newUsername)
 

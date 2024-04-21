@@ -11,7 +11,7 @@ func (db *appdbimpl) FollowUser(followerId structs.Identifier, followedId struct
 	var counter int
 
 	// check if user is arleady followed by userId
-	err := db.checkBan(followerId.Id, followedId.Id) // opposite of following
+	err := db.checkBan(followedId.Id, followerId.Id) // opposite of following
 	// err := db.checkBan(followedId.Id, followerId.Id) // opposite of following
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		println("user is banned cannot follow") // TODO log this in api
@@ -49,7 +49,7 @@ func (db *appdbimpl) UnfollowUser(followerId structs.Identifier, followedId stru
 	var counter int
 
 	// check if user is banned
-	err := db.checkBan(followerId.Id, followedId.Id)
+	err := db.checkBan(followedId.Id, followerId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		println("user is banned cannot unfollow") // TODO log this in api
 		return err
