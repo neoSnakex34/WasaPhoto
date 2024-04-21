@@ -47,6 +47,7 @@ func (db *appdbimpl) UnbanUser(bannerId structs.Identifier, bannedId structs.Ide
 			return err
 		}
 	}
+	println("user successfully unbanned")
 	return nil
 }
 
