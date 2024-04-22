@@ -21,3 +21,5 @@ var ErrPhotoNotLikedByUser = errors.New("photo not liked by user")
 
 var ErrInvalidIdMode = errors.New("invalid id mode")
 var ErrInvalidId = errors.New("invalid id")
+
+var ErrInvalidPhotoPath = errors.New("invalid photo path")

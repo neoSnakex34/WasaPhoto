@@ -8,7 +8,6 @@ import (
 	"errors"
 	"log"
 	"os"
-	"path/filepath"
 
 	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
@@ -302,7 +301,7 @@ func getPhotoCountAndList(userId string) (int, []string, error) {
 	path := Folder + userId + "/"
 	photoFsDirs, err := os.ReadDir(path)
 	if os.IsNotExist(err) {
-		log.Println("folder not found or does not exist")
+		log.Println("folder not found or does not exist counters set to 0")
 		return 0, nil, nil
 	} else if err != nil {
 		return 0, nil, err
@@ -312,7 +311,9 @@ func getPhotoCountAndList(userId string) (int, []string, error) {
 
 	var photoList []string
 	for _, photo := range photoFsDirs {
-		photoList = append(photoList, filepath.Join(path, photo.Name()))
+		// log.Println(photo.Name())
+		// log.Println(userId + "/" + photo.Name())
+		photoList = append(photoList, userId+"/"+photo.Name())
 	}
 
 	return photoCount, photoList, nil

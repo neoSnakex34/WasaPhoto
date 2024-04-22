@@ -12,16 +12,35 @@ export default {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
                 newUsername: '',
+                // TODO make photo obj and sort them ecc 
                 myPhotosPath: [],
+                myPhotos: [
+                    
+                ],
                 followerCounter: 0,
                 followingCounter: 0,
                 photoCounter: 0,
             },
-
+            servedPhotos : [],
             clicked: false,
             errMsg: null,
         }
     },
+
+    async created(){
+        await this.getUserProfile()
+        for (let path of this.profile.myPhotosPath){
+            this.servedPhotos.push(await this.getPhoto(path))
+        }
+
+    },
+
+    computed: {
+        sortPhotosInDisplayOrder(){
+            return this.servedPhotos.slice().reverse()
+        }
+    },
+
     methods: {
         async getUserProfile() {
         
@@ -105,7 +124,26 @@ export default {
             fileReader.readAsArrayBuffer(file)
 
         },
+        // THIS WILL CALL SERVEPHOTO IN API 
+        async getPhoto(partialPath) {
+            let photoId = partialPath.split('/')[1]
+      
+            try {
+                let response = await this.$axios.get(`users/${this.profile.userId}/photos/${photoId}`,
+                    {
+                        headers: {
+                            Authorization: this.profile.userId,
 
+                        },
+                        responseType: 'blob'
+                    })
+
+                let servedPhotoUrl = window.URL.createObjectURL(response.data) 
+                return servedPhotoUrl
+            } catch (e) {
+                alert(e)
+            }
+        }, 
         toggleEditing(newUsername) {
             if (this.clicked) {
 
@@ -116,9 +154,10 @@ export default {
             this.clicked = !this.clicked
         }
     },
-    mounted() {
-        this.getUserProfile()
-    }
+
+    // mounted() {
+    //     this.getUserProfile()
+    // }
 
 }
 </script>
@@ -176,17 +215,17 @@ export default {
     <div class="border-bottom"></div>
 
     <!-- photos -->
-    <div class="container pt-4 pb-4" style="width: 60%;">
-        <div v-for="url in this.profile.myPhotosPath">
-            {{ url }} 
+    <div v-if="!clicked" class="container pt-4 pb-4" style="width: 60%;">
+        <div v-for="(photo, index) in sortPhotosInDisplayOrder" key="index">
+        
             <Photo
-                :src="url"
-                uploader="rei"
-				date="2021-10-10"
-				likes="0"
-				liked="false"
+                :src = "photo"
+                :uploader = "this.profile.username"
+				date = "2021-10-10"
+				likes = "0"
+				liked = "false"
             />
 
         </div>
-    </div>
+    </div> 
 </template>

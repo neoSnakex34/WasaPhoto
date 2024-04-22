@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -106,4 +107,34 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusOK)
 	ctx.Logger.Info("photo deleted successfully")
 
+}
+
+// FIXME check response and errors, according to apis
+func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// TODO authorization could fail in servephoto for stream
+	userId := ps.ByName("userId")
+	photoId := ps.ByName("photoId")
+	log.Println("userId, photoId", userId, photoId)
+	if userId == "" || photoId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("userId or photoId has not been provided")
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+	log.Println(userId, authorization)
+	if userId != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed to view photo")
+		return
+	}
+
+	photoPath, err := serviceutilities.GetPhotoPath(userId + "/" + photoId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occured while getting photo path: ", err)
+		return
+	}
+
+	http.ServeFile(w, r, photoPath)
 }

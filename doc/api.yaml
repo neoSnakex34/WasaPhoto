@@ -7,6 +7,7 @@ info:
   version: 1.0.1
 
 servers:
+  # TODO change accordingly 
   - url: http://localhost:8090
 
 tags:
@@ -337,11 +338,39 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
-  /users/{userId}/photos/{photoId}:
+  /users/{userId}/photos/{photoId}: 
     parameters:
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
       
+    get: 
+      security:
+        - bearerAuth: []
+      tags:
+        - Photo
+      summary: retrieves a photo
+      description: returns an Image 
+      operationId: servePhoto
+      responses:
+        '200':
+          description: photo retrieved succesfully
+          content:
+            image/png:
+              schema:
+                $ref: "#/components/schemas/PhotoFile"
+        '400':
+          $ref:
+            "#/components/responses/BadRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: "#/components/responses/NotFound"
+        '500':
+          $ref: 
+            "#/components/responses/InternalServerError"
+
+
+
     delete:
       security:
         - bearerAuth: []

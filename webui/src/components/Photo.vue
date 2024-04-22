@@ -15,7 +15,7 @@ export default {
         }
     },
     mounted(){
-        alert(this.src)
+        // alert(this.src)
     },
     
 }
@@ -28,7 +28,7 @@ export default {
         <div class="card flex-grow-1">
             <img :src="src" class="card-img-top" />
             <div class="card-body">
-                <p class="card-text">Uploader: {{ this.uploader }}</p> <!-- username href to profile -->
+                <p class="card-text">Uploader: <strong>{{ this.uploader }}</strong></p> <!-- username href to profile -->
                 <p class="card-text">Date: {{ this.date }}</p>
                 <p class="card-text">Likes: {{ this.likes }}</p>
                 <!-- this should become an icon probably -->

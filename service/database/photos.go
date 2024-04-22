@@ -10,7 +10,6 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// TODO change this to be in home of user
 const Folder string = "/tmp/wasaphoto/photofiles/"
 
 // generate the identifier for the photo

@@ -3,7 +3,11 @@ package serviceutilities
 import (
 	"errors"
 	"regexp"
+
+	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 )
+
+const Folder string = "/tmp/wasaphoto/photofiles/"
 
 // TODO move folder in service and fix dependencies
 // [ ] IMPORTANT this should be implemented in login also !!!!
@@ -48,4 +52,11 @@ func CheckFileType(file []byte) (string, error) {
 	}
 	// HANDLE
 	return "", errors.New("file is not a photo")
+}
+
+func GetPhotoPath(partialPath string) (string, error) {
+	if partialPath == "" {
+		return "", customErrors.ErrInvalidPhotoPath
+	}
+	return Folder + partialPath, nil
 }

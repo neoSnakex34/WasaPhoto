@@ -32,7 +32,7 @@ func (rt *_router) Handler() http.Handler {
 	// // photo related routes
 	rt.router.POST("/users/:userId/photos", rt.wrap(rt.uploadPhoto))
 	rt.router.DELETE("/users/:userId/photos/:photoId", rt.wrap(rt.deletePhoto))
-
+	rt.router.GET("/users/:userId/photos/:photoId", rt.wrap(rt.servePhoto))
 	// // comment related routes
 	// userid is the uploader user id
 	// TODO custom header will ease this mess dunno if it is a good idea tho
