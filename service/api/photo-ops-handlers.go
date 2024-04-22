@@ -32,6 +32,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	// photoFile, err := os.ReadFile(path)
+
 	photoFile, err := io.ReadAll(r.Body)
 	if err != nil {
 		// [ ] check this and provide a better error

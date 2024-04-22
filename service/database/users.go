@@ -6,6 +6,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -194,9 +195,9 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 		FollowerCounter:  followerCounter,
 		FollowingCounter: followingCounter,
 		PhotoCounter:     photoCounter,
-		UploadedPhotos:   photoList,
+		PhotoList:        photoList,
 	}
-
+	log.Println(profileRetrieved)
 	return profileRetrieved, nil
 }
 
@@ -296,10 +297,14 @@ func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error
 	return following, err
 }
 
+// FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
 func getPhotoCountAndList(userId string) (int, []string, error) {
 	path := Folder + userId + "/"
 	photoFsDirs, err := os.ReadDir(path)
-	if err != nil {
+	if os.IsNotExist(err) {
+		log.Println("folder not found or does not exist")
+		return 0, nil, nil
+	} else if err != nil {
 		return 0, nil, err
 	}
 

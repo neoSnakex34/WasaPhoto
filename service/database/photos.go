@@ -19,7 +19,7 @@ const Folder string = "/tmp/wasaphoto/photofiles/"
 // TODO decide when to use photostruct and comment struct in interactions
 // FIXME will fronted give backend uploadphoto the file as a byte stream?
 func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) (structs.Photo, error) {
-	println(os.Getwd())
+
 	var isValidId bool = false
 	var newPhotoId structs.Identifier
 	var err error
