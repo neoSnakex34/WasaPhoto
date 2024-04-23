@@ -1,6 +1,8 @@
 package database
 
 import (
+	"database/sql"
+	"errors"
 	"os"
 	"path/filepath"
 	"sort"
@@ -207,7 +209,11 @@ func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) 
 	var date string
 	err := db.c.QueryRow(`SELECT date FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&date)
 	// FIXME manage errors
-	if err != nil {
+	// TODO change
+	// error no rows
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", nil
+	} else if err != nil {
 		return "", err
 	}
 	return date, nil

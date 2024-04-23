@@ -12,8 +12,7 @@ export default {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
                 newUsername: '',
-                // TODO make photo obj and sort them ecc 
-                myPhotosPath: [],
+                myPhotosPath: [], // TODO this will probably not be used anymore
                 myPhotos: [],
                 followerCounter: 0,
                 followingCounter: 0,
@@ -27,6 +26,9 @@ export default {
 
     async created(){
         await this.getUserProfile()
+        
+        for (let path of this.profile.myPhotos.path)
+
         for (let path of this.profile.myPhotosPath){
             this.servedPhotos.push(await this.getPhoto(path))
         }
@@ -41,7 +43,6 @@ export default {
 
     methods: {
         async getUserProfile() {
-        
             try {
                 let response = await this.$axios.get(`/users/${this.profile.userId}/profile`
                     , {
@@ -60,9 +61,10 @@ export default {
                 this.profile.followerCounter = response.data.followersCounter
                 this.profile.followingCounter = response.data.followingCounter
                 this.profile.photoCounter = response.data.photoCounter
-                this.profile.myPhotosPath = response.data.photoList
-                // alert(this.profile.myPhotosPath)
-
+                this.profile.myPhotosPath = response.data.photoPathList  
+                this.profile.myPhotos = response.data.photos
+                alert(this.profile.myPhotos)
+                console.log(response.data)
             } catch (e) {
                 this.errMsg = e
                 alert(e)

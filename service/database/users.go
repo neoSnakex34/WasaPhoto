@@ -197,7 +197,7 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 		PhotoPathList:    photoPathList,
 		Photos:           photos,
 	}
-	log.Println(profileRetrieved)
+	log.Println("THE PROFILE: ", profileRetrieved)
 	return profileRetrieved, nil
 }
 
