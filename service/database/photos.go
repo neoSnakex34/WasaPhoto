@@ -207,15 +207,18 @@ func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]str
 
 func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) {
 	var date string
+	println("plainPhotoId ", plainPhotoId)
 	err := db.c.QueryRow(`SELECT date FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&date)
 	// FIXME manage errors
 	// TODO change
 	// error no rows
+	println("err ", err)
 	if errors.Is(err, sql.ErrNoRows) {
 		return "", nil
 	} else if err != nil {
 		return "", err
 	}
+	println("photodate ", date)
 	return date, nil
 }
 

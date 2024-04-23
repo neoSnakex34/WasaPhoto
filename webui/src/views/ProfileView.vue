@@ -27,18 +27,25 @@ export default {
     async created(){
         await this.getUserProfile()
         
-        for (let path of this.profile.myPhotos.path)
+        let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
+            return new Date(b.date) - new Date(a.date)
+        })
 
-        for (let path of this.profile.myPhotosPath){
+        for (let photo of sortedPhotosByDate){
+            console.log(photo)
+            let path = photo.photoPath
             this.servedPhotos.push(await this.getPhoto(path))
         }
+
+        
+
 
     },
 
     computed: {
-        sortPhotosInDisplayOrder(){
-            return this.servedPhotos.slice().reverse()
-        }
+        displayPhotos() {
+            return this.servedPhotos
+        }, 
     },
 
     methods: {
@@ -52,19 +59,20 @@ export default {
                         }
                     }
                 )
-
+                
+                // check for username consistency 
                 if (this.profile.username !== response.data.username) {
                     this.profile.username = response.data.username
                     localStorage.setItem('username', response.data.username)
                 }
 
+                // populating profile 
                 this.profile.followerCounter = response.data.followersCounter
                 this.profile.followingCounter = response.data.followingCounter
                 this.profile.photoCounter = response.data.photoCounter
                 this.profile.myPhotosPath = response.data.photoPathList  
                 this.profile.myPhotos = response.data.photos
-                alert(this.profile.myPhotos)
-                console.log(response.data)
+                
             } catch (e) {
                 this.errMsg = e
                 alert(e)
@@ -219,14 +227,14 @@ export default {
 
     <!-- photos -->
     <div v-if="!clicked" class="container pt-4 pb-4" style="width: 60%;">
-        <div v-for="(photo, index) in sortPhotosInDisplayOrder" key="index">
+        <div v-for="(photo, index) in displayPhotos" key="index">
         
             <Photo
                 :src = "photo"
                 :uploader = "this.profile.username"
-				date = "2021-10-10"
-				likes = "0"
-				liked = "false"
+				:date = "this.profile.myPhotos[index].date"
+                :likes = "this.profile.myPhotos[index].likeCounter"
+				:liked = "this.profile.myPhotos[index].likedByCurrentUser"
             />
 
         </div>

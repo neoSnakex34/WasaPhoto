@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
@@ -310,6 +311,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 	}
 
 	photoCount := len(photoFsDirs)
+	var photoName string
 	var plainPhotoId string
 	var photoDate string
 	var likeCounter int
@@ -326,10 +328,12 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 	// to be used in frontend
 	for _, photo := range photoFsDirs {
 
-		plainPhotoId = photo.Name()
+		photoName = photo.Name()
+		plainPhotoId = strings.Split(photo.Name(), ".")[0]
+
 		// partial photo path
-		photoPath = userId + "/" + plainPhotoId
-		photoPathList = append(photoPathList, userId+"/"+plainPhotoId)
+		photoPath = userId + "/" + photoName
+		photoPathList = append(photoPathList, photoPath)
 
 		photoDate, err = db.getPhotoDateByPhotoId(plainPhotoId)
 		if err != nil {
