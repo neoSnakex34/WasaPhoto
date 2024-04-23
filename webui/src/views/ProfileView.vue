@@ -14,9 +14,7 @@ export default {
                 newUsername: '',
                 // TODO make photo obj and sort them ecc 
                 myPhotosPath: [],
-                myPhotos: [
-                    
-                ],
+                myPhotos: [],
                 followerCounter: 0,
                 followingCounter: 0,
                 photoCounter: 0,
@@ -113,6 +111,9 @@ export default {
                                 'Content-Type': 'application/octet-stream'
                             }
                         })
+                
+                // TODO add a success message with photoid returned by response or an alert
+
                 } catch (e) {
                     alert(e)
                     // TODO handle error

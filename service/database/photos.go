@@ -17,7 +17,7 @@ const Folder string = "/tmp/wasaphoto/photofiles/"
 // save the photo in the database and create a new photo struct
 // TODO decide when to use photostruct and comment struct in interactions
 // FIXME will fronted give backend uploadphoto the file as a byte stream?
-func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) (structs.Photo, error) {
+func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) (structs.Identifier, error) {
 
 	var isValidId bool = false
 	var newPhotoId structs.Identifier
@@ -29,7 +29,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 
 		newPhotoId, err = GenerateIdentifier("P")
 		if err != nil {
-			return structs.Photo{}, err
+			return structs.Identifier{}, err
 		}
 
 		isValidId, err = db.validId(newPhotoId.Id, "P")
@@ -37,7 +37,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	}
 
 	if err != nil {
-		return structs.Photo{}, err
+		return structs.Identifier{}, err
 	}
 
 	photoPath = Folder + uploaderId + "/" + newPhotoId.Id + "." + format
@@ -45,11 +45,14 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	// FIRST save the photo file in the filesystem
 	err = savePhotoFile(file, photoPath)
 	if err != nil {
-		return structs.Photo{}, err
+		return structs.Identifier{}, err
 	}
 
 	date := time.Now().UTC().Format(time.RFC3339)
 	// SECONDLY create the photo struct
+	// this is just for clean visualization of what ill put in db, i will not use it
+	// it will be less memory intensive to just put the values in the db
+	// need to think about this
 	newPhoto := structs.Photo{
 		PhotoId:        newPhotoId,
 		UploaderUserId: upoloaderUserId,
@@ -57,16 +60,15 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		// Comments:  []structs.Comment{}, // defaults not saved in the database
 		Date:      date,
 		PhotoPath: photoPath,
-		// PhotoBytes: file,
 	}
 
 	// AFTER FIRST TWO STEPS insert photo in the database
 	err = db.insertPhotoInTable(newPhotoId.Id, upoloaderUserId.Id, date, newPhoto.PhotoPath)
 	if err != nil {
-		return structs.Photo{}, err
+		return structs.Identifier{}, err
 	}
 
-	return newPhoto, nil
+	return newPhoto.PhotoId, nil
 }
 
 // [ ] check you built the path correctly
@@ -163,7 +165,7 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string) ([]structs.Ph
 	return photos, err
 }
 
-// TODO complete me
+// TODO improve and change sorting order (in frontend sorted will be better)
 func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]structs.Photo, error) { // TODO Note it returns a stream of photos, that needs to be displayed by obtaining info from the structs
 	// for each follower i should retrieve a (photo slice) in order to build the stream
 	// since i will need to sort the stream by date, i should return a complex struct instead of []string
@@ -199,4 +201,35 @@ func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]str
 	// CHECK if stream is sorted and err is actually nil then return err and not nil
 	return stream, nil
 
+}
+
+func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) {
+	var date string
+	err := db.c.QueryRow(`SELECT date FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&date)
+	// FIXME manage errors
+	if err != nil {
+		return "", err
+	}
+	return date, nil
+}
+
+func (db *appdbimpl) getNumberOfLikedByPhotoId(plainPhotoId string) (int, error) {
+	var likeCounter int
+	err := db.c.QueryRow(`SELECT COUNT(likerId) FROM likes WHERE photoId = ?`, plainPhotoId).Scan(&likeCounter)
+	// FIXME manage custom error here
+	if err != nil {
+		return 0, err
+	}
+	return likeCounter, nil
+}
+
+func (db *appdbimpl) getLikedByUserId(plainUserId string) (bool, error) {
+	var likeCounter int
+	err := db.c.QueryRow(`SELECT COUNT(photoId) FROM likes WHERE likerId = ?`, plainUserId).Scan(&likeCounter)
+	if err != nil {
+		return false, err
+	}
+	// FIXME manage
+	// this could be prone to bug, need to limit the liking option to one (check if liked in addLike)
+	return likeCounter > 0, nil
 }

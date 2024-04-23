@@ -4,7 +4,7 @@ info:
   description: |
     API specification for WASAPhoto, University project
     for web and software architecture course. 
-  version: 1.0.1
+  version: 1.0.2
 
 servers:
   # TODO change accordingly 
@@ -637,7 +637,7 @@ components:
       description: user of WasaPhoto can do a number of actions
       type: object 
       properties: 
-        #TODO manage required infos 
+
         userId:
           $ref: "#/components/schemas/Identifier"
           #description: unique identifier for a single user
@@ -645,10 +645,7 @@ components:
         username: 
           $ref: "#/components/schemas/UserName"
           
-     
-        
-
-  
+ 
     UserProfile: 
       title: userProfile
       description: a user profile, providing info about follwers and following, photos and user related stuff
@@ -686,42 +683,56 @@ components:
           items: 
             $ref: "#/components/schemas/Photo"
         
-        # [ ] what about banned users should i something to retrieve them?
+        
 
 
-    # FIXME check consistency here
+    # in backend i will take file, convert into bytes and use it through the program
+    # i can be more RESTful with those description, try to fix later 
     PhotoFile:
       title: photoFile 
-      description: the actual file of the photo, as a stream of bytes 
-      type: string
-      format: binary
-      # TODO this constraint does not apply on backend yet
-      minLength: 1
-      maxLength: 10485760 #binary 10 megs (2 power of 20 times 10),  probably need to add a control for larger images
+      description: the actual file of the photo, as a stream of bytes retrieved by it's path in filesystem
+      properties:
+        path:
+          description: position in filesystem for a file
+          type: string
+          example: "/tmp/wasaphoto/photofiles/rei.jpg"
+        
+        file:
+          description: the actual file of the photo
+          type: string
+          format: binary
+          minLength: 8 # to fit check for pngs header
+          maxLength: 10485760 #binary 10 megs (2 power of 20 times 10)
+          
     
     Photo: 
       title: photo
       description: a photo on the platform 
       type: object
       properties: 
+
         photoId: 
           $ref: "#/components/schemas/Identifier"
 
+        # uploader user id
         userId:
           $ref: "#/components/schemas/Identifier"
 
-        #consider adding a list of ids connected with the likes
-        like: 
-          description: number of likes the photo has recieved 
+        likes: 
+          description: number of likes the photo has recieved (represented by userId that liked the photo)
           type: integer 
           example: 50 
-      
-        #maybe better to be a counter 
+
+        likedByLoggedUser:
+          description: boolean value that tells if the photo is liked by the logged user will be computed when retrieving photo
+          type: boolean
+          example: true
+
         comments: 
           description: comments attached to the photo, made by users
           type: array
           minItems: 0
-          maxItems: 20 #not for real use, just as an example 
+          maxItems: 20 # not for real use, just as an example 
           items: 
             $ref: "#/components/schemas/Comment"
         
@@ -733,7 +744,8 @@ components:
           minLength: 20
           maxLength: 20 
 
-        photoBytes:
+        # what will be a photopath in struct (path + data) 
+        rawPhotoFile:
           $ref: "#/components/schemas/PhotoFile"
          
     CommentBody: 
@@ -749,7 +761,7 @@ components:
       description: a comment on a photo
       type: object
       properties:
-        #should i really use it? 
+     
         commentId:
           $ref: "#/components/schemas/Identifier"
 

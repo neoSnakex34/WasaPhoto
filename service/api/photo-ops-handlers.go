@@ -59,7 +59,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// call db
-	photo, err := rt.db.UploadPhoto(photoFile, userId, format)
+	photoId, err := rt.db.UploadPhoto(photoFile, userId, format)
 	if err != nil {
 		// TODO check this error and log better
 		w.WriteHeader(http.StatusInternalServerError)
@@ -72,7 +72,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// return photoId
 	w.WriteHeader(http.StatusCreated)
 	ctx.Logger.Info("photo uploaded successfully")
-	json.NewEncoder(w).Encode(photo)
+	json.NewEncoder(w).Encode(photoId) // it is not used at the moment, but it can be used as an additional check
 }
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

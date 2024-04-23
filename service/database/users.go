@@ -145,10 +145,10 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 // probably i can add a refreshUserProfile function that updates all the counters
 func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) {
 
-	id := profileUserId.Id
+	plainUserId := profileUserId.Id
 	requestor := requestorUserId.Id
 	// check requestor banned by profile user
-	err := db.checkBan(id, requestor)
+	err := db.checkBan(plainUserId, requestor)
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		println("requestor is banned by user") // TODO log this in api
 		return structs.UserProfile{}, err
@@ -162,39 +162,40 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	var photoCounter int
 
 	// [x] add photo list
-	var photoList []string
+	var photoPathList []string
 
 	// queries func
-	username, err = db.getUsernameByUserId(id)
+	username, err = db.getUsernameByUserId(plainUserId)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
 
 	// follower count
-	followerCounter, err = db.getFollowersCounterByUserId(id)
+	followerCounter, err = db.getFollowersCounterByUserId(plainUserId)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
 
 	// following count
-	followingCounter, err = db.getFollowingCounterByUserId(id)
+	followingCounter, err = db.getFollowingCounterByUserId(plainUserId)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
 
 	// photo count via os directory counter
-	photoCounter, photoList, err = getPhotoCountAndList(id)
+	photoCounter, photos, photoPathList, err := db.getPhotosAndInfoByUserId(plainUserId)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
-
+	println(photos, photoPathList)
 	profileRetrieved := structs.UserProfile{
 		UserId:           profileUserId,
 		Username:         username,
 		FollowerCounter:  followerCounter,
 		FollowingCounter: followingCounter,
 		PhotoCounter:     photoCounter,
-		PhotoList:        photoList,
+		PhotoPathList:    photoPathList,
+		Photos:           photos,
 	}
 	log.Println(profileRetrieved)
 	return profileRetrieved, nil
@@ -297,24 +298,74 @@ func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error
 }
 
 // FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
-func getPhotoCountAndList(userId string) (int, []string, error) {
+func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Photo, []string, error) {
+
 	path := Folder + userId + "/"
 	photoFsDirs, err := os.ReadDir(path)
 	if os.IsNotExist(err) {
 		log.Println("folder not found or does not exist counters set to 0")
-		return 0, nil, nil
+		return 0, nil, nil, nil
 	} else if err != nil {
-		return 0, nil, err
+		return 0, nil, nil, err
 	}
 
 	photoCount := len(photoFsDirs)
+	var plainPhotoId string
+	var photoDate string
+	var likeCounter int
+	var liked bool
+	var photoPath string
 
-	var photoList []string
+	var photos []structs.Photo
+	var photoPathList []string
+	var tmpPhoto structs.Photo
+
+	// for each photo in the folder i get the metadata
+	// and extract the path to the photo
+	// absolute path could be retrieved via db but i need the partial one
+	// to be used in frontend
 	for _, photo := range photoFsDirs {
-		// log.Println(photo.Name())
-		// log.Println(userId + "/" + photo.Name())
-		photoList = append(photoList, userId+"/"+photo.Name())
+
+		plainPhotoId = photo.Name()
+		// partial photo path
+		photoPath = userId + "/" + plainPhotoId
+		photoPathList = append(photoPathList, userId+"/"+plainPhotoId)
+
+		photoDate, err = db.getPhotoDateByPhotoId(plainPhotoId)
+		if err != nil {
+			log.Println("error in getting photo date from db")
+			return 0, nil, nil, err
+		}
+
+		likeCounter, err = db.getNumberOfLikedByPhotoId(plainPhotoId)
+		if err != nil {
+			log.Println("error in getting like counter from db")
+			return 0, nil, nil, err
+		}
+
+		liked, err = db.getLikedByUserId(userId)
+		if err != nil {
+			log.Println("error in getting info of like by user from db")
+			return 0, nil, nil, err
+		}
+
+		// FIXME i have to manage comments
+
+		comments := []structs.Comment{}
+
+		tmpPhoto = structs.Photo{
+			PhotoId:            structs.Identifier{Id: plainPhotoId},
+			UploaderUserId:     structs.Identifier{Id: userId},
+			LikeCounter:        likeCounter,
+			Comments:           comments,
+			LikedByCurrentUser: liked,
+			Date:               photoDate,
+			PhotoPath:          photoPath,
+		}
+
+		photos = append(photos, tmpPhoto)
+
 	}
 
-	return photoCount, photoList, nil
+	return photoCount, photos, photoPathList, nil
 }
