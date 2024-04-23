@@ -162,9 +162,6 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	var followingCounter int
 	var photoCounter int
 
-	// [x] add photo list
-	var photoPathList []string
-
 	// queries func
 	username, err = db.getUsernameByUserId(plainUserId)
 	if err != nil {
@@ -184,19 +181,19 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	}
 
 	// photo count via os directory counter
-	photoCounter, photos, photoPathList, err := db.getPhotosAndInfoByUserId(plainUserId)
+	photoCounter, photos, err := db.getPhotosAndInfoByUserId(plainUserId)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
-	println(photos, photoPathList)
+
 	profileRetrieved := structs.UserProfile{
 		UserId:           profileUserId,
 		Username:         username,
 		FollowerCounter:  followerCounter,
 		FollowingCounter: followingCounter,
 		PhotoCounter:     photoCounter,
-		PhotoPathList:    photoPathList,
-		Photos:           photos,
+
+		Photos: photos,
 	}
 	log.Println("THE PROFILE: ", profileRetrieved)
 	return profileRetrieved, nil
@@ -299,15 +296,15 @@ func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error
 }
 
 // FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
-func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Photo, []string, error) {
+func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Photo, error) {
 
 	path := Folder + userId + "/"
 	photoFsDirs, err := os.ReadDir(path)
 	if os.IsNotExist(err) {
 		log.Println("folder not found or does not exist counters set to 0")
-		return 0, nil, nil, nil
+		return 0, nil, nil
 	} else if err != nil {
-		return 0, nil, nil, err
+		return 0, nil, err
 	}
 
 	photoCount := len(photoFsDirs)
@@ -319,7 +316,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 	var photoPath string
 
 	var photos []structs.Photo
-	var photoPathList []string
+
 	var tmpPhoto structs.Photo
 
 	// for each photo in the folder i get the metadata
@@ -333,24 +330,24 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 
 		// partial photo path
 		photoPath = userId + "/" + photoName
-		photoPathList = append(photoPathList, photoPath)
+		// photoPathList = append(photoPathList, photoPath)
 
 		photoDate, err = db.getPhotoDateByPhotoId(plainPhotoId)
 		if err != nil {
 			log.Println("error in getting photo date from db")
-			return 0, nil, nil, err
+			return 0, nil, err
 		}
 
 		likeCounter, err = db.getNumberOfLikedByPhotoId(plainPhotoId)
 		if err != nil {
 			log.Println("error in getting like counter from db")
-			return 0, nil, nil, err
+			return 0, nil, err
 		}
 
 		liked, err = db.getLikedByUserId(userId)
 		if err != nil {
 			log.Println("error in getting info of like by user from db")
-			return 0, nil, nil, err
+			return 0, nil, err
 		}
 
 		// FIXME i have to manage comments
@@ -371,5 +368,5 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 
 	}
 
-	return photoCount, photos, photoPathList, nil
+	return photoCount, photos, nil
 }

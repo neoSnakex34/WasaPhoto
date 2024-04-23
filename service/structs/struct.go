@@ -15,9 +15,8 @@ type UserProfile struct {
 	FollowerCounter  int        `json:"followersCounter"`
 	FollowingCounter int        `json:"followingCounter"`
 	PhotoCounter     int        `json:"photoCounter"`
-	//TODO absolutely manage this in openapi
-	PhotoPathList []string `json:"photoPathList"` // list of paths to photos
-	Photos        []Photo  `json:"photos"`        // list of photos
+
+	Photos []Photo `json:"photos"` // list of photos
 	// BannedUsers    []UserName `json:"bannedUsers"`
 }
 

@@ -12,7 +12,6 @@ export default {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
                 newUsername: '',
-                myPhotosPath: [], // TODO this will probably not be used anymore
                 myPhotos: [],
                 followerCounter: 0,
                 followingCounter: 0,
@@ -24,7 +23,9 @@ export default {
         }
     },
 
+    // this will get the userprofile and sort photos
     async created(){
+
         await this.getUserProfile()
         
         let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
@@ -37,11 +38,9 @@ export default {
             this.servedPhotos.push(await this.getPhoto(path))
         }
 
-        
-
-
     },
 
+    // this will be used to display served photos in component
     computed: {
         displayPhotos() {
             return this.servedPhotos
@@ -70,7 +69,6 @@ export default {
                 this.profile.followerCounter = response.data.followersCounter
                 this.profile.followingCounter = response.data.followingCounter
                 this.profile.photoCounter = response.data.photoCounter
-                this.profile.myPhotosPath = response.data.photoPathList  
                 this.profile.myPhotos = response.data.photos
                 
             } catch (e) {
