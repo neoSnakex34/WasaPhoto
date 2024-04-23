@@ -52,10 +52,8 @@ func GenerateIdentifier(actor string) (structs.Identifier, error) {
 // when building core functionality decide it
 func (db *appdbimpl) checkBan(bannerId string, bannedId string) error {
 	var counter int
-	println("bannedid bannerId", bannedId, bannerId)
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
 
-	println("in checkban counter: ", counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -114,6 +112,8 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 
 func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
 	var plainUploaderId string
+	println("photoId ", photoId.Id)
+
 	err := db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, photoId.Id).Scan(&plainUploaderId)
 	return structs.Identifier{Id: plainUploaderId}, err
 }

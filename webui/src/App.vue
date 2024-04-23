@@ -2,7 +2,13 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-export default {}
+export default {
+	created() {
+		if (localStorage.getItem('authorization')) {
+			this.$axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization')
+		}
+	}
+}
 </script>
 
 <template>

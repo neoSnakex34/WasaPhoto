@@ -232,13 +232,12 @@ func (db *appdbimpl) getNumberOfLikedByPhotoId(plainPhotoId string) (int, error)
 	return likeCounter, nil
 }
 
-func (db *appdbimpl) getLikedByUserId(plainUserId string) (bool, error) {
-	var likeCounter int
-	err := db.c.QueryRow(`SELECT COUNT(photoId) FROM likes WHERE likerId = ?`, plainUserId).Scan(&likeCounter)
+func (db *appdbimpl) getLikedByUserId(plainUserId string, plainphotoId string) (bool, error) {
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, plainphotoId).Scan(&counter)
 	if err != nil {
+		println("an error occured while checking photolikedbycurrentid")
 		return false, err
 	}
-	// FIXME manage
-	// this could be prone to bug, need to limit the liking option to one (check if liked in addLike)
-	return likeCounter > 0, nil
+	return counter > 0, nil
 }

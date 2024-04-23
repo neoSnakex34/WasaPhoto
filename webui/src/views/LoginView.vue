@@ -29,14 +29,16 @@
                     let userId = response.data.identifier
                     localStorage.setItem('userId', userId)
                     localStorage.setItem('username', this.username)
-
+                    localStorage.setItem('authorization', userId)
+                   
                     // [ ] go to homepage (or profile here)
                     this.$router.push('/home')
-    
+                    
+                    this.$axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization')
                     // alert with the identifier
                     // alert(`Welcome to WasaPHOTO, this is your id: ${userId}`)
 
-                    this.$axios.defaults.headers.common['Authorization'] = `${response.data.identifier}`
+                    
 
                 } catch(e) {
                   // TODO check other errors

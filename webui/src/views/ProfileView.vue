@@ -8,6 +8,7 @@ export default {
     props: ['msg'],
     data: function () {
         return {
+            // FIXME there-s a bug with likebycurrent user retrival
             profile: {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
@@ -20,28 +21,35 @@ export default {
             servedPhotos : [],
             clicked: false,
             errMsg: null,
+            
         }
     },
-
+    // computed: {
+    //     getUserId(){
+    //         return this.profile.userId() = localStorage.getItem('userId')
+    //     },
+    // },
     // this will get the userprofile and sort photos
     async created(){
-
         await this.getUserProfile()
         await this.updateServedPhotos()
         
     },
 
-    // // this will be used to display served photos in component
-    // computed: {
-    //     displayPhotos() {
-    //         return this.servedPhotos
-    //     }, 
-    // },
+    
 
     methods: {
-        async updateServedPhotos(){
-        
 
+        // generalize it?
+        graphicallyLikeBeforeRefresh(index){
+            // on refresh likes will be retrieved from backend
+            this.profile.myPhotos[index].likeCounter++
+            // will also set liked 
+            this.profile.myPhotos[index].likedByCurrentUser = true
+        },
+
+        async updateServedPhotos(){
+    
 
         let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
             return new Date(b.date) - new Date(a.date)
@@ -49,7 +57,7 @@ export default {
 
         let tmpServedPhotos = []
         for (let photo of sortedPhotosByDate){
-            console.log(photo)
+            
             let path = photo.photoPath
             tmpServedPhotos.push(await this.getPhoto(path))
         }
@@ -60,8 +68,7 @@ export default {
             try {
                 let response = await this.$axios.get(`/users/${this.profile.userId}/profile`
                     , {
-                        headers: {
-                            Authorization: this.profile.userId,
+                        headers: { 
                             Requestor: this.profile.userId
                         }
                     }
@@ -78,7 +85,6 @@ export default {
                 this.profile.followingCounter = response.data.followingCounter
                 this.profile.photoCounter = response.data.photoCounter
                 this.profile.myPhotos = response.data.photos
-                
             } catch (e) {
                 this.errMsg = e
                 alert(e)
@@ -91,7 +97,6 @@ export default {
                     JSON.stringify(newUsername),
                     {
                         headers: {
-                            Authorization: this.profile.userId,
                             'Content-Type': 'application/json'
                         }
                     })
@@ -123,7 +128,6 @@ export default {
                         photoBinaryU8,
                         {
                             headers: {
-                                Authorization: this.profile.userId,
                                 'Content-Type': 'application/octet-stream'
                             }
                         })
@@ -153,10 +157,7 @@ export default {
             try {
                 let response = await this.$axios.get(`users/${this.profile.userId}/photos/${photoId}`,
                     {
-                        headers: {
-                            Authorization: this.profile.userId,
-
-                        },
+                       
                         responseType: 'blob'
                     })
 
@@ -177,9 +178,10 @@ export default {
         }
     },
 
-    // mounted() {
-    //     this.getUserProfile()
-    // }
+    mounted() {
+        this.profile.userId = localStorage.getItem('userId')
+        this.getUserProfile()
+    }
 
 }
 </script>
@@ -240,12 +242,19 @@ export default {
     <div v-if="!clicked" class="container pt-4 pb-4" style="width: 60%;">
         <div>
         
+            <!--- in stream uploader  will need to be passed from struct -->
             <Photo
               
                 v-for="(photo, index) in servedPhotos"
+                @like="graphicallyLikeBeforeRefresh(index)"
                 :src = "photo"
+    
                 :uploader = "this.profile.username"
-				:date = "this.profile.myPhotos[index].date"
+    
+                :photoId = "this.profile.myPhotos[index].photoId.identifier"
+                :uploaderId = "this.profile.myPhotos[index].uploaderUserId.identifier"
+				
+                :date = "this.profile.myPhotos[index].date"
                 :likes = "this.profile.myPhotos[index].likeCounter"
 				:liked = "this.profile.myPhotos[index].likedByCurrentUser"
             />

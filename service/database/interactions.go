@@ -131,7 +131,6 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 	}
 
 	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
-	println("photo is liked: ", photoIsLiked)
 	if err == nil && !photoIsLiked {
 		// TODO add like
 		err = db.addLike(userId.Id, photoId.Id)

@@ -296,9 +296,9 @@ func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error
 }
 
 // FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
-func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Photo, error) {
+func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string) (int, []structs.Photo, error) {
 
-	path := Folder + userId + "/"
+	path := Folder + plainUserId + "/"
 	photoFsDirs, err := os.ReadDir(path)
 	if os.IsNotExist(err) {
 		log.Println("folder not found or does not exist counters set to 0")
@@ -329,7 +329,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 		plainPhotoId = strings.Split(photo.Name(), ".")[0]
 
 		// partial photo path
-		photoPath = userId + "/" + photoName
+		photoPath = plainUserId + "/" + photoName
 		// photoPathList = append(photoPathList, photoPath)
 
 		photoDate, err = db.getPhotoDateByPhotoId(plainPhotoId)
@@ -344,7 +344,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 			return 0, nil, err
 		}
 
-		liked, err = db.getLikedByUserId(userId)
+		liked, err = db.getLikedByUserId(plainUserId, plainPhotoId)
 		if err != nil {
 			log.Println("error in getting info of like by user from db")
 			return 0, nil, err
@@ -356,7 +356,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(userId string) (int, []structs.Pho
 
 		tmpPhoto = structs.Photo{
 			PhotoId:            structs.Identifier{Id: plainPhotoId},
-			UploaderUserId:     structs.Identifier{Id: userId},
+			UploaderUserId:     structs.Identifier{Id: plainUserId},
 			LikeCounter:        likeCounter,
 			Comments:           comments,
 			LikedByCurrentUser: liked,
