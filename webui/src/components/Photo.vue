@@ -7,13 +7,7 @@ export default {
         Comment
     },
     props: ['src', 'uploader', 'date', 'likes','liked'], // some ID wont be visualized
-    data: function(){
-        return {
-            liked: false,
-            likes: 0,
-           
-        }
-    },
+   
     mounted(){
         // alert(this.src)
     },

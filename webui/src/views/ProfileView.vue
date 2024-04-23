@@ -27,27 +27,35 @@ export default {
     async created(){
 
         await this.getUserProfile()
+        await this.updateServedPhotos()
         
+    },
+
+    // // this will be used to display served photos in component
+    // computed: {
+    //     displayPhotos() {
+    //         return this.servedPhotos
+    //     }, 
+    // },
+
+    methods: {
+        async updateServedPhotos(){
+        
+
+
         let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
             return new Date(b.date) - new Date(a.date)
         })
 
+        let tmpServedPhotos = []
         for (let photo of sortedPhotosByDate){
             console.log(photo)
             let path = photo.photoPath
-            this.servedPhotos.push(await this.getPhoto(path))
+            tmpServedPhotos.push(await this.getPhoto(path))
         }
 
+        this.servedPhotos = tmpServedPhotos
     },
-
-    // this will be used to display served photos in component
-    computed: {
-        displayPhotos() {
-            return this.servedPhotos
-        }, 
-    },
-
-    methods: {
         async getUserProfile() {
             try {
                 let response = await this.$axios.get(`/users/${this.profile.userId}/profile`
@@ -121,8 +129,13 @@ export default {
                         })
                 
                 // TODO add a success message with photoid returned by response or an alert
-
-                } catch (e) {
+                alert("Photo uploaded successfully")
+                    
+                // this will refresh the profile 
+                await this.getUserProfile()
+                await this.updateServedPhotos()
+                
+            } catch (e) {
                     alert(e)
                     // TODO handle error
                 }
@@ -225,9 +238,11 @@ export default {
 
     <!-- photos -->
     <div v-if="!clicked" class="container pt-4 pb-4" style="width: 60%;">
-        <div v-for="(photo, index) in displayPhotos" key="index">
+        <div>
         
             <Photo
+              
+                v-for="(photo, index) in servedPhotos"
                 :src = "photo"
                 :uploader = "this.profile.username"
 				:date = "this.profile.myPhotos[index].date"
