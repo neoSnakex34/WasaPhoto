@@ -5,18 +5,18 @@ export default {
     data: function () {
         return {
             likerId: localStorage.getItem('userId'),
-            delete: false
         }
     },
     components: {
         Comment
     },
-    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId'], // some ID wont be visualized
+    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete'], // some ID wont be visualized
     methods:
     {
         toggleDelete() {
             this.delete = !this.delete
         },
+
         async likePhoto() {
             try {
                 let response = await this.$axios.put(`/users/${this.uploaderId}/photos/${this.photoId}/likes/${this.likerId}`,
@@ -40,6 +40,7 @@ export default {
                 }
             }
         },
+
 
         async unlikePhoto(){
             try{
@@ -79,7 +80,7 @@ export default {
 <template>
 
     <div class="d-flex flex-grow-1 pb-2">
-        <button v-if="this.delete" @click="deletePhoto" class="d-flex btn btn-danger flex-grow-1 justify-content-center fw-bold">DELETE</button>
+        <button v-if="this.delete" @click="$emit('delete-event')" class="d-flex btn btn-danger flex-grow-1 justify-content-center fw-bold">DELETE</button>
     </div>
  
     <div class="card flex-grow-1 ">
@@ -88,7 +89,8 @@ export default {
 
         <img :src="src" class="card-img-top" />
             <!-- kebab button -->
-            <button @click="toggleDelete" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
+            <button @click="$emit('toggle-delete')" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
+            <!-- <button @click="toggleDelete" class="position-absolute top-0 end-0 custom-button fw-bold">...</button> -->
            
    
         <div class="card-body d-flex flex-column">

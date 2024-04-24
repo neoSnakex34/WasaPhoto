@@ -21,6 +21,7 @@ export default {
             servedPhotos: [],
             clicked: false,
             errMsg: null,
+            deleteToggle: false
 
         }
     },
@@ -53,8 +54,25 @@ export default {
             this.profile.myPhotos[index].likedByCurrentUser = false
         },
 
+        toggleDeleteButton() {
+            this.deleteToggle = !this.deleteToggle
+        },
+
+        formUploadSelect() {
+
+            let input = this.$refs.inputForm.files[0]
+            if (input) {
+                this.uploadPhoto(input)
+            }
+        },
+
+
         async updateServedPhotos() {
 
+            if (this.profile.myPhotos === null) {
+                this.servedPhotos = []
+                return
+            }
 
             let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
                 return new Date(b.date) - new Date(a.date)
@@ -69,6 +87,7 @@ export default {
 
             this.servedPhotos = tmpServedPhotos
         },
+
         async getUserProfile() {
             try {
                 let response = await this.$axios.get(`/users/${this.profile.userId}/profile`
@@ -112,14 +131,7 @@ export default {
             }
         },
 
-        formUploadSelect() {
-
-            let input = this.$refs.inputForm.files[0]
-            if (input) {
-                this.uploadPhoto(input)
-            }
-        },
-
+     
         async uploadPhoto(file) {
 
             let fileReader = new FileReader();
@@ -137,8 +149,7 @@ export default {
                             }
                         })
 
-                    // TODO add a success message with photoid returned by response or an alert
-                    alert("Photo uploaded successfully")
+                    // alert("Photo uploaded successfully")
 
                     // this will refresh the profile 
                     await this.getUserProfile()
@@ -154,6 +165,27 @@ export default {
 
             fileReader.readAsArrayBuffer(file)
 
+        },
+
+        async deletePhoto(index) {
+            let photoId = this.profile.myPhotos[index].photoId.identifier
+            alert(photoId)
+            try {
+                let response = await this.$axios.delete(`/users/${this.profile.userId}/photos/${photoId}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+
+                // this will refresh the profile 
+                this.toggleDeleteButton()
+                await this.getUserProfile()
+                await this.updateServedPhotos()
+
+            } catch (e) {
+                alert(e)
+            }
         },
         // THIS WILL CALL SERVEPHOTO IN API 
         async getPhoto(partialPath) {
@@ -248,12 +280,19 @@ export default {
         <div>
 
             <!--- in stream uploader  will need to be passed from struct -->
-            <Photo v-for="(photo, index) in servedPhotos" @like="graphicallyLikeBeforeRefresh(index)"
-                @unlike="graphicallyUnlikeBeforeRefresh(index)" :src="photo" :uploader="this.profile.username"
+            <Photo v-for="(photo, index) in servedPhotos"
+                
+                @like="graphicallyLikeBeforeRefresh(index)"
+                @unlike="graphicallyUnlikeBeforeRefresh(index)" 
+                @toggle-delete="this.deleteToggle = !this.deleteToggle"
+                @delete-event="deletePhoto(index)"
+                :src="photo" :uploader="this.profile.username"
                 :photoId="this.profile.myPhotos[index].photoId.identifier"
                 :uploaderId="this.profile.myPhotos[index].uploaderUserId.identifier"
                 :date="this.profile.myPhotos[index].date" :likes="this.profile.myPhotos[index].likeCounter"
-                :liked="this.profile.myPhotos[index].likedByCurrentUser" />
+                :liked="this.profile.myPhotos[index].likedByCurrentUser" 
+                :delete = this.deleteToggle
+                />
 
         </div>
     </div>
