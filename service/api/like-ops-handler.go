@@ -61,10 +61,12 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	err := rt.db.UnlikePhoto(photoId, likerId)
+	err := rt.db.UnlikePhoto(likerId, photoId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Internal Server Error"))
+		// TODO: all errors will be sent to frontned like that
+		errMsg := "500: " + err.Error()
+		w.Write([]byte(errMsg))
 		ctx.Logger.Error("an error occured while unliking the photo: ", err)
 		return
 	}

@@ -37,11 +37,32 @@ export default {
             }
         },
 
-        async unlikePhoto() {
+        async unlikePhoto(){
+            try{
+                let response = await this.$axios.delete(`/users/${this.uploaderId}/photos/${this.photoId}/likes/${this.likerId}`,
+                {
+                    headers: {
+                        
+                        'Content-Type': 'application/json'
+                    }
+                }
+                )
 
+                if(response.status === 200){
+                    this.$emit('unlike');
+                }
+                
+            }catch(e){
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+                }
+            }
         }
 
     },
+        
     mounted() {
         // alert(this.src)
     },
@@ -56,7 +77,7 @@ export default {
     <div class="card flex-grow-1">
         <img :src="src" class="card-img-top" />
         <div class="card-body d-flex flex-column">
-        
+
             <div class="d-flex align-items-center justify-content-center justify-content-between pt-2 pb-2"
                 style="width: 60%; margin: auto;">
                 <div class="d-flex flex-column justify-content-between">
@@ -65,11 +86,29 @@ export default {
                     <p class="card-text"><strong>DATE</strong> {{ this.date }}</p>
                     <p class="card-text"><strong>LIKES</strong>: {{ this.likes }}</p>
                     <!-- this should beco<strong>me an icon probably -->
-                    <p class="card-text"><strong>LIKED</strong>: {{ this.liked }}</p>
+                    <!-- <p class="card-text"><strong>LIKED</strong>: {{ this.liked }}</p> -->
+                    
+                    
 
                 </div>
+                
+                
+                <!-- heart icon using imported svgs from folder public  -->
+                    <div  class="me-4" style="width: 10%;">
+                        <div v-if="!this.liked">
+                            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" @click="likePhoto()">
+                                <path d="m458.4 64.3c-57.8-48.6-147.1-41.3-202.4 15-55.3-56.3-144.6-63.7-202.4-15-75.2 63.3-64.2 166.5-10.6 221.2l175.4 178.7c10 10.2 23.4 15.9 37.6 15.9 14.3 0 27.6-5.6 37.6-15.8l175.4-178.7c53.5-54.7 64.7-157.9-10.6-221.3zm-23.6 187.5-175.4 178.7c-2.4 2.4-4.4 2.4-6.8 0l-175.4-178.7c-36.5-37.2-43.9-107.6 7.3-150.7 38.9-32.7 98.9-27.8 136.5 10.5l35 35.7 35-35.7c37.8-38.5 97.8-43.2 136.5-10.6 51.1 43.1 43.5 113.9 7.3 150.8z"/>
+                            </svg>
+                        </div>
+                        <div v-if="this.liked">
+                            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" @click="unlikePhoto()">
+                                <path d="m462.3 62.6c-54.8-46.7-136.3-38.3-186.6 13.6l-19.7 20.3-19.7-20.3c-50.2-51.9-131.8-60.3-186.6-13.6-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/>
+                            </svg>
+                        </div>
+                    </div>
+<!-- 
                 <button class="ms-4 d-flex btn rounded-pill btn-primary fw-bold" @click="likePhoto()">Like</button>
-                <button class="d-flex btn rounded-pill btn-danger fw-bold" @click="unlikePhoto()">Unlike</button>
+                <button class="d-flex btn rounded-pill btn-danger fw-bold" @click="unlikePhoto()">Unlike</button> -->
 
             </div>
         </div>

@@ -18,10 +18,10 @@ export default {
                 followingCounter: 0,
                 photoCounter: 0,
             },
-            servedPhotos : [],
+            servedPhotos: [],
             clicked: false,
             errMsg: null,
-            
+
         }
     },
     // computed: {
@@ -30,50 +30,55 @@ export default {
     //     },
     // },
     // this will get the userprofile and sort photos
-    async created(){
+    async created() {
         await this.getUserProfile()
         await this.updateServedPhotos()
-        
+
     },
 
-    
+
 
     methods: {
 
         // generalize it?
-        graphicallyLikeBeforeRefresh(index){
+        graphicallyLikeBeforeRefresh(index) {
             // on refresh likes will be retrieved from backend
             this.profile.myPhotos[index].likeCounter++
             // will also set liked 
             this.profile.myPhotos[index].likedByCurrentUser = true
         },
 
-        async updateServedPhotos(){
-    
+        graphicallyUnlikeBeforeRefresh(index) {
+            this.profile.myPhotos[index].likeCounter--
+            this.profile.myPhotos[index].likedByCurrentUser = false
+        },
 
-        let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
-            return new Date(b.date) - new Date(a.date)
-        })
+        async updateServedPhotos() {
 
-        let tmpServedPhotos = []
-        for (let photo of sortedPhotosByDate){
-            
-            let path = photo.photoPath
-            tmpServedPhotos.push(await this.getPhoto(path))
-        }
 
-        this.servedPhotos = tmpServedPhotos
-    },
+            let sortedPhotosByDate = this.profile.myPhotos.sort((a, b) => {
+                return new Date(b.date) - new Date(a.date)
+            })
+
+            let tmpServedPhotos = []
+            for (let photo of sortedPhotosByDate) {
+
+                let path = photo.photoPath
+                tmpServedPhotos.push(await this.getPhoto(path))
+            }
+
+            this.servedPhotos = tmpServedPhotos
+        },
         async getUserProfile() {
             try {
                 let response = await this.$axios.get(`/users/${this.profile.userId}/profile`
                     , {
-                        headers: { 
+                        headers: {
                             Requestor: this.profile.userId
                         }
                     }
                 )
-                
+
                 // check for username consistency 
                 if (this.profile.username !== response.data.username) {
                     this.profile.username = response.data.username
@@ -116,7 +121,7 @@ export default {
         },
 
         async uploadPhoto(file) {
-          
+
             let fileReader = new FileReader();
 
             fileReader.onload = async () => {
@@ -131,15 +136,15 @@ export default {
                                 'Content-Type': 'application/octet-stream'
                             }
                         })
-                
-                // TODO add a success message with photoid returned by response or an alert
-                alert("Photo uploaded successfully")
-                    
-                // this will refresh the profile 
-                await this.getUserProfile()
-                await this.updateServedPhotos()
-                
-            } catch (e) {
+
+                    // TODO add a success message with photoid returned by response or an alert
+                    alert("Photo uploaded successfully")
+
+                    // this will refresh the profile 
+                    await this.getUserProfile()
+                    await this.updateServedPhotos()
+
+                } catch (e) {
                     alert(e)
                     // TODO handle error
                 }
@@ -153,20 +158,20 @@ export default {
         // THIS WILL CALL SERVEPHOTO IN API 
         async getPhoto(partialPath) {
             let photoId = partialPath.split('/')[1]
-      
+
             try {
                 let response = await this.$axios.get(`users/${this.profile.userId}/photos/${photoId}`,
                     {
-                       
+
                         responseType: 'blob'
                     })
 
-                let servedPhotoUrl = window.URL.createObjectURL(response.data) 
+                let servedPhotoUrl = window.URL.createObjectURL(response.data)
                 return servedPhotoUrl
             } catch (e) {
                 alert(e)
             }
-        }, 
+        },
         toggleEditing(newUsername) {
             if (this.clicked) {
 
@@ -195,7 +200,7 @@ export default {
                 <h3 class="h3"><strong>{{ this.profile.username }}</strong></h3>
                 <h6 class="text-muted ms-2">(<strong>{{ this.profile.userId }}</strong>)</h6>
             </div>
-            
+
             <div class="d-flex ms-auto pe-1">
                 <!-- counters -->
                 <div class="text-center me-4">
@@ -241,24 +246,15 @@ export default {
     <!-- photos -->
     <div v-if="!clicked" class="container pt-4 pb-4" style="width: 60%;">
         <div>
-        
+
             <!--- in stream uploader  will need to be passed from struct -->
-            <Photo
-              
-                v-for="(photo, index) in servedPhotos"
-                @like="graphicallyLikeBeforeRefresh(index)"
-                :src = "photo"
-    
-                :uploader = "this.profile.username"
-    
-                :photoId = "this.profile.myPhotos[index].photoId.identifier"
-                :uploaderId = "this.profile.myPhotos[index].uploaderUserId.identifier"
-				
-                :date = "this.profile.myPhotos[index].date"
-                :likes = "this.profile.myPhotos[index].likeCounter"
-				:liked = "this.profile.myPhotos[index].likedByCurrentUser"
-            />
+            <Photo v-for="(photo, index) in servedPhotos" @like="graphicallyLikeBeforeRefresh(index)"
+                @unlike="graphicallyUnlikeBeforeRefresh(index)" :src="photo" :uploader="this.profile.username"
+                :photoId="this.profile.myPhotos[index].photoId.identifier"
+                :uploaderId="this.profile.myPhotos[index].uploaderUserId.identifier"
+                :date="this.profile.myPhotos[index].date" :likes="this.profile.myPhotos[index].likeCounter"
+                :liked="this.profile.myPhotos[index].likedByCurrentUser" />
 
         </div>
-    </div> 
+    </div>
 </template>
