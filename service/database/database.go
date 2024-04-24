@@ -116,8 +116,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 		likeTable := `CREATE TABLE likes (
 			likerId VARCHAR(11) NOT NULL,
 			photoId VARCHAR(11) NOT NULL,
-			FOREIGN KEY (likerId) REFERENCES users(userId)
-			FOREIGN KEY (photoId) REFERENCES photos(photoId)
+			FOREIGN KEY (likerId) REFERENCES users(userId) 
+			FOREIGN KEY (photoId) REFERENCES photos(photoId) ON DELETE CASCADE
 			PRIMARY KEY (likerId, photoId)
 		)`
 
@@ -128,7 +128,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			body TEXT, 
 			date TEXT,
 			FOREIGN KEY (userId) REFERENCES users(userId),
-			FOREIGN KEY (photoId) REFERENCES photos(photoId)
+			FOREIGN KEY (photoId) REFERENCES photos(photoId) ON DELETE CASCADE
 		)`
 
 		// TODO this would be executed one by one with dedicated errors probably
