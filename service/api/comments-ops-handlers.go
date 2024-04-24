@@ -12,17 +12,19 @@ import (
 )
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	commentingUserId := structs.Identifier{Id: ps.ByName("commentingId")} // FIXME consistency via db
+
+	requestorUserId := structs.Identifier{Id: r.Header.Get("Requestor")}
+	// TODO check requestor is not banned
 	photoId := structs.Identifier{Id: ps.ByName("photoId")}
 
-	if commentingUserId.Id == "" || photoId.Id == "" {
+	if requestorUserId.Id == "" || photoId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("userId or photoId has not been provided")
 		return
 	}
 
 	authorization := r.Header.Get("Authorization")
-	if commentingUserId.Id != authorization {
+	if requestorUserId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to comment photo") // not logged in
 		return
@@ -39,7 +41,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	commentBody := commentBodyReq.Body
 
 	// TODO fix this, check return for consistency etc etc
-	comment, err := rt.db.CommentPhoto(photoId, commentingUserId, commentBody)
+	comment, err := rt.db.CommentPhoto(photoId, requestorUserId, commentBody)
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is banned and cannot comment photo")
@@ -58,16 +60,16 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	commentId := structs.Identifier{Id: ps.ByName("commentId")}
-	commentingUserId := structs.Identifier{Id: ps.ByName("commentingId")}
+	requestorUserId := structs.Identifier{Id: r.Header.Get("Requestor")}
 
-	if commentId.Id == "" || commentingUserId.Id == "" {
+	if commentId.Id == "" || requestorUserId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("commentId or commentingUserId has not been provided")
 		return
 	}
 
 	authorization := r.Header.Get("Authorization")
-	if commentingUserId.Id != authorization {
+	if requestorUserId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to uncomment photo") // not logged in
 		return

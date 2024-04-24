@@ -26,6 +26,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 		return structs.Comment{}, err
 	}
 
+	// TODO be sure this is the right order to check
 	// check ban
 	err = db.checkBan(userUploaderId.Id, requestorUserId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {
@@ -84,6 +85,7 @@ func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
 		return err
 	}
 
+	// TODO be sure this is the right order to check
 	// check ban
 	err = db.checkBan(uploaderId.Id, commenterId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {

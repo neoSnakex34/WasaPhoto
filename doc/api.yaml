@@ -394,12 +394,11 @@ paths:
             "#/components/responses/InternalServerError"
 
 
-  /users/{userId}/photos/{photoId}/comments/{commentingId}: 
+  /users/{userId}/photos/{photoId}/comments: 
     
     parameters: 
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
-      - $ref: "#/components/parameters/commentingId"
 
     post: 
       security:
@@ -436,12 +435,11 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
-  /users/{userId}/photos/{photoId}/comments/{commentingId}/{commentId}:
+  /users/{userId}/photos/{photoId}/comments/{commentId}:
     parameters:
       - $ref: "#/components/parameters/userId"
       - $ref: "#/components/parameters/photoId"
       - $ref: "#/components/parameters/commentId"
-      - $ref: "#/components/parameters/commentingId"
 
     delete:
       security:
@@ -465,8 +463,6 @@ paths:
           $ref: 
             "#/components/responses/InternalServerError"
 
-  # userId will be the liker
-  # FIXME this is a bad design
   /users/{userId}/photos/{photoId}/likes/{likerId}:
     parameters:
       - $ref: "#/components/parameters/photoId"     
@@ -476,7 +472,6 @@ paths:
     put: 
       security:
         - bearerAuth: []
-      #TODO change arrays of tags like that 
       tags: 
         - Like 
       summary: adds a like to a photo 
@@ -549,65 +544,54 @@ components:
   parameters:
   
     userId:
-      description: identifier for a single user 
-      schema: 
-        $ref: "#/components/schemas/Identifier"
       name: userId
       in: path
       required: true
-    
-    followerId:
-      description: identifier for a user that follows another
+      description: identifier for a single user 
       schema: 
         $ref: "#/components/schemas/Identifier"
+     
+    followerId:
       name: followerId 
       in: path
       required: true
-
-    bannerId:
-      description: identifier for a user banning another  
+      description: identifier for a user that follows another
       schema: 
         $ref: "#/components/schemas/Identifier"
+      
+    bannerId:
       name: bannerId
       in: path
       required: true
+      description: identifier for a user banning another  
+      schema: 
+        $ref: "#/components/schemas/Identifier"
+    
     
     photoId:
+      name: photoId
+      in: path
+      required: true
       description: identifier for a photo
       schema:
         $ref: "#/components/schemas/Identifier"
-      name: photoId
-      in: path 
-      required: true
       
     commentId:
       name: commentId
-      required: true
       in: path 
+      required: true
       description: identifier for a comment, used to retrieve comments
       schema:
         $ref: "#/components/schemas/Identifier"
     
-    commentingId:
-      name: commentingId
-      required: true
-      in: path
-      description: identifier for a user that comments a photo
-      schema:
-        $ref: "#/components/schemas/Identifier"
-
     likerId:
       name: likerId
-      required: true
       in: path
+      required: true
       description: identifier for a user that likes a photo (it represents the actual like)
       schema:
         $ref: "#/components/schemas/Identifier"
     
-      
-
-
-
   schemas:
 
     Identifier:
@@ -629,8 +613,6 @@ components:
       pattern: '^[a-z0-9]*?$'
       minLength: 3 
       maxLength: 12
-     
-
 
     User:
       title: user
@@ -682,9 +664,6 @@ components:
           maxItems: 20
           items: 
             $ref: "#/components/schemas/Photo"
-        
-        
-
 
     # in backend i will take file, convert into bytes and use it through the program
     # i can be more RESTful with those description, try to fix later 
