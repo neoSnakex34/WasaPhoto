@@ -1,10 +1,18 @@
 <script>
+import Photo from '../components/Photo.vue';
+
 export default {
+    props : ['userId'],
+    components: {
+        Photo
+    },
+
     data: function () {
+       
         return {
-            profile: {
+            otherProfile: {
                 username: "",
-                userId: "",
+                
                 following: 0,
                 followedCounter: 0,
                 photoCounter: 0,
@@ -16,7 +24,38 @@ export default {
             banned: false,
 
         }
-    }
+    }, 
+    async created(){
+        await this.getUserProfileAsGues()
+    }, 
+
+    methods:{
+
+        async getUserProfileAsGues() {
+            try {
+
+                // TODO check if ban works 
+                let response = await this.$axios.get(`/users/${this.userId}`, {
+                    headers: {
+                        Requestor: localStorage.getItem('userId')
+                    }
+                })
+
+                this.otherProfile.userId = response.data.userId
+                this.otherProfile.username = response.data.username
+
+
+            }catch(e){
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+                }
+            }
+        }
+
+    }, 
+
 }
 </script>
 
@@ -26,8 +65,8 @@ export default {
         <div class="d-flex">
             <!-- username and id -->
             <div class="d-flex align-items-baseline ps-1">
-                <h3 class="h3"><strong>username</strong></h3>
-                <h6 class="text-muted ms-2">(<strong>userid</strong>)</h6>
+                <h3 class="h3"><strong>{{this.otherProfile.username}}</strong></h3>
+                <h6 class="text-muted ms-2">(<strong>{{this.userId}}</strong>)</h6>
             </div>
 
             <div class="d-flex ms-auto pe-1">
