@@ -122,7 +122,7 @@
     </div>
     <div class="container pt-1" style="height: 500px; width: 80%">
         <div class="border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center"
-             v-for="user in matchingUsers" :key="userId"
+             v-for="user in matchingUsers" 
              @mouseenter="user.showButtons = true"
              @mouseleave="user.showButtons = false">
             <!-- add href to profile -->

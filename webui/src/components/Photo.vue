@@ -4,7 +4,8 @@ import Comment from '../components/Comment.vue'
 export default {
     data: function () {
         return {
-            likerId: localStorage.getItem('userId')
+            likerId: localStorage.getItem('userId'),
+            delete: false
         }
     },
     components: {
@@ -13,6 +14,9 @@ export default {
     props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId'], // some ID wont be visualized
     methods:
     {
+        toggleDelete() {
+            this.delete = !this.delete
+        },
         async likePhoto() {
             try {
                 let response = await this.$axios.put(`/users/${this.uploaderId}/photos/${this.photoId}/likes/${this.likerId}`,
@@ -74,9 +78,22 @@ export default {
 <!--- href for visualizing photo in another windows? what about -->
 <template>
 
-    <div class="card flex-grow-1">
+    <div class="d-flex flex-grow-1 pb-2">
+        <button v-if="this.delete" @click="deletePhoto" class="d-flex btn btn-danger flex-grow-1 justify-content-center fw-bold">DELETE</button>
+    </div>
+ 
+    <div class="card flex-grow-1 ">
+        
+       
+
         <img :src="src" class="card-img-top" />
+            <!-- kebab button -->
+            <button @click="toggleDelete" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
+           
+   
         <div class="card-body d-flex flex-column">
+                  
+
 
             <div class="d-flex align-items-center justify-content-center justify-content-between pt-2 pb-2"
                 style="width: 60%; margin: auto;">
@@ -101,12 +118,13 @@ export default {
                             </svg>
                         </div>
                         <div v-if="this.liked">
-                            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" @click="unlikePhoto()">
+                            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" @click="unlikePhoto()" style="fill: blueviolet ">
                                 <path d="m462.3 62.6c-54.8-46.7-136.3-38.3-186.6 13.6l-19.7 20.3-19.7-20.3c-50.2-51.9-131.8-60.3-186.6-13.6-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/>
                             </svg>
                         </div>
                     </div>
-<!-- 
+
+                <!--  deprecated, remove 
                 <button class="ms-4 d-flex btn rounded-pill btn-primary fw-bold" @click="likePhoto()">Like</button>
                 <button class="d-flex btn rounded-pill btn-danger fw-bold" @click="unlikePhoto()">Unlike</button> -->
 
@@ -123,13 +141,20 @@ export default {
     <div class="overflow-auto  pt-2 pb-5 mb-5" style="max-height: 200px;">
         <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
         <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
+
 
     </div>
+
+    
 </template>
+
+<style>
+    .custom-button {
+    border: none; 
+    outline: none; 
+    color: white;
+    background-color: transparent;  
+    font-size: 40px;
+    padding: 5px 30px; /* top bottom; left right */
+}
+</style>
