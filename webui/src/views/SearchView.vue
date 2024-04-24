@@ -128,7 +128,7 @@
              
              style="min-height: 100px;">
             <!-- add href to profile -->
-            <router-link :to="`/profile/${encodeURIComponent(user.userId.identifier)}`">{{ user.username }}</router-link>
+            <router-link :to="`/profile/${encodeURIComponent(user.userId.identifier)}`" style="font-size: large;"><strong>{{ user.username }}</strong></router-link>
            
             <div class="btn-group" v-show="user.showButtons">
 
