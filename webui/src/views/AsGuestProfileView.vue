@@ -13,19 +13,21 @@ export default {
             otherProfile: {
                 username: "",
                 
-                following: 0,
+                followingCounter: 0,
                 followedCounter: 0,
                 photoCounter: 0,
                 photos: [],
 
             },
-
+            backendReadableUserId: decodeURIComponent(this.userId),
             servedPhotos: [],
-            banned: false,
+            bannedByHost: false, // SHOULD BE A PROP
 
         }
     }, 
-    async created(){
+
+    async mounted(){
+       
         await this.getUserProfileAsGues()
     }, 
 
@@ -35,14 +37,16 @@ export default {
             try {
 
                 // TODO check if ban works 
-                let response = await this.$axios.get(`/users/${this.userId}`, {
+                let response = await this.$axios.get(`/users/${this.userId}/profile`, {
                     headers: {
                         Requestor: localStorage.getItem('userId')
                     }
                 })
 
-                this.otherProfile.userId = response.data.userId
+                
                 this.otherProfile.username = response.data.username
+                this.otherProfile.followedCounter = response.data.followersCounter
+                this.otherProfile.followingCounter = response.data.followingCounter
 
 
             }catch(e){
@@ -73,15 +77,15 @@ export default {
                 <!-- counters -->
                 <div class="text-center me-4">
                     <div class="fw-bold">Following</div>
-                    <div class="fw-bold">0</div>
+                    <div class="fw-bold">{{ this.otherProfile.followingCounter }}</div>
                 </div>
                 <div class="text-center ps-4 pe-4 me-4">
-                    <div class="fw-bold">Followed</div>
-                    <div class="fw-bold">0</div>
+                    <div class="fw-bold">Followed by</div>
+                    <div class="fw-bold">{{ this.otherProfile.followedCounter }}</div>
                 </div>
                 <div class="text-center">
                     <div class="fw-bold">Photos</div>
-                    <div class="fw-bold">0</div>
+                    <div class="fw-bold">{{ this.otherProfile.photoCounter }}</div>
                 </div>
             </div>
 
@@ -90,20 +94,26 @@ export default {
 
 
     </div>
-    <div class="container pt-3 pb-3 d-flex align-items-center justify-content-center" style="width: 90%;">
-
-
-    </div>
-
 
     <div class="border-bottom"></div>
 
     <!-- photos v if not banned -->
     <div class="container pt-4 pb-4" style="width: 60%;">
-        <div>
+        <div v-if="!bannedByHost">   
 
-            <!--- in stream uploader  will need to be passed from struct -->
-
+            <Photo v-for="(photo, index) in servedPhotos"
+                
+                @like="graphicallyLikeBeforeRefresh(index)"
+                @unlike="graphicallyUnlikeBeforeRefresh(index)" 
+                @toggle-delete="this.deleteToggle = !this.deleteToggle"
+                @delete-event="deletePhoto(index)"
+                :src="photo" :uploader="this.profile.username"
+                :photoId="this.profile.myPhotos[index].photoId.identifier"
+                :uploaderId="this.profile.myPhotos[index].uploaderUserId.identifier"
+                :date="this.profile.myPhotos[index].date" :likes="this.profile.myPhotos[index].likeCounter"
+                :liked="this.profile.myPhotos[index].likedByCurrentUser" 
+                :delete = this.deleteToggle
+                />
 
         </div>
     </div>

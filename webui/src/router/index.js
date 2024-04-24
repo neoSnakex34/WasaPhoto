@@ -10,7 +10,7 @@ const router = createRouter({
 	routes: [
 		{path: '/login', name: 'login', component: Login},
 		{path: '/profile', name: 'profile',  component: ProfileView},
-		{path: '/profile/:username', name: 'asGuestProfile', component: AsGuestProfileView},
+		{path: '/profile/:userId', name: 'asGuestProfile', component: AsGuestProfileView, props: true},
 		{path: '/search', name: 'search', component: SearchView},
 		{path: '/home', component: HomeView},
 		{path: '/link1', component: HomeView},

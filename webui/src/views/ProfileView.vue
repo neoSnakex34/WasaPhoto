@@ -238,6 +238,7 @@ export default {
 </script>
 
 <template>
+    <!--- could be generalized into a component need to decide if i want to... -->
     <div class="pt-3 pb-3 border-bottom">
 
         <div class="d-flex">
@@ -254,7 +255,7 @@ export default {
                     <div class="fw-bold">{{ this.profile.followingCounter }}</div>
                 </div>
                 <div class="text-center ps-4 pe-4 me-4">
-                    <div class="fw-bold">Followed</div>
+                    <div class="fw-bold">Followed by</div>
                     <div class="fw-bold">{{ this.profile.followerCounter }}</div>
                 </div>
                 <div class="text-center">

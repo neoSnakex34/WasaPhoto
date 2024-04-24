@@ -120,6 +120,7 @@
 
     </div>
     <div class="container pt-1" style="height: 500px; width: 80%">
+        <!-- add a condition in script for excluding banned user -->
         <div class="border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center"
              v-for="user in matchingUsers" 
              @mouseenter="user.showButtons = true"
@@ -127,7 +128,8 @@
              
              style="min-height: 100px;">
             <!-- add href to profile -->
-            <a>{{ user.username }}</a> <!--  add ref to profile-->
+            <router-link :to="`/profile/${encodeURIComponent(user.userId.identifier)}`">{{ user.username }}</router-link>
+           
             <div class="btn-group" v-show="user.showButtons">
 
                 <button class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(user.userId.identifier)">Follow</button>
