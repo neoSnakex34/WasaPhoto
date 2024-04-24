@@ -70,7 +70,7 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	// FIXME since single char are unicode byte
 	// even if i am sure that those are utf8 1byte chars
 	// it is probably better to check them using the appropriate comparator
-	println("id: ", id)
+
 	// FIXME this is a check thhat works only if the id already exists
 	// if mode != "N" {
 	// 	var idMode string = string(id[1])
@@ -112,7 +112,6 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 
 func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
 	var plainUploaderId string
-	println("photoId ", photoId.Id)
 
 	err := db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, photoId.Id).Scan(&plainUploaderId)
 	return structs.Identifier{Id: plainUploaderId}, err

@@ -2,6 +2,7 @@ package serviceutilities
 
 import (
 	"errors"
+	"log"
 	"regexp"
 
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
@@ -14,7 +15,7 @@ const Folder string = "/tmp/wasaphoto/photofiles/"
 // FIXME
 func CheckRegexNewUsername(username string) bool {
 
-	println("regex call")
+	log.Println("regex check for username entered")
 
 	usernameRegex := "^[a-z0-9]{3,12}?$"
 	matched, err := regexp.MatchString(usernameRegex, username)
@@ -22,7 +23,7 @@ func CheckRegexNewUsername(username string) bool {
 		return false
 	}
 
-	println("matched: ", matched)
+	log.Println("regex check for username match: ", matched)
 
 	return matched
 }

@@ -3,12 +3,14 @@ import HomeView from '../views/HomeView.vue'
 import Login from '../views/LoginView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import SearchView from '../views/SearchView.vue'
+import AsGuestProfileView from '../views/AsGuestProfileView.vue'
 
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
 		{path: '/login', name: 'login', component: Login},
 		{path: '/profile', name: 'profile',  component: ProfileView},
+		{path: '/profile/:username', name: 'asGuestProfile', component: AsGuestProfileView},
 		{path: '/search', name: 'search', component: SearchView},
 		{path: '/home', component: HomeView},
 		{path: '/link1', component: HomeView},

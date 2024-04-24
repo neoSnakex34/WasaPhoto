@@ -42,10 +42,10 @@
 
                 } catch(e) {
                   // TODO check other errors
-                    if (e.response.status === 400) {
+                    if (e.response.data) {
                         this.errMsg = `${e.response.data}`
                         // alert(this.errMsg)
-                    }
+                    } else{alert (e)}
                   }
             }
             },

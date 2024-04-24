@@ -25,7 +25,6 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	idIsValid := false
 
 	exist, userId, err := db.checkUserExists(username)
-	println("user exist: ", exist)
 	// if any error is found i return it (TODO handle)
 	if err != nil {
 		// check if you need to throw the login error or not
@@ -35,14 +34,13 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	// else if the user exist i have to login
 	if exist {
 		// login
-		println("user exist!")
+		log.Println("user exist")
 		return structs.Identifier{Id: userId}, nil
 
 	} else if !exist {
 
 		// loop until a valid user or error is found
 		for (!idIsValid) && (err == nil) {
-			println("im here now // debugging")
 			idIsValid, err = db.validId(userId, "U")
 
 			// println("id: ", userId)
@@ -60,11 +58,11 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		if err != nil {
 			return structs.Identifier{}, err
 		}
-		println("im out")
 		// here i actually create the user by setting is username in N mode
 		// setting username for the first time is part of the action of generating the userId
 		// that it has been verified in the for (while) loop on line 38
-		println(userId, " ", username)
+		log.Println(userId, " ", username)
+
 		// [ ] GIVEN that here will be called setMyUsername regex check will be done after generating id, it is not slow but neither is
 		// efficient or clean
 		// i should modify that
@@ -85,8 +83,6 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	// TODO all this cheks must be lowercase, also i need an efficient way to loop over errors till
 	// a valid name pops up
 
-	println("entered setmyusername")
-
 	var count int
 	var valid bool = false
 
@@ -96,18 +92,17 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	//  i check if newUsername is taken
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
 
-	println("err: ", err)
 	matched := serviceutilities.CheckRegexNewUsername(newUsername)
 
 	if count == 0 && matched {
 
-		println("username is valid")
+		log.Printf("username [%s] is valid\n", newUsername)
 		valid = true
 
 	} else {
 		if !matched {
 			err = customErrors.ErrInvalidRegexUsername
-			println("username is not valid", err)
+			log.Printf("username [%s] is valid\n", newUsername)
 			return err
 		}
 
@@ -128,12 +123,12 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 
 		case "U":
 
-			println("updating username")
-
+			log.Println("updating username")
 			_, err := db.c.Exec(`UPDATE users SET username = ? WHERE userId = ?`, newUsername, userId)
 			return err
 
 		default:
+			// FIXME add custom error
 			return errors.New("error in parsing mode or invalid mode for userame operation")
 
 		}
@@ -146,12 +141,14 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 // probably i can add a refreshUserProfile function that updates all the counters
 func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) {
 
+	println("profileUserId, requestorUserId: ", profileUserId.Id, requestorUserId.Id)
 	plainUserId := profileUserId.Id
 	requestor := requestorUserId.Id
 	// check requestor banned by profile user
 	err := db.checkBan(plainUserId, requestor)
+
 	if errors.Is(err, customErrors.ErrIsBanned) {
-		println("requestor is banned by user") // TODO log this in api
+		log.Println("requestor is banned by user") // TODO log this in api
 		return structs.UserProfile{}, err
 	} else if err != nil {
 		return structs.UserProfile{}, err
@@ -195,7 +192,7 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 
 		Photos: photos,
 	}
-	log.Println("THE PROFILE: ", profileRetrieved)
+	// log.Println("THE PROFILE: ", profileRetrieved)
 	return profileRetrieved, nil
 }
 
@@ -249,7 +246,8 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, er
 func (db *appdbimpl) createUser(username string, userId string) error {
 
 	_, err := db.c.Exec("INSERT INTO users (username, userId) VALUES (?, ?)", username, userId)
-	println("user created")
+
+	log.Println("user created with error returned: ", err)
 	return err
 }
 

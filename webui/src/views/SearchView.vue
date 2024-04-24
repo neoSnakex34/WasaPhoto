@@ -22,9 +22,8 @@
                     }
                 });
                 this.users = response.data;
-                // this.usernames = this.users.map(user => user.username);
            
-                this.matchingUsers = this.users.filter(user => user.username.includes(this.query.toLowerCase())).filter(user => user.userId.identifier !== this.userId);
+                this.matchingUsers = this.users.filter(user => user.username.startsWith(this.query.toLowerCase())).filter(user => user.userId.identifier !== this.userId);
               
                 // this.matchingUsernames = this.usernames.filter(username => username.includes(this.query.toLowerCase()));
                 } catch(e){
@@ -124,7 +123,9 @@
         <div class="border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center"
              v-for="user in matchingUsers" 
              @mouseenter="user.showButtons = true"
-             @mouseleave="user.showButtons = false">
+             @mouseleave="user.showButtons = false"
+             
+             style="min-height: 100px;">
             <!-- add href to profile -->
             <a>{{ user.username }}</a> <!--  add ref to profile-->
             <div class="btn-group" v-show="user.showButtons">

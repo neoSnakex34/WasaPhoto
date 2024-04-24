@@ -14,7 +14,6 @@ import (
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var username string
-	ctx.Logger.Println(r.Body)
 
 	err := json.NewDecoder(r.Body).Decode(&username)
 	if err != nil {

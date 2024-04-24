@@ -8,7 +8,7 @@ export default {
     props: ['msg'],
     data: function () {
         return {
-            // FIXME there-s a bug with likebycurrent user retrival
+        
             profile: {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
@@ -20,7 +20,6 @@ export default {
             },
             servedPhotos: [],
             clicked: false,
-            errMsg: null,
             deleteToggle: false
 
         }
@@ -58,12 +57,17 @@ export default {
             this.deleteToggle = !this.deleteToggle
         },
 
+        // via file selector i call and upload photo
         formUploadSelect() {
 
             let input = this.$refs.inputForm.files[0]
             if (input) {
                 this.uploadPhoto(input)
             }
+            
+            // empties the selector
+            this.$refs.inputForm.value = null
+
         },
 
 
@@ -110,8 +114,11 @@ export default {
                 this.profile.photoCounter = response.data.photoCounter
                 this.profile.myPhotos = response.data.photos
             } catch (e) {
-                this.errMsg = e
-                alert(e)
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+                }
             }
         },
 
@@ -156,8 +163,11 @@ export default {
                     await this.updateServedPhotos()
 
                 } catch (e) {
-                    alert(e)
-                    // TODO handle error
+                    if (e.response.data) {
+                        alert(e.response.data)
+                    } else {
+                        alert(e)
+                    }
                 }
 
 
@@ -169,7 +179,7 @@ export default {
 
         async deletePhoto(index) {
             let photoId = this.profile.myPhotos[index].photoId.identifier
-            alert(photoId)
+            
             try {
                 let response = await this.$axios.delete(`/users/${this.profile.userId}/photos/${photoId}`,
                     {
@@ -184,7 +194,11 @@ export default {
                 await this.updateServedPhotos()
 
             } catch (e) {
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
                 alert(e)
+                }
             }
         },
         // THIS WILL CALL SERVEPHOTO IN API 

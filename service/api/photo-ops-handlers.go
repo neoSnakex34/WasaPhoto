@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -114,7 +113,7 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	// TODO authorization could fail in servephoto for stream
 	userId := ps.ByName("userId")
 	photoId := ps.ByName("photoId")
-	log.Println("userId, photoId", userId, photoId)
+
 	if userId == "" || photoId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("userId or photoId has not been provided")
@@ -122,7 +121,9 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	authorization := r.Header.Get("Authorization")
-	log.Println(userId, authorization)
+
+	// log.Println(userId, authorization)
+
 	if userId != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to view photo")
