@@ -45,12 +45,7 @@ type Comment struct {
 	//TODO manage others
 }
 
+// BodyRequest ... request body for a comment
 type BodyRequest struct {
 	Body string `json:"body"`
 }
-
-// TODO did i use this?
-// type StreamInfo struct {
-// 	PhotoPaths []string
-// 	Date       string
-// }
