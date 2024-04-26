@@ -4,7 +4,12 @@ package database
 // between the two files
 
 import (
+	"database/sql"
+	"errors"
+	"log"
 	"math/rand"
+	"os"
+	"strings"
 	"time"
 
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
@@ -13,6 +18,8 @@ import (
 
 // as stated in api.yaml the identifier is a string of lenght 11 @X000000000
 // actor will be mode of the id (U P C)
+// not sure if this needs to be exported
+// FIXME ^^^^
 func GenerateIdentifier(actor string) (structs.Identifier, error) {
 	const lenght = 9
 	const validChars = "0123456789"
@@ -117,10 +124,29 @@ func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.I
 	return structs.Identifier{Id: plainUploaderId}, err
 }
 
-func (db *appdbimpl) getCommenterByCommentId(commentId structs.Identifier) (structs.Identifier, error) {
+func (db *appdbimpl) getCommenterIdByCommentId(commentId structs.Identifier) (structs.Identifier, error) {
 	var plainCommenterId string
 	err := db.c.QueryRow(`SELECT userId FROM comments WHERE commentId = ?`, commentId.Id).Scan(&plainCommenterId)
-	return structs.Identifier{Id: plainCommenterId}, err
+	if err != nil {
+		return structs.Identifier{}, err // MANAGE
+	}
+	return structs.Identifier{Id: plainCommenterId}, nil
+}
+
+func (db *appdbimpl) getCommenterUsernameByCommentId(commentId structs.Identifier) (string, error) {
+	var username string
+	var userId string
+	err := db.c.QueryRow(`SELECT userId FROM comments WHERE commentId = ?`, commentId.Id).Scan(&userId)
+	if err != nil {
+		return "", err
+	}
+
+	err = db.c.QueryRow(`SELECT username FROM users WHERE userId = ?`, userId).Scan(&username)
+	if err != nil {
+		return "", err
+	}
+
+	return username, nil
 }
 
 func (db *appdbimpl) getUploaderByCommentId(commentId structs.Identifier) (structs.Identifier, error) {
@@ -133,4 +159,177 @@ func (db *appdbimpl) getUploaderByCommentId(commentId structs.Identifier) (struc
 	err = db.c.QueryRow(`SELECT userId FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&plainUploaderId)
 
 	return structs.Identifier{Id: plainUploaderId}, err
+}
+
+func (db *appdbimpl) alreadyLiked(requestorUserId string, likedPhotoId string) (bool, error) {
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, requestorUserId, likedPhotoId).Scan(&counter)
+	if err != nil {
+		return false, err
+	} else if counter > 0 {
+		return true, customErrors.ErrPhotoAlreadyLikedByUser
+	}
+	return false, nil
+
+}
+
+func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string) ([]structs.Photo, error) {
+	var photos []structs.Photo
+	var userId string = plainUploaderId
+	var photoId string
+	var date string
+	var photoPath string
+
+	// query to retrieve info
+	rows, err := db.c.Query(`SELECT photoId, userId, date, photoPath FROM photos WHERE userId = ?`, plainUploaderId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		// user id is the same for all photos at every call, but for now is re assigned
+		err = rows.Scan(&photoId, &userId, &date, &photoPath)
+		if err != nil {
+			return nil, err
+		}
+		photo := structs.Photo{
+			PhotoId:        structs.Identifier{Id: photoId},
+			UploaderUserId: structs.Identifier{Id: userId},
+			Date:           date,
+			PhotoPath:      photoPath,
+		}
+		photos = append(photos, photo)
+	}
+
+	return photos, err
+}
+
+func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) {
+	var date string
+
+	err := db.c.QueryRow(`SELECT date FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&date)
+	// FIXME manage errors
+	// TODO change
+	// error no rows
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", nil
+	} else if err != nil {
+		return "", err
+	}
+
+	return date, nil
+}
+
+func (db *appdbimpl) getNumberOfLikedByPhotoId(plainPhotoId string) (int, error) {
+	var likeCounter int
+	err := db.c.QueryRow(`SELECT COUNT(likerId) FROM likes WHERE photoId = ?`, plainPhotoId).Scan(&likeCounter)
+	// FIXME manage custom error here
+	if err != nil {
+		return 0, err
+	}
+	return likeCounter, nil
+}
+
+func (db *appdbimpl) getLikedByUserId(plainUserId string, plainphotoId string) (bool, error) {
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, plainphotoId).Scan(&counter)
+	if err != nil {
+		println("an error occured while checking photolikedbycurrentid")
+		return false, err
+	}
+	return counter > 0, nil
+}
+
+func (db *appdbimpl) getUsernameByUserId(plainUserId string) (string, error) {
+	var username string
+	err := db.c.QueryRow(`SELECT username FROM users WHERE userId = ?`, plainUserId).Scan(&username)
+	return username, err
+}
+
+func (db *appdbimpl) getFollowersCounterByUserId(plainUserId string) (int, error) {
+	var followers int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followedId = ?`, plainUserId).Scan(&followers)
+	return followers, err
+}
+
+func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error) {
+	var following int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ?`, plainUserId).Scan(&following)
+	return following, err
+}
+
+// FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
+func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestorUserId string) (int, []structs.Photo, error) {
+
+	path := Folder + plainUserId + "/"
+	photoFsDirs, err := os.ReadDir(path)
+	if os.IsNotExist(err) {
+		log.Println("folder not found or does not exist counters set to 0")
+		return 0, nil, nil
+	} else if err != nil {
+		return 0, nil, err
+	}
+
+	photoCount := len(photoFsDirs)
+	var photoName string
+	var plainPhotoId string
+	var photoDate string
+	var likeCounter int
+	var liked bool
+	var photoPath string
+
+	var photos []structs.Photo
+
+	var tmpPhoto structs.Photo
+
+	// for each photo in the folder i get the metadata
+	// and extract the path to the photo
+	// absolute path could be retrieved via db but i need the partial one
+	// to be used in frontend
+	for _, photo := range photoFsDirs {
+
+		photoName = photo.Name()
+		plainPhotoId = strings.Split(photo.Name(), ".")[0]
+
+		// partial photo path
+		photoPath = plainUserId + "/" + photoName
+		// photoPathList = append(photoPathList, photoPath)
+
+		photoDate, err = db.getPhotoDateByPhotoId(plainPhotoId)
+		if err != nil {
+			log.Println("error in getting photo date from db")
+			return 0, nil, err
+		}
+
+		likeCounter, err = db.getNumberOfLikedByPhotoId(plainPhotoId)
+		if err != nil {
+			log.Println("error in getting like counter from db")
+			return 0, nil, err
+		}
+
+		liked, err = db.getLikedByUserId(plainRequestorUserId, plainPhotoId)
+		if err != nil {
+			log.Println("error in getting info of like by user from db")
+			return 0, nil, err
+		}
+
+		// FIXME i have to manage comments
+		comments := []structs.Comment{}
+
+		tmpPhoto = structs.Photo{
+			PhotoId:            structs.Identifier{Id: plainPhotoId},
+			UploaderUserId:     structs.Identifier{Id: plainUserId},
+			LikeCounter:        likeCounter,
+			Comments:           comments,
+			LikedByCurrentUser: liked,
+			Date:               photoDate,
+			PhotoPath:          photoPath,
+		}
+
+		photos = append(photos, tmpPhoto)
+
+	}
+
+	return photoCount, photos, nil
 }

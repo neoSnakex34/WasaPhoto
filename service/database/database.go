@@ -55,11 +55,11 @@ type AppDatabase interface {
 	BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error           // done
 	UnbanUser(bannerUserId structs.Identifier, bannedUserId structs.Identifier) error // done
 
-	UploadPhoto(file []byte, uploaderUserId structs.Identifier, format string) (structs.Identifier, error) // done
-	RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error                               // done
+	UploadPhoto(file []byte, uploaderUserId structs.Identifier, format string) error // done
+	RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error         // done
 
-	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) // done
-	UncommentPhoto(commentId structs.Identifier) error                                                                          // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done
+	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) error // done
+	UncommentPhoto(commentId structs.Identifier) error                                                       // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done
 
 	LikePhoto(userId structs.Identifier, photoId structs.Identifier) error   // done
 	UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error // done

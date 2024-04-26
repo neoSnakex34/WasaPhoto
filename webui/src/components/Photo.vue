@@ -5,14 +5,27 @@ export default {
     data: function () {
         return {
             likerId: localStorage.getItem('userId'),
+            commentBody: '',
+            comments: [
+                /* 
+                    commentId 
+                    userId // id of commentor
+                    username // username of commentor
+                    photoId 
+                    body
+                    date
+                */
+            ]
         }
     },
     components: {
         Comment
     },
     props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest'], // some ID wont be visualized
-    methods:
-    {
+    methods: {
+
+        
+
         toggleDelete() {
             this.delete = !this.delete
         },
@@ -64,10 +77,42 @@ export default {
                     alert(e)
                 }
             }
-        }
+        },
+
+        async commentPhoto() {
+
+            try {
+                alert(" called ")
+                let response = await this.$axios.post(`/users/${this.uploaderId}/photos/${this.photoId}/comments`,
+                    {
+                        body: this.commentBody
+                    },
+                    {
+
+                        headers: {
+                            requestor: localStorage.getItem('userId'),
+                            'Content-Type': 'application/json'
+                        }
+                    })
+
+            } catch (e) {
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+                }
+
+            }
+
+            // empyting the comment field
+            this.commentBody = ''
+        },
 
     },
-        
+
+  
+
+    
     mounted() {
         // alert(this.src)
     },
@@ -136,8 +181,9 @@ export default {
 
     </div>
     <div class="input-group rounded pt-1">
-        <input class="form-control form-control-lg" type="text" placeholder="Comment" />
-        <button class="btn btn-success btn-lg fw-bold" type="button">Comment</button>
+        <!-- emit remove comment (if author == ecc ecc )-->
+        <input  v-model="commentBody" class="form-control form-control-lg" type="text" placeholder="Comment" />
+        <button @click="commentPhoto" class="btn btn-success btn-lg fw-bold" type="button">Comment</button>
     </div>
 
     <!-- change accordingly with photo max dimension, must be set-->

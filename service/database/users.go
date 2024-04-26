@@ -7,8 +7,6 @@ import (
 	"database/sql"
 	"errors"
 	"log"
-	"os"
-	"strings"
 
 	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
@@ -267,98 +265,4 @@ func (db *appdbimpl) checkUserExists(username string) (bool, string, error) {
 	}
 
 	return userInTable, id, nil
-}
-
-func (db *appdbimpl) getUsernameByUserId(plainUserId string) (string, error) {
-	var username string
-	err := db.c.QueryRow(`SELECT username FROM users WHERE userId = ?`, plainUserId).Scan(&username)
-	return username, err
-}
-
-func (db *appdbimpl) getFollowersCounterByUserId(plainUserId string) (int, error) {
-	var followers int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followedId = ?`, plainUserId).Scan(&followers)
-	return followers, err
-}
-
-func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error) {
-	var following int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ?`, plainUserId).Scan(&following)
-	return following, err
-}
-
-// FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
-func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestorUserId string) (int, []structs.Photo, error) {
-
-	path := Folder + plainUserId + "/"
-	photoFsDirs, err := os.ReadDir(path)
-	if os.IsNotExist(err) {
-		log.Println("folder not found or does not exist counters set to 0")
-		return 0, nil, nil
-	} else if err != nil {
-		return 0, nil, err
-	}
-
-	photoCount := len(photoFsDirs)
-	var photoName string
-	var plainPhotoId string
-	var photoDate string
-	var likeCounter int
-	var liked bool
-	var photoPath string
-
-	var photos []structs.Photo
-
-	var tmpPhoto structs.Photo
-
-	// for each photo in the folder i get the metadata
-	// and extract the path to the photo
-	// absolute path could be retrieved via db but i need the partial one
-	// to be used in frontend
-	for _, photo := range photoFsDirs {
-
-		photoName = photo.Name()
-		plainPhotoId = strings.Split(photo.Name(), ".")[0]
-
-		// partial photo path
-		photoPath = plainUserId + "/" + photoName
-		// photoPathList = append(photoPathList, photoPath)
-
-		photoDate, err = db.getPhotoDateByPhotoId(plainPhotoId)
-		if err != nil {
-			log.Println("error in getting photo date from db")
-			return 0, nil, err
-		}
-
-		likeCounter, err = db.getNumberOfLikedByPhotoId(plainPhotoId)
-		if err != nil {
-			log.Println("error in getting like counter from db")
-			return 0, nil, err
-		}
-
-		liked, err = db.getLikedByUserId(plainRequestorUserId, plainPhotoId)
-		if err != nil {
-			log.Println("error in getting info of like by user from db")
-			return 0, nil, err
-		}
-
-		// FIXME i have to manage comments
-
-		comments := []structs.Comment{}
-
-		tmpPhoto = structs.Photo{
-			PhotoId:            structs.Identifier{Id: plainPhotoId},
-			UploaderUserId:     structs.Identifier{Id: plainUserId},
-			LikeCounter:        likeCounter,
-			Comments:           comments,
-			LikedByCurrentUser: liked,
-			Date:               photoDate,
-			PhotoPath:          photoPath,
-		}
-
-		photos = append(photos, tmpPhoto)
-
-	}
-
-	return photoCount, photos, nil
 }

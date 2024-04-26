@@ -12,7 +12,7 @@ import (
 
 // ======= comments operations
 // FIXME add comments to comments list in photo struct
-func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) {
+func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) error {
 
 	var isValidId bool = false
 	// photoId and userId are already verified when firstly created, note that unmasking the use of a function like this
@@ -23,23 +23,23 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	// check ban
 	userUploaderId, err := db.getUploaderByPhotoId(commentedPhotoId)
 	if err != nil {
-		return structs.Comment{}, err
+		return err
 	}
 
 	// TODO be sure this is the right order to check
 	// check ban
 	err = db.checkBan(userUploaderId.Id, requestorUserId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {
-		return structs.Comment{}, err
+		return err
 	} else if err != nil {
-		return structs.Comment{}, err
+		return err
 	}
 
 	for !isValidId && err == nil {
 
 		newCommentId, err = GenerateIdentifier("C")
 		if err != nil {
-			return structs.Comment{}, err
+			return err
 		}
 		isValidId, err = db.validId(newCommentId.Id, "C")
 
@@ -47,7 +47,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 	if err != nil {
 
-		return structs.Comment{}, err
+		return err
 
 	}
 
@@ -56,23 +56,28 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 	err = db.addComment(newCommentId.Id, requestorUserId.Id, commentedPhotoId.Id, body, commentDate)
 	// insert comment in db
-
 	if err != nil {
-		return structs.Comment{}, err
+		return err
 	}
 
-	newComment := structs.Comment{
-		CommentId:        newCommentId,
-		CommentingUserId: requestorUserId,
-		PhotoId:          commentedPhotoId,
-		Body:             body,
-		Date:             commentDate,
-	}
-	return newComment, nil
+	// TODO this structs returned when commenting or uploading photos can be useful for debug purposes but since thy are not
+	// used directly here they will allocate useless memory
+	// i should remove those return statements and just return err or nil
+
+	// newComment := structs.Comment{
+	// 	CommentId:        newCommentId,
+	// 	CommentingUserId: requestorUserId,
+	// 	PhotoId:          commentedPhotoId,
+	// 	Body:             body,
+	// 	Date:             commentDate,
+	// }
+	return err
 }
 
 // TODO make this an external function removeComment to maintain the consistency
 func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
+
+	// THOSE CHECKS ARE KINDA OVERKILL SINCE  if a user is banned won't be able to see the photo
 
 	// get uplader id
 	uploaderId, err := db.getUploaderByCommentId(commentId)
@@ -80,7 +85,7 @@ func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
 		return err
 	}
 
-	commenterId, err := db.getCommenterByCommentId(commentId)
+	commenterId, err := db.getCommenterIdByCommentId(commentId)
 	if err != nil {
 		return err
 	}
@@ -179,16 +184,4 @@ func (db *appdbimpl) addLike(requestorUserId string, likedPhotoId string) error 
 func (db *appdbimpl) removeLike(requestorUserId string, likedPhotoId string) error {
 	_, err := db.c.Exec(`DELETE FROM likes WHERE likerId = ? AND photoId = ?`, requestorUserId, likedPhotoId)
 	return err
-}
-
-func (db *appdbimpl) alreadyLiked(requestorUserId string, likedPhotoId string) (bool, error) {
-	var counter int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, requestorUserId, likedPhotoId).Scan(&counter)
-	if err != nil {
-		return false, err
-	} else if counter > 0 {
-		return true, customErrors.ErrPhotoAlreadyLikedByUser
-	}
-	return false, nil
-
 }

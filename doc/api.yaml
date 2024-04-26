@@ -305,13 +305,9 @@ paths:
         required: true
 
       responses:
-        "201":
-          description: photo uploaded succesfully, returns the photoId
-          content:
-            application/json:
-              schema:
-                # TODO if it works manage to return photoid, not sure if is a good idea
-                $ref: "#/components/schemas/Identifier"
+        "204":
+          description: photo uploaded succesfully
+        
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -389,14 +385,9 @@ paths:
               $ref: "#/components/schemas/CommentBody"
 
       responses:
-        "201":
+        "204":
           description: comment left succesfully
-          content:
-            application/json:
-              schema:
-                # FIXME shold i return the commentId?
-                # check the backend
-                $ref: "#/components/schemas/Comment"
+          
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":

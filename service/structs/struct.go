@@ -1,13 +1,8 @@
 package structs
 
-// FIXME check json tags
 type Identifier struct {
 	Id string `json:"identifier"`
 }
-
-// type UserName struct {
-// 	PlainUsername string `json:"username"`
-// }
 
 type UserProfile struct {
 	UserId           Identifier `json:"userId"`
@@ -15,9 +10,8 @@ type UserProfile struct {
 	FollowerCounter  int        `json:"followersCounter"`
 	FollowingCounter int        `json:"followingCounter"`
 	PhotoCounter     int        `json:"photoCounter"`
+	Photos           []Photo    `json:"photos"` // list of photos
 
-	Photos []Photo `json:"photos"` // list of photos
-	// BannedUsers    []UserName `json:"bannedUsers"`
 }
 
 type User struct {
@@ -29,8 +23,8 @@ type Photo struct {
 	PhotoId            Identifier `json:"photoId"`
 	UploaderUserId     Identifier `json:"uploaderUserId"`
 	LikeCounter        int        `json:"likeCounter"`
-	Comments           []Comment  `json:"comments"`           // How to manage this?
-	LikedByCurrentUser bool       `json:"likedByCurrentUser"` // FIXME seems like a problem
+	Comments           []Comment  `json:"comments"`
+	LikedByCurrentUser bool       `json:"likedByCurrentUser"`
 	Date               string     `json:"date"`
 	PhotoPath          string     `json:"photoPath"` // in openapi this is represented as photofile
 }
@@ -39,9 +33,10 @@ type Photo struct {
 type Comment struct {
 	CommentId        Identifier `json:"commentId"`
 	CommentingUserId Identifier `json:"commentingUserId"` // commenter id
+	CommentingUser   string     `json:"commentingUser"`   // commenter username not saved directly in db but obtained via db utilities
 	PhotoId          Identifier `json:"photoId"`
-	Body             string
-	Date             string `json:"commentDate"` // FIXME this should be changed in commentdate
+	Body             string     `json:"commentBody"`
+	Date             string     `json:"commentDate"` // FIXME this should be changed in commentdate
 	//TODO manage others
 }
 

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -59,7 +58,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// call db
-	photoId, err := rt.db.UploadPhoto(photoFile, userId, format)
+	err = rt.db.UploadPhoto(photoFile, userId, format)
 	if err != nil {
 		// TODO check this error and log better
 		w.WriteHeader(http.StatusInternalServerError)
@@ -69,10 +68,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// FIXME a whole photo with all details is returned, at the moment we only need the photoId
 	// probably needs to be changed
 
-	// return photoId
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	ctx.Logger.Info("photo uploaded successfully")
-	json.NewEncoder(w).Encode(photoId) // it is not used at the moment, but it can be used as an additional check
+
+	// json.NewEncoder(w).Encode(photoId) // it is not used at the moment, but it can be used as an additional check
 }
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
