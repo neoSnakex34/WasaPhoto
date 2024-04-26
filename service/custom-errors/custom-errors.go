@@ -4,6 +4,7 @@ import "errors"
 
 // FIXME check errors new in other files and use them here
 
+var ErrAlreadyTakenUsername = errors.New("username already taken")
 var ErrInvalidRegexUsername = errors.New("invalid username")
 var ErrCriticDuplicatedId = errors.New("duplicated id multiple actors with the same id")
 

@@ -80,9 +80,6 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 
 func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode string) error {
 
-	// TODO all this cheks must be lowercase, also i need an efficient way to loop over errors till
-	// a valid name pops up
-
 	var count int
 	var valid bool = false
 
@@ -90,7 +87,11 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	// if user is already signed MODE = U i need to update by id
 
 	//  i check if newUsername is taken
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
+	db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
+	if count > 0 { // cannot check with err (count will always return something)
+		return customErrors.ErrAlreadyTakenUsername
+	}
+	// TODO should i check even for err of that queryrow?
 
 	matched := serviceutilities.CheckRegexNewUsername(newUsername)
 
@@ -99,17 +100,8 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 		log.Printf("username [%s] is valid\n", newUsername)
 		valid = true
 
-	} else {
-		if !matched {
-			err = customErrors.ErrInvalidRegexUsername
-			log.Printf("username [%s] is valid\n", newUsername)
-			return err
-		}
-
-		// if any other error occurred i return it
-		if err != nil {
-			return err
-		}
+	} else if !matched {
+		return customErrors.ErrInvalidRegexUsername
 	}
 
 	if valid {
@@ -135,7 +127,9 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 
 	}
 
-	return err
+	// FIXME add custom error or other cheks
+
+	return nil
 }
 
 // probably i can add a refreshUserProfile function that updates all the counters

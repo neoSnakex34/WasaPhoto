@@ -12,7 +12,6 @@ export default {
             profile: {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
-                newUsername: '',
                 myPhotos: [
                     /*
                         TODO add what will contain
@@ -153,8 +152,14 @@ export default {
                 this.profile.username = newUsername // kinda useless but keeps consistency in vue state 
                 localStorage.setItem('username', newUsername)
             } catch (e) {
-
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+               }
             }
+
+            this.newUsername = '' 
         },
 
      
@@ -242,6 +247,7 @@ export default {
                 alert(e)
             }
         },
+
         toggleEditing(newUsername) {
             if (this.clicked) {
 
@@ -298,7 +304,7 @@ export default {
 
         </div>
         <div class="d-flex">
-            <input v-if="clicked" v-model="newUsername" type="text" class="form-control me-4" placeholder="new username"
+            <input v-if="clicked" v-model="newUsername" ref="username-form" type="text" class="form-control me-4" placeholder="new username"
                 style="outline: 2px solid lightcyan;" />
             <button class="btn btn-primary rounded-pill fw-bold" @click="toggleEditing(newUsername)">{{ clicked
                     ? 'Confirm' : 'setUsername' }}</button>

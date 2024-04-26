@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -10,18 +11,16 @@ import (
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
 )
 
-// stream username in U mode (in db it calls only for n mode) set and getprofile
+// stream username in U mode (only mode available plain via api; dologin calls only for n mode) set and getprofile
 func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
 	// PLEASE NOTE that this will call setMyUsername with mode U
 	// cause mode N is encapsulated in doLogin signin operation
 	// hence it is also obfuscated from openapi design
-	println("setMyUsername called")
+	log.Println("entered SetMyUsername")
 
 	userId := ps.ByName("userId")
 
-	println("userId: ", userId)
-
-	// [x] handle empty user id
 	if userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -29,7 +28,7 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 
 	// check if user is allowed
 	authorization := r.Header.Get("Authorization")
-	println(authorization)
+
 	if userId != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to set username")
@@ -47,7 +46,7 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	}
 	// defer r.Body.Close()
 
-	println("newUsername: ", newUsername)
+	log.Println("newUsername: ", newUsername)
 
 	// [x]check new username is valid (unicity will be checked in db, is it a good idea? )
 	if !serviceutilities.CheckRegexNewUsername(newUsername) {
@@ -56,12 +55,14 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 		ctx.Logger.Error("new username is not valid", err)
 		return
 	}
+
 	// TODO ERRORS if name exists
 	// now call db to set username
 	err = rt.db.SetMyUserName(newUsername, userId, "U")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occurred during db calls in setting username: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
