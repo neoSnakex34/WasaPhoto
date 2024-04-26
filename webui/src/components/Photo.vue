@@ -5,23 +5,24 @@ export default {
     data: function () {
         return {
             likerId: localStorage.getItem('userId'),
-            commentBody: '',
-            comments: [
-                /* 
-                    commentId 
-                    userId // id of commentor
-                    username // username of commentor
-                    photoId 
-                    body
-                    date
-                */
-            ]
+            loggedUserId: localStorage.getItem('userId'), // THIS COULD have problems with references
+            commentBodyIn: '',
+            // comments: [
+            //     /* 
+            //         commentId 
+            //         userId // id of commentor
+            //         username // username of commentor
+            //         photoId 
+            //         body
+            //         date
+            //     */
+            // ]
         }
     },
     components: {
         Comment
     },
-    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest'], // some ID wont be visualized
+    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'comments'], // some ID wont be visualized
     methods: {
 
         
@@ -85,7 +86,7 @@ export default {
                 alert(" called ")
                 let response = await this.$axios.post(`/users/${this.uploaderId}/photos/${this.photoId}/comments`,
                     {
-                        body: this.commentBody
+                        body: this.commentBodyIn
                     },
                     {
 
@@ -105,8 +106,11 @@ export default {
             }
 
             // empyting the comment field
-            this.commentBody = ''
+            this.commentBodyIn = ''
         },
+
+        // TODO implement 
+        deleteComment(){ console.log("recieved delete comment event")}
 
     },
 
@@ -114,6 +118,7 @@ export default {
 
     
     mounted() {
+        // console.log(this.loggedUserId)
         // alert(this.src)
     },
 
@@ -182,14 +187,25 @@ export default {
     </div>
     <div class="input-group rounded pt-1">
         <!-- emit remove comment (if author == ecc ecc )-->
-        <input  v-model="commentBody" class="form-control form-control-lg" type="text" placeholder="Comment" />
+        <input  v-model="commentBodyIn" class="form-control form-control-lg" type="text" placeholder="Comment" />
         <button @click="commentPhoto" class="btn btn-success btn-lg fw-bold" type="button">Comment</button>
     </div>
 
     <!-- change accordingly with photo max dimension, must be set-->
     <div class="overflow-auto  pt-2 pb-5 mb-5" style="max-height: 200px;">
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
-        <Comment commentingId="1" username="rei" body="This is a comment" date="2021-10-10" />
+        <!-- probably you need a sorter -->
+        <div v-for="comment in comments">
+            <Comment
+                @delete-comment-event = "deleteComment"
+                :commentingUserId="comment.commentingUserId.identifier"
+                :commentId="comment.commentId.identifier"
+                :username="comment.commentingUsername"
+                :body="comment.commentBody"
+                :date="comment.commentDate"
+                
+                :loggedUserId="loggedUserId"
+            />
+        </div>
 
 
     </div>

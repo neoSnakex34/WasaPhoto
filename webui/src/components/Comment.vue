@@ -2,8 +2,14 @@
 <script>
     export default{
         // TODO comment id will not be visualized, just used to remove 
-        props: ["commentingId", "username", "body", "date"], // add others 
+        props: ["commentingUserId", "commentId",  "username", "body", "date", "photoOwnerId", "loggedUserId"], // add others 
+        created () {
+            console.log(this.commentingUserId + " "+ this.body) 
+            
+            // console.log(this.loggedUserId)
+        }
     }
+    
 </script>
 
 <!-- fix styling; add functions-->
@@ -14,7 +20,7 @@
             <h5 class="fw-bold"><strong>{{ this.username }}</strong></h5> <!--- username of commentor-->
             <!-- <h6 class="fw-bold text-muted"><strong>{{ this.commentingId }}</strong></h6> -->
             <span class="ms-4">{{ this.date }}</span>
-            <button class="btn btn-danger rounded-pill ms-auto">x</button>
+            <button @click="$emit('delete-comment-event')" v-if="this.loggedUserId === this.photoOwnerId || this.loggedUserId === this.commentingUserId" class="btn btn-danger rounded-pill ms-auto">x</button>
         </div>
         <div>
             <span>{{ this.body }}</span>

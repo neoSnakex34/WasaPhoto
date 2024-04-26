@@ -27,6 +27,7 @@ export default {
     },
 
     async created() {
+        
         await this.getUserProfileAsGuest()
         await this.updateGuestServedPhotos()
     },
@@ -181,6 +182,8 @@ export default {
                 :uploader="this.otherProfile.username"
                 :photoId="photo.photoId.identifier"
                 :uploaderId="photo.uploaderUserId.identifier"
+                :comments="photo.comments"
+                :photoOwnerId="photo.uploaderUserId.identifier"
                 :date="photo.date" 
                 :likes="photo.likeCounter"
                 :liked="photo.likedByCurrentUser" 

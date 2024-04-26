@@ -128,6 +128,7 @@ export default {
                 this.profile.followingCounter = response.data.followingCounter
                 this.profile.photoCounter = response.data.photoCounter
                 this.profile.myPhotos = response.data.photos
+                console.log(this.profile.myPhotos)
             } catch (e) {
                 if (e.response.data) {
                     alert(e.response.data)
@@ -332,12 +333,16 @@ export default {
                 :src="photo.served" 
                 :uploader="this.profile.username"
                 :photoId="photo.photoId.identifier"
+                :comments="photo.comments"
                 :uploaderId="photo.uploaderUserId.identifier"
+                :photoOwnerId="photo.uploaderUserId.identifier"
+                :loggedUserId="this.profile.userId"
                 :date="photo.date" 
                 :likes="photo.likeCounter"
                 :liked="photo.likedByCurrentUser" 
                 :delete = this.deleteToggle
                 :guest = this.guest
+
                 />
 
         </div>
