@@ -17,12 +17,15 @@ export default {
             //         date
             //     */
             // ]
+          
         }
     },
     components: {
-        Comment
+        Comment 
     },
     props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'comments'], // some ID wont be visualized
+
+    
     methods: {
 
         
@@ -110,7 +113,24 @@ export default {
         },
 
         // TODO implement 
-        deleteComment(){ console.log("recieved delete comment event")}
+        async deleteComment(commentId){ 
+            try {
+                let response = await this.$axios.delete(`/users/${this.uploaderId}/photos/${this.photoId}/comments/${commentId}`, {
+                    headers: {
+                        requestor: localStorage.getItem('userId')
+                    }
+                 
+                })
+                
+            }catch(e){
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+            }
+
+            }
+        },
 
     },
 
@@ -194,7 +214,8 @@ export default {
     <!-- change accordingly with photo max dimension, must be set-->
     <div class="overflow-auto  pt-2 pb-5 mb-5" style="max-height: 200px;">
         <!-- probably you need a sorter -->
-        <div v-for="comment in comments">
+        <div v-for="comment in comments" :key="comments.date">
+
             <Comment
                 @delete-comment-event = "deleteComment"
                 :commentingUserId="comment.commentingUserId.identifier"
