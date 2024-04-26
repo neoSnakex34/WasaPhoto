@@ -25,7 +25,15 @@ export default {
     },
     props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'comments'], // some ID wont be visualized
 
-    
+    computed: {
+          sortedComments() {
+            if (this.comments){
+                return this.comments.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).reverse();
+
+            }
+        },
+        
+    },
     methods: {
 
         
@@ -84,9 +92,11 @@ export default {
         },
 
         async commentPhoto() {
+            if (this.commentBodyIn === '') {
+                return
+            }
 
             try {
-                alert(" called ")
                 let response = await this.$axios.post(`/users/${this.uploaderId}/photos/${this.photoId}/comments`,
                     {
                         body: this.commentBodyIn
@@ -99,18 +109,26 @@ export default {
                         }
                     })
 
+                let comment = response.data
+
+                // add comment to the list of comments
+
+
+                // Update the comments array in place
+                this.comments.push(comment);
+
+                // Empties the comment field
+                this.commentBodyIn = '';
+                    
+
+
             } catch (e) {
-                if (e.response.data) {
-                    alert(e.response.data)
-                } else {
-                    alert(e)
-                }
+                alert(e)
 
             }
-
-            // empyting the comment field
-            this.commentBodyIn = ''
         },
+
+            // empyting the comment field        },
 
         // TODO implement 
         async deleteComment(commentId){ 
@@ -120,7 +138,12 @@ export default {
                         requestor: localStorage.getItem('userId')
                     }
                  
-                })
+                });
+
+                // SHOULD I CHECK FOR ERRORSc
+                let idx = this.comments.findIndex(comment => comment.commentId.identifier === commentId)
+                this.comments.splice(idx, 1)
+
                 
             }catch(e){
                 if (e.response.data) {
@@ -129,7 +152,10 @@ export default {
                     alert(e)
             }
 
+
             }
+            
+            // TODO check reactivit
         },
 
     },
@@ -213,8 +239,8 @@ export default {
 
     <!-- change accordingly with photo max dimension, must be set-->
     <div class="overflow-auto  pt-2 pb-5 mb-5" style="max-height: 200px;">
-        <!-- probably you need a sorter -->
-        <div v-for="comment in comments" :key="comments.date">
+        
+        <div v-for="comment in sortedComments">
 
             <Comment
                 @delete-comment-event = "deleteComment"

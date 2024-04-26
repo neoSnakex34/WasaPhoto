@@ -12,7 +12,7 @@ import (
 
 // ======= comments operations
 // FIXME add comments to comments list in photo struct
-func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) error {
+func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) {
 
 	var isValidId bool = false
 	// photoId and userId are already verified when firstly created, note that unmasking the use of a function like this
@@ -23,55 +23,58 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	// check ban
 	userUploaderId, err := db.getUploaderByPhotoId(commentedPhotoId)
 	if err != nil {
-		return err
+		return structs.Comment{}, err
 	}
 
 	// TODO be sure this is the right order to check
 	// check ban
 	err = db.checkBan(userUploaderId.Id, requestorUserId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {
-		return err
+		return structs.Comment{}, err
 	} else if err != nil {
-		return err
+		return structs.Comment{}, err
 	}
 
 	for !isValidId && err == nil {
 
 		newCommentId, err = GenerateIdentifier("C")
 		if err != nil {
-			return err
+			return structs.Comment{}, err
 		}
 		isValidId, err = db.validId(newCommentId.Id, "C")
 
 	}
-
+	// could accumulate errs from validId
 	if err != nil {
-
-		return err
-
+		return structs.Comment{}, err
 	}
 
-	// TODO keep the date inference after the validId loop
+	// get current date (always validid loop)
 	commentDate := time.Now().UTC().Format(time.RFC3339)
 
 	err = db.addComment(newCommentId.Id, requestorUserId.Id, commentedPhotoId.Id, body, commentDate)
 	// insert comment in db
 	if err != nil {
-		return err
+		return structs.Comment{}, err
 	}
 
 	// TODO this structs returned when commenting or uploading photos can be useful for debug purposes but since thy are not
 	// used directly here they will allocate useless memory
 	// i should remove those return statements and just return err or nil
+	commentingUsername, err := db.getCommenterUsernameByCommentingId(requestorUserId.Id)
+	if err != nil {
+		return structs.Comment{}, err
+	}
 
-	// newComment := structs.Comment{
-	// 	CommentId:        newCommentId,
-	// 	CommentingUserId: requestorUserId,
-	// 	PhotoId:          commentedPhotoId,
-	// 	Body:             body,
-	// 	Date:             commentDate,
-	// }
-	return err
+	newComment := structs.Comment{
+		CommentId:          newCommentId,
+		CommentingUserId:   requestorUserId,
+		CommentingUsername: commentingUsername,
+		PhotoId:            commentedPhotoId,
+		Body:               body,
+		Date:               commentDate,
+	}
+	return newComment, nil
 }
 
 // TODO make this an external function removeComment to maintain the consistency

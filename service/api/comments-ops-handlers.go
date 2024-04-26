@@ -41,7 +41,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	commentBody := commentBodyReq.Body
 
 	// TODO fix this, check return for consistency etc etc
-	err = rt.db.CommentPhoto(photoId, requestorUserId, commentBody)
+	comment, err := rt.db.CommentPhoto(photoId, requestorUserId, commentBody)
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is banned and cannot comment photo")
@@ -52,10 +52,10 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	ctx.Logger.Info("photo commented successfully")
 
-	// json.NewEncoder(w).Encode(comment)
+	json.NewEncoder(w).Encode(comment)
 
 }
 

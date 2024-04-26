@@ -28,12 +28,7 @@ export default {
             guest: false // DO NOT CHANGE
         }
     },
-    // computed: {
-    //     getUserId(){
-    //         return this.profile.userId() = localStorage.getItem('userId')
-    //     },
-    // },
-    // this will get the userprofile and sort photos
+
     async created() {
         await this.getUserProfile()
         await this.updateServedPhotos()
@@ -254,7 +249,6 @@ export default {
             if ((this.clicked) && (newUsername !== "")){
 
                 this.setMyUsername(newUsername)
-                // this.refresh()
             }
             // alert(this.username)
             this.clicked = !this.clicked
@@ -330,6 +324,8 @@ export default {
                 @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)" 
                 @toggle-delete="this.deleteToggle = !this.deleteToggle"
                 @delete-event="deletePhoto(photo.photoId.identifier)"
+         
+                
                 :src="photo.served" 
                 :uploader="this.profile.username"
                 :photoId="photo.photoId.identifier"

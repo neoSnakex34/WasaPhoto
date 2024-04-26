@@ -177,7 +177,8 @@ export default {
             <Photo v-for="photo in otherProfile.photos" :key="photo.photoId.identifier"
 
                 @like="graphicallyLikeBeforeRefresh(photo.photoId.identifier)"
-                @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)" 
+                @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)"
+             
                 :src="photo.served" 
                 :uploader="this.otherProfile.username"
                 :photoId="photo.photoId.identifier"
