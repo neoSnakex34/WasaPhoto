@@ -2,17 +2,17 @@
 import Photo from '../components/Photo.vue';
 
 export default {
-    props : ['userId'],
+    props: ['userId'],
     components: {
         Photo
     },
 
     data: function () {
-       
+
         return {
             otherProfile: {
                 username: "",
-                
+                userId: this.userId,
                 followingCounter: 0,
                 followedCounter: 0,
                 photoCounter: 0,
@@ -20,20 +20,89 @@ export default {
 
             },
             backendReadableUserId: decodeURIComponent(this.userId),
-            servedPhotos: [],
+            // servedPhotos: [], deprecaated
             bannedByHost: false, // SHOULD BE A PROP
-
+            guest: true // DO NOT CHANGE 
         }
-    }, 
+    },
 
-    async mounted(){
-       
-        await this.getUserProfileAsGues()
-    }, 
+    async created() {
+        await this.getUserProfileAsGuest()
+        await this.updateGuestServedPhotos()
+    },
 
-    methods:{
+    methods: {
 
-        async getUserProfileAsGues() {
+        //  PLEASE NOTE
+        // in the sake of simplicity in developing the app for the exam
+        // i would not generalize methods with same or similar behaviour into 
+        // specific components not to overcomplicate my workflow
+        // in a future update this could be generalized
+        graphicallyLikeBeforeRefresh(id) {
+            const photo = this.otherProfile.photos.find(p => p.photoId.identifier === id);
+            photo.likeCounter++;
+            photo.likedByCurrentUser = true;
+        },
+
+        graphicallyUnlikeBeforeRefresh(id) {
+            const photo = this.otherProfile.photos.find(p => p.photoId.identifier === id);
+            photo.likeCounter--;
+            photo.likedByCurrentUser = false;
+        },
+
+        // in a future update this couls be generalized
+        // THIS WILL CALL SERVEPHOTO IN API 
+        async getPhoto(partialPath) {
+
+            let photoId = partialPath.split('/')[1]
+
+            try {
+                let response = await this.$axios.get(`users/${this.otherProfile.userId}/photos/${photoId}`, {
+                    responseType: 'blob',
+                    headers: {
+                        Requestor: localStorage.getItem('userId')
+                    }
+                })
+
+                let servedPhotoUrl = window.URL.createObjectURL(response.data)
+                // alert(servedPhotoUrl)
+                return servedPhotoUrl
+
+            } catch (e) {
+                if (e.response.data) {
+                    alert(e.response.data)
+                } else {
+                    alert(e)
+                }
+            }
+        },
+
+        async updateGuestServedPhotos() {
+
+            // FIXME this should be changed in both profile views
+            if (this.otherProfile.photos === null) {
+                this.servedPhotos = []
+                return
+            }
+
+            let sortedPhotosByDate = this.otherProfile.photos.sort((a, b) => {
+                return new Date(b.date) - new Date(a.date)
+            })
+
+            // let tmpServedPhotos = []
+            for (let [index, photo] of sortedPhotosByDate.entries()) {
+
+                let path = photo.photoPath
+                sortedPhotosByDate[index].served = await this.getPhoto(path)
+                // tmpServedPhotos.push(await this.getPhoto(path))
+
+            }
+
+            // this.servedPhotos = tmpServedPhotos
+
+        },
+
+        async getUserProfileAsGuest() {
             try {
 
                 // TODO check if ban works 
@@ -43,13 +112,16 @@ export default {
                     }
                 })
 
-                
+
                 this.otherProfile.username = response.data.username
+                // this.otherProfile.userId = response.data.userId.identifier
                 this.otherProfile.followedCounter = response.data.followersCounter
                 this.otherProfile.followingCounter = response.data.followingCounter
+                this.otherProfile.photoCounter = response.data.photoCounter
+                this.otherProfile.photos = response.data.photos
 
 
-            }catch(e){
+            } catch (e) {
                 if (e.response.data) {
                     alert(e.response.data)
                 } else {
@@ -58,7 +130,7 @@ export default {
             }
         }
 
-    }, 
+    },
 
 }
 </script>
@@ -69,8 +141,8 @@ export default {
         <div class="d-flex">
             <!-- username and id -->
             <div class="d-flex align-items-baseline ps-1">
-                <h3 class="h3"><strong>{{this.otherProfile.username}}</strong></h3>
-                <h6 class="text-muted ms-2">(<strong>{{this.userId}}</strong>)</h6>
+                <h3 class="h3"><strong>{{ this.otherProfile.username }}</strong></h3>
+                <h6 class="text-muted ms-2">(<strong>{{ this.userId }}</strong>)</h6>
             </div>
 
             <div class="d-flex ms-auto pe-1">
@@ -99,20 +171,20 @@ export default {
 
     <!-- photos v if not banned -->
     <div class="container pt-4 pb-4" style="width: 60%;">
-        <div v-if="!bannedByHost">   
+        <div v-if="!bannedByHost">
 
-            <Photo v-for="(photo, index) in servedPhotos"
-                
-                @like="graphicallyLikeBeforeRefresh(index)"
-                @unlike="graphicallyUnlikeBeforeRefresh(index)" 
-                @toggle-delete="this.deleteToggle = !this.deleteToggle"
-                @delete-event="deletePhoto(index)"
-                :src="photo" :uploader="this.profile.username"
-                :photoId="this.profile.myPhotos[index].photoId.identifier"
-                :uploaderId="this.profile.myPhotos[index].uploaderUserId.identifier"
-                :date="this.profile.myPhotos[index].date" :likes="this.profile.myPhotos[index].likeCounter"
-                :liked="this.profile.myPhotos[index].likedByCurrentUser" 
-                :delete = this.deleteToggle
+            <Photo v-for="photo in otherProfile.photos" :key="photo.photoId.identifier"
+
+                @like="graphicallyLikeBeforeRefresh(photo.photoId.identifier)"
+                @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)" 
+                :src="photo.served" 
+                :uploader="this.otherProfile.username"
+                :photoId="photo.photoId.identifier"
+                :uploaderId="photo.uploaderUserId.identifier"
+                :date="photo.date" 
+                :likes="photo.likeCounter"
+                :liked="photo.likedByCurrentUser" 
+                :guest="this.guest"
                 />
 
         </div>

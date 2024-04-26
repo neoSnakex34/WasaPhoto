@@ -13,15 +13,19 @@ export default {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
                 newUsername: '',
-                myPhotos: [],
+                myPhotos: [
+                    /*
+                        TODO add what will contain
+                    */
+                ],
                 followerCounter: 0,
                 followingCounter: 0,
                 photoCounter: 0,
             },
-            servedPhotos: [],
+            // servedPhotos: [], deprecated
             clicked: false,
-            deleteToggle: false
-
+            deleteToggle: false,
+            guest: false // DO NOT CHANGE
         }
     },
     // computed: {
@@ -33,24 +37,31 @@ export default {
     async created() {
         await this.getUserProfile()
         await this.updateServedPhotos()
-
     },
 
 
 
     methods: {
 
-        // generalize it?
-        graphicallyLikeBeforeRefresh(index) {
+        //  PLEASE NOTE
+        // in the sake of simplicity in developing the app for the exam
+        // i would not generalize methods with same or similar behaviour into 
+        // specific components not to overcomplicate my workflow
+        // in a future update this could be generalized
+        graphicallyLikeBeforeRefresh(id) {
+            
+            // find will always be true and return the right obj cause photoId is unique
+            const photo = this.profile.myPhotos.find(p => p.photoId.identifier === id);
             // on refresh likes will be retrieved from backend
-            this.profile.myPhotos[index].likeCounter++
+            photo.likeCounter++;
             // will also set liked 
-            this.profile.myPhotos[index].likedByCurrentUser = true
+            photo.likedByCurrentUser = true;
         },
 
-        graphicallyUnlikeBeforeRefresh(index) {
-            this.profile.myPhotos[index].likeCounter--
-            this.profile.myPhotos[index].likedByCurrentUser = false
+        graphicallyUnlikeBeforeRefresh(id) {
+            const photo = this.profile.myPhotos.find(p => p.photoId.identifier === id);
+            photo.likeCounter--;
+            photo.likedByCurrentUser = false;
         },
 
         toggleDeleteButton() {
@@ -82,14 +93,18 @@ export default {
                 return new Date(b.date) - new Date(a.date)
             })
 
-            let tmpServedPhotos = []
-            for (let photo of sortedPhotosByDate) {
+            // let tmpServedPhotos = []
+            
+            for (let [index, photo] of sortedPhotosByDate.entries()) {
 
                 let path = photo.photoPath
-                tmpServedPhotos.push(await this.getPhoto(path))
+                // FIXME be wary of this crappy reference to array python like stuff
+                sortedPhotosByDate[index].served = await this.getPhoto(path)
+                // tmpServedPhotos.push(await this.getPhoto(path))
+
             }
 
-            this.servedPhotos = tmpServedPhotos
+            // this.servedPhotos = tmpServedPhotos
         },
 
         async getUserProfile() {
@@ -117,7 +132,11 @@ export default {
                 if (e.response.data) {
                     alert(e.response.data)
                 } else {
-                    alert(e)
+                    if (e.response.status === 403) {
+                        alert("You are banned")
+                    } else {
+                        alert(e)
+                    }
                 }
             }
         },
@@ -177,11 +196,13 @@ export default {
 
         },
 
-        async deletePhoto(index) {
-            let photoId = this.profile.myPhotos[index].photoId.identifier
+        // FIXME
+        async deletePhoto(id) {
+            // TODO remove after testing
+            // let photoId = this.profile.myPhotos[index].photoId.identifier
             
             try {
-                let response = await this.$axios.delete(`/users/${this.profile.userId}/photos/${photoId}`,
+                let response = await this.$axios.delete(`/users/${this.profile.userId}/photos/${id}`,
                     {
                         headers: {
                             'Content-Type': 'application/json'
@@ -201,6 +222,7 @@ export default {
                 }
             }
         },
+
         // THIS WILL CALL SERVEPHOTO IN API 
         async getPhoto(partialPath) {
             let photoId = partialPath.split('/')[1]
@@ -208,8 +230,10 @@ export default {
             try {
                 let response = await this.$axios.get(`users/${this.profile.userId}/photos/${photoId}`,
                     {
-
-                        responseType: 'blob'
+                        responseType: 'blob',
+                        headers: {
+                            Requestor: localStorage.getItem('userId')
+                        }
                     })
 
                 let servedPhotoUrl = window.URL.createObjectURL(response.data)
@@ -229,10 +253,7 @@ export default {
         }
     },
 
-    mounted() {
-        this.profile.userId = localStorage.getItem('userId')
-        this.getUserProfile()
-    }
+
 
 }
 </script>
@@ -295,18 +316,21 @@ export default {
         <div>
 
             <!--- in stream uploader  will need to be passed from struct -->
-            <Photo v-for="(photo, index) in servedPhotos"
+            <Photo v-for="photo in profile.myPhotos" :key="photo.photoId.identifier"
                 
-                @like="graphicallyLikeBeforeRefresh(index)"
-                @unlike="graphicallyUnlikeBeforeRefresh(index)" 
+                @like="graphicallyLikeBeforeRefresh(photo.photoId.identifier)"
+                @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)" 
                 @toggle-delete="this.deleteToggle = !this.deleteToggle"
-                @delete-event="deletePhoto(index)"
-                :src="photo" :uploader="this.profile.username"
-                :photoId="this.profile.myPhotos[index].photoId.identifier"
-                :uploaderId="this.profile.myPhotos[index].uploaderUserId.identifier"
-                :date="this.profile.myPhotos[index].date" :likes="this.profile.myPhotos[index].likeCounter"
-                :liked="this.profile.myPhotos[index].likedByCurrentUser" 
+                @delete-event="deletePhoto(photo.photoId.identifier)"
+                :src="photo.served" 
+                :uploader="this.profile.username"
+                :photoId="photo.photoId.identifier"
+                :uploaderId="photo.uploaderUserId.identifier"
+                :date="photo.date" 
+                :likes="photo.likeCounter"
+                :liked="photo.likedByCurrentUser" 
                 :delete = this.deleteToggle
+                :guest = this.guest
                 />
 
         </div>

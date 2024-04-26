@@ -10,7 +10,7 @@ export default {
     components: {
         Comment
     },
-    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete'], // some ID wont be visualized
+    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest'], // some ID wont be visualized
     methods:
     {
         toggleDelete() {
@@ -90,7 +90,7 @@ export default {
         <img :src="src" class="card-img-top" />
 
             <!-- kebab button  v if profile personal (add a check) unused valued should be null in guestProfileView-->
-            <button @click="$emit('toggle-delete')" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
+            <button v-if="!guest" @click="$emit('toggle-delete')" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
             <!-- <button @click="toggleDelete" class="position-absolute top-0 end-0 custom-button fw-bold">...</button> -->
            
    

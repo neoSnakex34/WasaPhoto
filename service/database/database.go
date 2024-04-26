@@ -33,6 +33,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
@@ -82,7 +83,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		// change integer with text or something like that to match regex pattern
+
 		userTable := `CREATE TABLE users (
 			userId VARCHAR(11) NOT NULL PRIMARY KEY,
 			username VARCHAR(18) NOT NULL UNIQUE
@@ -144,7 +145,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 func runCreateQueries(db *sql.DB, queries ...string) error {
 	for _, query := range queries {
-		println("creating table: ", query)
+		println("creating table: ", strings.Split(query, " ")[2])
 		_, err := db.Exec(query)
 
 		// TODO change this

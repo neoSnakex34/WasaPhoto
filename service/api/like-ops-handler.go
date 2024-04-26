@@ -6,11 +6,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
+	"github.com/sirupsen/logrus"
 )
 
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoId := structs.Identifier{Id: ps.ByName("photoId")}
 	likerId := structs.Identifier{Id: ps.ByName("likerId")}
+
+	logrus.Info("requested photoId: ", photoId.Id)
 
 	if photoId.Id == "" || likerId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)

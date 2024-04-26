@@ -143,9 +143,9 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 
 	println("profileUserId, requestorUserId: ", profileUserId.Id, requestorUserId.Id)
 	plainUserId := profileUserId.Id
-	requestor := requestorUserId.Id
+	plainRequestorUserId := requestorUserId.Id
 	// check requestor banned by profile user
-	err := db.checkBan(plainUserId, requestor)
+	err := db.checkBan(plainUserId, plainRequestorUserId)
 
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		log.Println("requestor is banned by user") // TODO log this in api
@@ -178,7 +178,7 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	}
 
 	// photo count via os directory counter
-	photoCounter, photos, err := db.getPhotosAndInfoByUserId(plainUserId)
+	photoCounter, photos, err := db.getPhotosAndInfoByUserId(plainUserId, plainRequestorUserId)
 	if err != nil {
 		return structs.UserProfile{}, err
 	}
@@ -294,7 +294,7 @@ func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error
 }
 
 // FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
-func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string) (int, []structs.Photo, error) {
+func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestorUserId string) (int, []structs.Photo, error) {
 
 	path := Folder + plainUserId + "/"
 	photoFsDirs, err := os.ReadDir(path)
@@ -342,7 +342,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string) (int, []struct
 			return 0, nil, err
 		}
 
-		liked, err = db.getLikedByUserId(plainUserId, plainPhotoId)
+		liked, err = db.getLikedByUserId(plainRequestorUserId, plainPhotoId)
 		if err != nil {
 			log.Println("error in getting info of like by user from db")
 			return 0, nil, err
