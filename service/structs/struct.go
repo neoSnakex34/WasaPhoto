@@ -31,12 +31,12 @@ type Photo struct {
 
 // HANDLE THIS TAGS
 type Comment struct {
-	CommentId        Identifier `json:"commentId"`
-	CommentingUserId Identifier `json:"commentingUserId"` // commenter id
-	CommentingUser   string     `json:"commentingUser"`   // commenter username not saved directly in db but obtained via db utilities
-	PhotoId          Identifier `json:"photoId"`
-	Body             string     `json:"commentBody"`
-	Date             string     `json:"commentDate"` // FIXME this should be changed in commentdate
+	CommentId          Identifier `json:"commentId"`
+	CommentingUserId   Identifier `json:"commentingUserId"`   // commenter id
+	CommentingUsername string     `json:"commentingUsername"` // commenter username not saved directly in db but obtained via db utilities
+	PhotoId            Identifier `json:"photoId"`
+	Body               string     `json:"commentBody"`
+	Date               string     `json:"commentDate"` // FIXME this should be changed in commentdate
 	//TODO manage others
 }
 

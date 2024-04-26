@@ -117,6 +117,8 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	return false, customErrors.ErrInvalidId
 }
 
+// TODO important
+// FIXME pass those as plain ids instead
 func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
 	var plainUploaderId string
 
@@ -133,15 +135,9 @@ func (db *appdbimpl) getCommenterIdByCommentId(commentId structs.Identifier) (st
 	return structs.Identifier{Id: plainCommenterId}, nil
 }
 
-func (db *appdbimpl) getCommenterUsernameByCommentId(commentId structs.Identifier) (string, error) {
+func (db *appdbimpl) getCommenterUsernameByCommentingId(plainCommenterId string) (string, error) {
 	var username string
-	var userId string
-	err := db.c.QueryRow(`SELECT userId FROM comments WHERE commentId = ?`, commentId.Id).Scan(&userId)
-	if err != nil {
-		return "", err
-	}
-
-	err = db.c.QueryRow(`SELECT username FROM users WHERE userId = ?`, userId).Scan(&username)
+	err := db.c.QueryRow(`SELECT username FROM users WHERE userId = ?`, plainCommenterId).Scan(&username)
 	if err != nil {
 		return "", err
 	}
@@ -161,9 +157,9 @@ func (db *appdbimpl) getUploaderByCommentId(commentId structs.Identifier) (struc
 	return structs.Identifier{Id: plainUploaderId}, err
 }
 
-func (db *appdbimpl) alreadyLiked(requestorUserId string, likedPhotoId string) (bool, error) {
+func (db *appdbimpl) alreadyLiked(plainRequestorUserId string, likedPhotoId string) (bool, error) {
 	var counter int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, requestorUserId, likedPhotoId).Scan(&counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainRequestorUserId, likedPhotoId).Scan(&counter)
 	if err != nil {
 		return false, err
 	} else if counter > 0 {
@@ -314,8 +310,12 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 			return 0, nil, err
 		}
 
-		// FIXME i have to manage comments
-		comments := []structs.Comment{}
+		comments, err := db.getCommentsByPhotoId(plainPhotoId)
+		// TODO manage errors
+		if err != nil {
+			log.Println("error in getting comments from db")
+			return 0, nil, err
+		}
 
 		tmpPhoto = structs.Photo{
 			PhotoId:            structs.Identifier{Id: plainPhotoId},
@@ -331,5 +331,51 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 
 	}
 
+	// logrus.Info("comments: ", photos[0].Comments)
 	return photoCount, photos, nil
+}
+
+// id will be plain cause it is passed as plain
+func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Comment, error) {
+	var Comments []structs.Comment
+
+	rows, err := db.c.Query(`SELECT commentId, userId, body, date FROM comments WHERE photoId = ?`, plainPhotoId)
+	// TODO manage errors
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var plainCommentId string
+		var plainUserId string
+		var body string
+		var date string
+
+		err = rows.Scan(&plainCommentId, &plainUserId, &body, &date)
+		if err != nil {
+			return nil, err
+		}
+
+		commentingUsername, err := db.getCommenterUsernameByCommentingId(plainUserId)
+		if err != nil {
+			return nil, err
+		}
+
+		comment := structs.Comment{
+			CommentId:          structs.Identifier{Id: plainCommentId},
+			CommentingUserId:   structs.Identifier{Id: plainUserId},
+			CommentingUsername: commentingUsername,
+			PhotoId:            structs.Identifier{Id: plainPhotoId},
+			Body:               body,
+			Date:               date,
+		}
+
+		Comments = append(Comments, comment)
+
+	}
+
+	return Comments, nil
+
 }
