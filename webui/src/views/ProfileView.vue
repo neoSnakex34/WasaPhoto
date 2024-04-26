@@ -21,6 +21,7 @@ export default {
                 followingCounter: 0,
                 photoCounter: 0,
             },
+            newUsername: '',
             // servedPhotos: [], deprecated
             clicked: false,
             deleteToggle: false,
@@ -249,7 +250,7 @@ export default {
         },
 
         toggleEditing(newUsername) {
-            if (this.clicked) {
+            if ((this.clicked) && (newUsername !== "")){
 
                 this.setMyUsername(newUsername)
                 // this.refresh()
