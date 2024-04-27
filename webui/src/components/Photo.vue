@@ -4,6 +4,7 @@ import Comment from '../components/Comment.vue'
 export default {
     data: function () {
         return {
+            attachedComments: this.comments,
             likerId: localStorage.getItem('userId'),
             loggedUserId: localStorage.getItem('userId'), // THIS COULD have problems with references
             commentBodyIn: '',
@@ -27,8 +28,8 @@ export default {
 
     computed: {
           sortedComments() {
-            if (this.comments){
-                return this.comments.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).reverse();
+            if (this.attachedComments){
+                return this.attachedComments.slice().sort((a, b) => new Date(b.date) - new Date(a.date)).reverse();
 
             }
         },
@@ -114,8 +115,11 @@ export default {
                 // add comment to the list of comments
 
 
-                // Update the comments array in place
-                this.comments.push(comment);
+                // initialize array if it does not exist so push wont alert error
+                if (!this.attachedComments) {
+                    this.attachedComments = []
+                }
+                this.attachedComments.push(comment);
 
                 // Empties the comment field
                 this.commentBodyIn = '';
@@ -141,8 +145,8 @@ export default {
                 });
 
                 // SHOULD I CHECK FOR ERRORSc
-                let idx = this.comments.findIndex(comment => comment.commentId.identifier === commentId)
-                this.comments.splice(idx, 1)
+                let idx = this.attachedComments.findIndex(comment => comment.commentId.identifier === commentId)
+                this.attachedComments.splice(idx, 1)
 
                 
             }catch(e){
@@ -251,6 +255,7 @@ export default {
                 :date="comment.commentDate"
                 
                 :loggedUserId="loggedUserId"
+                :photoOwnerId="uploaderId"
             />
         </div>
 
