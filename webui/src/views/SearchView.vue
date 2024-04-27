@@ -25,11 +25,15 @@
                 this.usersFromQuery = response.data;
                 console.log(this.usersFromQuery);
 
-                this.matchingUsers = this.usersFromQuery.filter(userObj => userObj.user.username.startsWith(this.query.toLowerCase()))
-                // this.matchingUsers = this.users.filter(user => user.username.startsWith(this.query.toLowerCase())).filter(user => user.userId.identifier !== this.userId);
-                console.log(this.matchingUsers);
-                // this.matchingUsernames = this.usernames.filter(username => username.includes(this.query.toLowerCase()));
-                } catch(e){
+                if (!this.usersFromQuery){
+                    alert("No users found");
+                } else {
+                    this.matchingUsers = this.usersFromQuery.filter(userObj => userObj.user.username.startsWith(this.query.toLowerCase()))
+                    console.log(this.matchingUsers);
+
+                    }
+
+            } catch(e){
                     console.log(e);
                     alert("Error");
                 }
