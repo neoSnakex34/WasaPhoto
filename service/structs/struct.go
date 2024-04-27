@@ -19,6 +19,11 @@ type User struct {
 	Username string     `json:"username"`
 }
 
+type UserFromQuery struct {
+	User              User `json:"user"`
+	IsRequestorBanned bool `json:"isRequestorBanned"`
+}
+
 type Photo struct {
 	PhotoId            Identifier `json:"photoId"`
 	UploaderUserId     Identifier `json:"uploaderUserId"`

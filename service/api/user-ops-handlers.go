@@ -9,6 +9,7 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
 	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
+	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
 // stream username in U mode (only mode available plain via api; dologin calls only for n mode) set and getprofile
@@ -72,6 +73,11 @@ func (rt *_router) getListOfUsers(w http.ResponseWriter, r *http.Request, ps htt
 	// retrieve by header the requestor
 	reqId := r.Header.Get("Requestor")
 
+	// TODO log that in frontend
+	if reqId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	authorization := r.Header.Get("Authorization")
 	if authorization != reqId {
 		w.WriteHeader(http.StatusForbidden)
@@ -79,7 +85,7 @@ func (rt *_router) getListOfUsers(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	users, err := rt.db.GetUserList()
+	users, err := rt.db.GetUserList(structs.Identifier{Id: reqId})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occurred during db calls in getting list of users: ", err)

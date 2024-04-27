@@ -57,10 +57,12 @@ func GenerateIdentifier(actor string) (structs.Identifier, error) {
 }
 
 // when building core functionality decide it
-func (db *appdbimpl) checkBan(bannerId string, bannedId string) error {
+func (db *appdbimpl) checkBan(plainBannerId string, plainBannedId string) error {
 	var counter int
 
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId, bannedId).Scan(&counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, plainBannerId, plainBannedId).Scan(&counter)
+	println("in checkban check ")
+	println("counter: ", counter)
 
 	if err != nil {
 		return err

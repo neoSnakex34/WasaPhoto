@@ -3,7 +3,8 @@
     export default{
         data: function(){
             return {
-                users: [],
+                usersFromQuery: [],
+                matchingUsers: [],
                 userId: localStorage.getItem('userId'),
                 usernames: [],
                 matchingUsers: [],
@@ -21,10 +22,12 @@
                         Requestor: this.userId, 
                     }
                 });
-                this.users = response.data;
-           
-                this.matchingUsers = this.users.filter(user => user.username.startsWith(this.query.toLowerCase())).filter(user => user.userId.identifier !== this.userId);
-              
+                this.usersFromQuery = response.data;
+                console.log(this.usersFromQuery);
+
+                this.matchingUsers = this.usersFromQuery.filter(userObj => userObj.user.username.startsWith(this.query.toLowerCase()))
+                // this.matchingUsers = this.users.filter(user => user.username.startsWith(this.query.toLowerCase())).filter(user => user.userId.identifier !== this.userId);
+                console.log(this.matchingUsers);
                 // this.matchingUsernames = this.usernames.filter(username => username.includes(this.query.toLowerCase()));
                 } catch(e){
                     console.log(e);
@@ -122,20 +125,20 @@
     <div class="container pt-1" style="height: 500px; width: 80%">
         <!-- add a condition in script for excluding banned user -->
         <div class="border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center"
-             v-for="user in matchingUsers" 
-             @mouseenter="user.showButtons = true"
-             @mouseleave="user.showButtons = false"
+             v-for="entry in matchingUsers" 
+             @mouseenter="entry.showButtons = true"
+             @mouseleave="entry.showButtons = false"
              
              style="min-height: 100px;">
             <!-- add href to profile -->
-            <router-link :to="`/profile/${encodeURIComponent(user.userId.identifier)}`" style="font-size: large;"><strong>{{ user.username }}</strong></router-link>
+            <router-link :to="`/profile/${encodeURIComponent(entry.user.userId.identifier)}`" style="font-size: large;"><strong>{{ entry.user.username }}</strong></router-link>
            
-            <div class="btn-group" v-show="user.showButtons">
+            <div class="btn-group" v-if="!entry.isRequestorBanned" v-show="entry.showButtons">
 
-                <button class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(user.userId.identifier)">Follow</button>
-                <button class="btn btn-danger fw-bold rounded-pill ms-auto me-3" @click="unfollowUser(user.userId.identifier)" >Unfollow</button>
-                <button class="btn btn-secondary fw-bold rounded-pill ms-auto me-3" @click="banUser(user.userId.identifier)">Ban</button>
-                <button class="btn btn-success fw-bold rounded-pill ms-auto" @click="unbanUser(user.userId.identifier)">Unban</button>
+                <button class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(entry.user.userId.identifier)">Follow</button>
+                <button class="btn btn-danger fw-bold rounded-pill ms-auto me-3" @click="unfollowUser(entry.user.userId.identifier)" >Unfollow</button>
+                <button class="btn btn-secondary fw-bold rounded-pill ms-auto me-3" @click="banUser(entry.user.userId.identifier)">Ban</button>
+                <button class="btn btn-success fw-bold rounded-pill ms-auto" @click="unbanUser(entry.user.userId.identifier)">Unban</button>
 
             </div>
         </div>

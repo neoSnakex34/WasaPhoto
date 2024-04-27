@@ -188,27 +188,41 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	return profileRetrieved, nil
 }
 
-func (db *appdbimpl) GetUserList() ([]structs.User, error) {
+func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.UserFromQuery, error) {
 
-	var userList []structs.User
+	var userFromQueryList []structs.UserFromQuery
+	var userId string
+	var username string
+	var isRequestorBanned bool
 
-	rows, err := db.c.Query(`SELECT userId, username FROM users`)
+	rows, err := db.c.Query(`SELECT userId, username FROM users WHERE userId != ?`, requestorUserId.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		var userId string
-		var username string
 		err = rows.Scan(&userId, &username)
 		if err != nil {
 			return nil, err
 		}
+		println("userId, username: ", userId, username)
+		println("requestorUserId: ", requestorUserId.Id)
 
-		userList = append(userList, structs.User{UserId: structs.Identifier{Id: userId}, Username: username})
+		err = db.checkBan(userId, requestorUserId.Id)
+		println("err: ", err)
+		if errors.Is(err, customErrors.ErrIsBanned) {
+			isRequestorBanned = true
+		} else if err != nil {
+			return nil, err
+		} else {
+			isRequestorBanned = false
+
+		}
+
+		userFromQueryList = append(userFromQueryList, structs.UserFromQuery{User: structs.User{UserId: structs.Identifier{Id: userId}, Username: username}, IsRequestorBanned: isRequestorBanned})
 	}
 
-	return userList, nil
+	return userFromQueryList, nil
 }
 
 // TODO sort photosbydate
