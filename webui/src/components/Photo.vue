@@ -24,7 +24,7 @@ export default {
     components: {
         Comment 
     },
-    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'comments'], // some ID wont be visualized
+    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'stream', 'comments'], // some ID wont be visualized
 
     computed: {
           sortedComments() {
@@ -190,7 +190,7 @@ export default {
         <img :src="src" class="card-img-top" />
 
             <!-- kebab button  v if profile personal (add a check) unused valued should be null in guestProfileView-->
-            <button v-if="!guest" @click="$emit('toggle-delete')" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
+            <button v-if="!guest && !stream" @click="$emit('toggle-delete')" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
             <!-- <button @click="toggleDelete" class="position-absolute top-0 end-0 custom-button fw-bold">...</button> -->
            
    
@@ -214,7 +214,7 @@ export default {
                 
                 
                 <!-- heart icon using imported svgs from folder public  -->
-                    <div  class="me-4" style="width: 10%;">
+                    <div  style="width: 10%;">
                         <div v-if="!this.liked">
                             <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" @click="likePhoto()" style="fill: black; opacity: 75%;">
                                 <path d="m458.4 64.3c-57.8-48.6-147.1-41.3-202.4 15-55.3-56.3-144.6-63.7-202.4-15-75.2 63.3-64.2 166.5-10.6 221.2l175.4 178.7c10 10.2 23.4 15.9 37.6 15.9 14.3 0 27.6-5.6 37.6-15.8l175.4-178.7c53.5-54.7 64.7-157.9-10.6-221.3zm-23.6 187.5-175.4 178.7c-2.4 2.4-4.4 2.4-6.8 0l-175.4-178.7c-36.5-37.2-43.9-107.6 7.3-150.7 38.9-32.7 98.9-27.8 136.5 10.5l35 35.7 35-35.7c37.8-38.5 97.8-43.2 136.5-10.6 51.1 43.1 43.5 113.9 7.3 150.8z"/>
@@ -273,11 +273,9 @@ export default {
    
     background-color: transparent;  
     font-size: 40px;
-    text-shadow:  /* cross browser */
-        -1px -1px 0 black,  /* shadow on every direction */
-         1px -1px 0 black, /* simulates a stroke */
-        -1px  1px 0 black, /* less aesthetic than webkit stroke but works */
-         1px  1px 0 black;
+    -webkit-text-stroke : 1px black;
     padding: 5px 30px; /* top bottom; left right */
 }
+
+    
 </style>

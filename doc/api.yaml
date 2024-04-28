@@ -8,7 +8,7 @@ info:
 
 servers:
   # TODO change accordingly
-  - url: http://localhost:8090
+  - url: http://localhost:3000
 
 tags:
   - name: "User"
@@ -179,7 +179,7 @@ paths:
             application/json:
               schema:
                 type: array
-                description: list of photos in the stream #TODO change
+                description: list of photos in the stream 
                 items:
                   $ref: "#/components/schemas/Photo"
                 minItems: 0
@@ -593,6 +593,10 @@ components:
           description: boolean value that tells if the user is banned by the requestor
           type: boolean
           example: false
+        requestorHasBanned:
+          description: boolean value that tells if the requestor has banned the user
+          type: boolean
+          example: false
 
     User:
       title: user
@@ -669,9 +673,12 @@ components:
           $ref: "#/components/schemas/Identifier"
 
         # uploader user id
-        userId:
+        uploaderUserId:
           $ref: "#/components/schemas/Identifier"
-
+        
+        uploaderUsername:
+          $ref: "#/components/schemas/UserName"
+        
         likes:
           description: number of likes the photo has recieved (represented by userId that liked the photo)
           type: integer

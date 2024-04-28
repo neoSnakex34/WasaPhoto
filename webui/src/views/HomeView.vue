@@ -10,7 +10,7 @@ export default {
 		return {
 			username: localStorage.getItem('username'),
 			userId: localStorage.getItem('userId'),
-			stream: [], // TODO
+			stream: [], 
 			// servedStream: [],
 		}
 	},
@@ -19,6 +19,22 @@ export default {
 	}, 
 
 	methods: {
+
+			graphicallyLikeBeforeRefresh(id) {
+
+				// TODO change in all const or all let variables
+				const photo = this.stream.find(p => p.photoId.identifier === id);
+				// on refresh likes will be retrieved from backend
+				photo.likeCounter++;
+				// will also set liked 
+				photo.likedByCurrentUser = true;
+			},
+
+			graphicallyUnlikeBeforeRefresh(id) {
+				const photo = this.stream.find(p => p.photoId.identifier === id);
+				photo.likeCounter--;
+				photo.likedByCurrentUser = false;
+			},
 
 		   async updateServedStream() {
 
@@ -99,8 +115,11 @@ export default {
 		<div class="container pt-4 pb-4" style="width: 60%;">
 			<Photo v-for="photo in stream"
 
+				@like="graphicallyLikeBeforeRefresh(photo.photoId.identifier)"
+                @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)"
+
 				:src="photo.served" 
-                uploader="tb added"
+                :uploader="photo.uploaderUsername"
                 :photoId="photo.photoId.identifier"
                 :comments="photo.comments"
                 :uploaderId="photo.uploaderUserId.identifier"
@@ -109,6 +128,7 @@ export default {
                 :date="photo.date" 
                 :likes="photo.likeCounter"
                 :liked="photo.likedByCurrentUser" 
+				:stream="true"
 
 			 	/>
 

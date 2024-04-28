@@ -210,9 +210,15 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 			return nil, err
 		}
 
+		uploaderUsername, err := db.getUsernameByUserId(plainUserId)
+		if err != nil {
+			return nil, err
+		}
+
 		photo := structs.Photo{
 			PhotoId:            structs.Identifier{Id: plainPhotoId},
 			UploaderUserId:     structs.Identifier{Id: plainUserId},
+			UploaderUsername:   uploaderUsername,
 			LikeCounter:        likeCounter,
 			Comments:           comments,
 			LikedByCurrentUser: likedByCurrentUser,
@@ -298,6 +304,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 	var likeCounter int
 	var liked bool
 	var photoPath string
+	var uploaderUsername string
 
 	var photos []structs.Photo
 
@@ -341,9 +348,16 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 			return 0, nil, err
 		}
 
+		uploaderUsername, err = db.getUsernameByUserId(plainUserId)
+		if err != nil {
+			log.Println("error in getting username from db")
+			return 0, nil, err
+		}
+
 		tmpPhoto = structs.Photo{
 			PhotoId:            structs.Identifier{Id: plainPhotoId},
 			UploaderUserId:     structs.Identifier{Id: plainUserId},
+			UploaderUsername:   uploaderUsername,
 			LikeCounter:        likeCounter,
 			Comments:           comments,
 			LikedByCurrentUser: liked,
@@ -401,5 +415,57 @@ func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Commen
 	}
 
 	return Comments, nil
+
+}
+
+func (db *appdbimpl) removeAllCommentsByUserId(plainUserId string) error {
+
+	// check if comments exists
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM comments WHERE userId = ?`, plainUserId).Scan(&counter)
+	if err != nil {
+		return err
+	} else if counter == 0 {
+		return nil
+	}
+
+	_, err = db.c.Exec(`DELETE FROM comments WHERE userId = ?`, plainUserId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (db *appdbimpl) removeAllLikesByUserId(plainUserId string) error {
+
+	// check if likes exists
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ?`, plainUserId).Scan(&counter)
+	if err != nil {
+		return err
+	} else if counter == 0 {
+		return nil
+	}
+
+	_, err = db.c.Exec(`DELETE FROM likes WHERE likerId = ?`, plainUserId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (db *appdbimpl) follows(plainFollowerId string, plainFollowedId string) (bool, error) {
+
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ? AND followedId = ?`, plainFollowerId, plainFollowedId).Scan(&counter)
+	if err != nil {
+		return false, err
+	}
+
+	return counter > 0, nil
 
 }

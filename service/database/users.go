@@ -194,6 +194,7 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 	var userId string
 	var username string
 	var isRequestorBanned bool
+	var requestorHasBanned bool
 
 	rows, err := db.c.Query(`SELECT userId, username FROM users WHERE userId != ?`, requestorUserId.Id)
 	if err != nil {
@@ -205,8 +206,6 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 		if err != nil {
 			return nil, err
 		}
-		println("userId, username: ", userId, username)
-		println("requestorUserId: ", requestorUserId.Id)
 
 		err = db.checkBan(userId, requestorUserId.Id)
 		println("err: ", err)
@@ -216,10 +215,25 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 			return nil, err
 		} else {
 			isRequestorBanned = false
-
 		}
 
-		userFromQueryList = append(userFromQueryList, structs.UserFromQuery{User: structs.User{UserId: structs.Identifier{Id: userId}, Username: username}, IsRequestorBanned: isRequestorBanned})
+		err = db.checkBan(requestorUserId.Id, userId)
+		if errors.Is(err, customErrors.ErrIsBanned) {
+			requestorHasBanned = true
+		} else if err != nil {
+			return nil, err
+		} else {
+			requestorHasBanned = false
+		}
+
+		userFromQueryList = append(userFromQueryList, structs.UserFromQuery{
+			User: structs.User{
+				UserId:   structs.Identifier{Id: userId},
+				Username: username,
+			},
+			IsRequestorBanned:  isRequestorBanned,
+			RequestorHasBanned: requestorHasBanned,
+		})
 	}
 
 	return userFromQueryList, nil

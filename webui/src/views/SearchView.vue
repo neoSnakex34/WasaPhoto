@@ -84,8 +84,14 @@
                             'Content-Type': 'application/json'
                         }
                     });
+
                     // TODO change
                     alert("banned");
+
+                    // find user in matching users with banned id
+                    let bannedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === bannedId);
+                    bannedUserFromQuery.requestorHasBanned = true;
+                    
                 } catch(e){
                     // TODO log errors to alreadyfollowed
                     console.log(e);
@@ -102,6 +108,11 @@
                             'Content-Type': 'application/json'
                         }
                     });
+
+                    // find user in matching users with banned id
+                    let ubannedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === bannedId);
+                    ubannedUserFromQuery.requestorHasBanned = false;
+
                     // TODO change
                     alert("unbanned");
                 } catch(e){
@@ -135,13 +146,19 @@
              
              style="min-height: 100px;">
             <!-- add href to profile -->
-            <router-link :to="`/profile/${encodeURIComponent(entry.user.userId.identifier)}`" style="font-size: large;"><strong>{{ entry.user.username }}</strong></router-link>
-           
-            <div class="btn-group" v-if="!entry.isRequestorBanned" v-show="entry.showButtons">
+            
+            <router-link v-if="!entry.isRequestorBanned && !entry.requestorHasBanned" :to="`/profile/${encodeURIComponent(entry.user.userId.identifier)}`" style="font-size: large;"><strong>{{ entry.user.username }}</strong></router-link>
+            <div v-if="entry.isRequestorBanned" class="disabled" style="font-size: large;">{{ entry.user.username }}</div>
+            <div v-if="entry.requestorHasBanned" class="disabled" style="font-size: large;">{{ entry.user.username }}</div>
 
-                <button class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(entry.user.userId.identifier)">Follow</button>
-                <button class="btn btn-danger fw-bold rounded-pill ms-auto me-3" @click="unfollowUser(entry.user.userId.identifier)" >Unfollow</button>
-                <button class="btn btn-secondary fw-bold rounded-pill ms-auto me-3" @click="banUser(entry.user.userId.identifier)">Ban</button>
+            <div v-if="!entry.isRequestorBanned" class="btn-group"  v-show="entry.showButtons">
+
+                <div v-if="!entry.requestorHasBanned">
+                    <button class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(entry.user.userId.identifier)">Follow</button>
+                    <button class="btn btn-danger fw-bold rounded-pill ms-auto me-3" @click="unfollowUser(entry.user.userId.identifier)" >Unfollow</button>
+                    <button class="btn btn-secondary fw-bold rounded-pill ms-auto me-3" @click="banUser(entry.user.userId.identifier)">Ban</button>
+
+                </div>
                 <button class="btn btn-success fw-bold rounded-pill ms-auto" @click="unbanUser(entry.user.userId.identifier)">Unban</button>
 
             </div>

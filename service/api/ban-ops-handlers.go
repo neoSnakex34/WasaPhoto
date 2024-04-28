@@ -15,7 +15,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	var bannedId structs.Identifier
 
 	bannerId = structs.Identifier{Id: ps.ByName("bannerId")}
-	bannedId = structs.Identifier{Id: ps.ByName("userId")}
+	bannedId = structs.Identifier{Id: ps.ByName("userId")} //TODO change
 
 	if bannerId.Id == "" || bannedId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)

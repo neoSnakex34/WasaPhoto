@@ -10,6 +10,7 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 	var counter int
 	var err error
 
+	// TODO this shouls be a function utility
 	// check if user is arleady banned
 	err = db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
 
@@ -20,6 +21,40 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 	} else if counter == 0 { // redundand check just to be paranoid
 		// here i ban
 		err = db.addBan(bannerId.Id, bannedId.Id)
+		if err != nil {
+			return err
+		}
+
+		userFollowsBanned, err := db.follows(bannerId.Id, bannedId.Id)
+		if err != nil {
+			return err
+		}
+
+		bannedFollowsUser, err := db.follows(bannedId.Id, bannerId.Id)
+		if err != nil {
+			return err
+		}
+
+		if userFollowsBanned {
+			err = db.removeFollow(bannerId.Id, bannedId.Id)
+			if err != nil {
+				return err
+			}
+		}
+
+		if bannedFollowsUser {
+			err = db.removeFollow(bannedId.Id, bannerId.Id)
+			if err != nil {
+				return err
+			}
+		}
+
+		err = db.removeAllCommentsByUserId(bannedId.Id)
+		if err != nil {
+			return err
+		}
+
+		err = db.removeAllLikesByUserId(bannedId.Id)
 		if err != nil {
 			return err
 		}

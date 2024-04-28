@@ -20,13 +20,15 @@ type User struct {
 }
 
 type UserFromQuery struct {
-	User              User `json:"user"`
-	IsRequestorBanned bool `json:"isRequestorBanned"`
+	User               User `json:"user"`
+	IsRequestorBanned  bool `json:"isRequestorBanned"`
+	RequestorHasBanned bool `json:"requestorHasBanned"`
 }
 
 type Photo struct {
 	PhotoId            Identifier `json:"photoId"`
 	UploaderUserId     Identifier `json:"uploaderUserId"`
+	UploaderUsername   string     `json:"uploaderUsername"`
 	LikeCounter        int        `json:"likeCounter"`
 	Comments           []Comment  `json:"comments"`
 	LikedByCurrentUser bool       `json:"likedByCurrentUser"`
