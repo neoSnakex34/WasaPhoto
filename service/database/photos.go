@@ -17,19 +17,19 @@ const Folder string = "/tmp/wasaphoto/photofiles/"
 // save the photo in the database and create a new photo struct
 // TODO decide when to use photostruct and comment struct in interactions
 // FIXME will fronted give backend uploadphoto the file as a byte stream?
-func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) error {
+func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) (structs.Photo, error) {
 
 	var isValidId bool = false
 	var newPhotoId structs.Identifier
 	var err error
-	var photoPath string
+	var completePhotoPath string
 	var uploaderId string = upoloaderUserId.Id
 	// generate a new photo valid id
 	for !isValidId && err == nil {
 
 		newPhotoId, err = GenerateIdentifier("P")
 		if err != nil {
-			return err
+			return structs.Photo{}, err
 		}
 
 		isValidId, err = db.validId(newPhotoId.Id, "P")
@@ -37,41 +37,37 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	}
 
 	if err != nil {
-		return err
+		return structs.Photo{}, err
 	}
 
-	photoPath = Folder + uploaderId + "/" + newPhotoId.Id + "." + format
+	completePhotoPath = Folder + uploaderId + "/" + newPhotoId.Id + "." + format //
 
 	// FIRST save the photo file in the filesystem
-	err = savePhotoFile(file, photoPath)
+	err = savePhotoFile(file, completePhotoPath)
 	if err != nil {
-		return err
+		return structs.Photo{}, err
 	}
 
 	date := time.Now().UTC().Format(time.RFC3339)
 
 	// SECONDLY create the photo struct
-	// this is just for clean visualization of what ill put in db, i will not use it
-	// it will be less memory intensive to just put the values in the db
-	// need to think about this
-
-	// newPhoto := structs.Photo{
-	// 	PhotoId:        newPhotoId,
-	// 	UploaderUserId: upoloaderUserId,
-	// 	// Like:      0,                   // defaults not saved in the database
-	// 	// Comments:  []structs.Comment{}, // defaults not saved in the database
-	// 	Date:      date,
-	// 	PhotoPath: photoPath,
-	// }
-
-	// AFTER FIRST TWO STEPS insert photo in the database
-	err = db.insertPhotoInTable(newPhotoId.Id, upoloaderUserId.Id, date, photoPath)
-	if err != nil {
-		return err
+	newPhoto := structs.Photo{
+		PhotoId:            newPhotoId,
+		UploaderUserId:     upoloaderUserId,
+		LikeCounter:        0,
+		Comments:           []structs.Comment{},
+		LikedByCurrentUser: false,
+		Date:               date,
+		PhotoPath:          uploaderId + "/" + newPhotoId.Id + "." + format, // needs to be partial for frontend
 	}
 
-	// FIXME
-	return err // or nil directly
+	// AFTER FIRST TWO STEPS insert photo in the database
+	err = db.insertPhotoInTable(newPhotoId.Id, upoloaderUserId.Id, date, completePhotoPath)
+	if err != nil {
+		return structs.Photo{}, err
+	}
+
+	return newPhoto, err // or nil directly
 }
 
 // [ ] check you built the path correctly

@@ -20,7 +20,7 @@
             <h5 class="fw-bold"><strong>{{ this.username }}</strong></h5> <!--- username of commentor-->
             <!-- <h6 class="fw-bold text-muted"><strong>{{ this.commentingId }}</strong></h6> -->
             <span class="ms-4">{{ this.date }}</span>
-            <button @click="$emit('delete-comment-event', commentId)" v-if="this.loggedUserId === this.photoOwnerId || this.loggedUserId === this.commentingUserId" class="btn btn-danger rounded-pill ms-auto">x</button>
+            <button @click="$emit('delete-comment-event', commentId)" v-if="this.loggedUserId === this.photoOwnerId || this.loggedUserId === this.commentingUserId" class="btn btn-danger rounded-pill fw-bold ms-auto">x</button>
         </div>
         <div>
             <span>{{ this.body }}</span>

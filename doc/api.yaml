@@ -303,14 +303,22 @@ paths:
       requestBody:
         description: the file of the photo to be uploaded
         content:
+          # TODO WARNING
           image/png:
+            schema:
+              $ref: "#/components/schemas/PhotoFile"
+          image/jpeg:
             schema:
               $ref: "#/components/schemas/PhotoFile"
         required: true
 
       responses:
-        "204":
+        "200":
           description: photo uploaded succesfully
+          content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Photo"
         
         "400":
           $ref: "#/components/responses/BadRequest"

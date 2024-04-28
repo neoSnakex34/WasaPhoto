@@ -12,11 +12,7 @@ export default {
             profile: {
                 username: localStorage.getItem('username'),
                 userId: localStorage.getItem('userId'),
-                myPhotos: [
-                    /*
-                        TODO add what will contain
-                    */
-                ],
+                myPhotos: [],
                 followerCounter: 0,
                 followingCounter: 0,
                 photoCounter: 0,
@@ -30,6 +26,9 @@ export default {
     },
 
     async created() {
+        if (!this.profile.myPhotos) {
+            this.profile.myPhotos = []
+        }
         await this.getUserProfile()
         await this.updateServedPhotos()
     },
@@ -93,9 +92,10 @@ export default {
             for (let [index, photo] of sortedPhotosByDate.entries()) {
 
                 let path = photo.photoPath
-                // FIXME be wary of this crappy reference to array python like stuff
-                sortedPhotosByDate[index].served = await this.getPhoto(path)
-                // tmpServedPhotos.push(await this.getPhoto(path))
+                // array by reference is not a copy
+                // cause you know speedy speedy scripting lang
+                // doing speedy speedy dumb things
+                photo.served = await this.getPhoto(path)
 
             }
 
@@ -123,6 +123,9 @@ export default {
                 this.profile.followingCounter = response.data.followingCounter
                 this.profile.photoCounter = response.data.photoCounter
                 this.profile.myPhotos = response.data.photos
+                if (this.profile.myPhotos === null) {
+                    this.profile.myPhotos = []
+                }
                 console.log(this.profile.myPhotos)
             } catch (e) {
                 if (e.response.data) {
@@ -174,17 +177,18 @@ export default {
                         {
                             headers: {
                                 'Content-Type': 'application/octet-stream'
+                    
                             }
                         })
 
-                    // alert("Photo uploaded successfully")
-
-                    // this will refresh the profile 
-                    await this.getUserProfile()
+                    let newPhoto = response.data
+                    this.profile.myPhotos.push(newPhoto)
+                    
                     await this.updateServedPhotos()
+                    console.log(this.profile.myPhotos)
 
                 } catch (e) {
-                    if (e.response.data) {
+                    if (e.response) {
                         alert(e.response.data)
                     } else {
                         alert(e)
@@ -198,10 +202,7 @@ export default {
 
         },
 
-        // FIXME
         async deletePhoto(id) {
-            // TODO remove after testing
-            // let photoId = this.profile.myPhotos[index].photoId.identifier
             
             try {
                 let response = await this.$axios.delete(`/users/${this.profile.userId}/photos/${id}`,
@@ -209,12 +210,17 @@ export default {
                         headers: {
                             'Content-Type': 'application/json'
                         }
-                    })
+                    });
 
-                // this will refresh the profile 
-                this.toggleDeleteButton()
-                await this.getUserProfile()
-                await this.updateServedPhotos()
+                this.toggleDeleteButton();
+              
+
+
+                // TODO maybe check for errors?
+                let idx = this.profile.myPhotos.findIndex(p => p.photoId.identifier === id);
+                this.profile.myPhotos.splice(idx, 1)
+                // await this.getUserProfile()
+                // await this.updateServedPhotos()
 
             } catch (e) {
                 if (e.response.data) {
