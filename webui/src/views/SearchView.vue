@@ -70,7 +70,6 @@
                 } catch(e){
                     // TODO log errors to alreadyfollowed
                     console.log(e);
-                    alert("Error");
                 }
 
         },
@@ -84,9 +83,6 @@
                             'Content-Type': 'application/json'
                         }
                     });
-
-                    // TODO change
-                    alert("banned");
 
                     // find user in matching users with banned id
                     let bannedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === bannedId);
@@ -113,8 +109,6 @@
                     let ubannedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === bannedId);
                     ubannedUserFromQuery.requestorHasBanned = false;
 
-                    // TODO change
-                    alert("unbanned");
                 } catch(e){
                     // TODO log errors to alreadyfollowed
                     console.log(e);
