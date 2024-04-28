@@ -171,12 +171,12 @@ func (db *appdbimpl) alreadyLiked(plainRequestorUserId string, likedPhotoId stri
 
 }
 
-func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string) ([]structs.Photo, error) {
+func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequestorId string) ([]structs.Photo, error) {
 	var photos []structs.Photo
-	var userId string = plainUploaderId
-	var photoId string
+	var plainUserId string = plainUploaderId
+	var plainPhotoId string
 	var date string
-	var photoPath string
+	var completePhotoPath string
 
 	// query to retrieve info
 	rows, err := db.c.Query(`SELECT photoId, userId, date, photoPath FROM photos WHERE userId = ?`, plainUploaderId)
@@ -187,15 +187,37 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string) ([]structs.Ph
 
 	for rows.Next() {
 		// user id is the same for all photos at every call, but for now is re assigned
-		err = rows.Scan(&photoId, &userId, &date, &photoPath)
+		err = rows.Scan(&plainPhotoId, &plainUploaderId, &date, &completePhotoPath)
 		if err != nil {
 			return nil, err
 		}
+
+		//splitting the path to get the partial one
+		photoPath := strings.Split(completePhotoPath, "/photofiles/")[1]
+
+		likeCounter, err := db.getNumberOfLikedByPhotoId(plainPhotoId)
+		if err != nil {
+			return nil, err
+		}
+
+		comments, err := db.getCommentsByPhotoId(plainPhotoId)
+		if err != nil {
+			return nil, err
+		}
+
+		likedByCurrentUser, err := db.getLikedByUserId(plainRequestorId, plainPhotoId)
+		if err != nil {
+			return nil, err
+		}
+
 		photo := structs.Photo{
-			PhotoId:        structs.Identifier{Id: photoId},
-			UploaderUserId: structs.Identifier{Id: userId},
-			Date:           date,
-			PhotoPath:      photoPath,
+			PhotoId:            structs.Identifier{Id: plainPhotoId},
+			UploaderUserId:     structs.Identifier{Id: plainUserId},
+			LikeCounter:        likeCounter,
+			Comments:           comments,
+			LikedByCurrentUser: likedByCurrentUser,
+			Date:               date,
+			PhotoPath:          photoPath,
 		}
 		photos = append(photos, photo)
 	}

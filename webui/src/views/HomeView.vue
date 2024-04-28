@@ -11,37 +11,77 @@ export default {
 			username: localStorage.getItem('username'),
 			userId: localStorage.getItem('userId'),
 			stream: [], // TODO
-			errormsg: null,
-			loading: false,
-			some_data: null,
+			// servedStream: [],
 		}
 	},
+	async mounted() {
+		this.getMyStream();
+	}, 
+
 	methods: {
-		async refresh() {
 
-			this.loading = true;
-			this.errormsg = null;
-			try {
-				let response = await this.$axios.get("/");
-				// this.some_data = response.data;
-			} catch (e) {
-				this.errormsg = e.toString();
+		   async updateServedStream() {
 
+            if (this.stream === null) {
+                this.servedStream = []
+                return
+            }
+
+            let sortedPhotosByDate = this.stream.sort((a, b) => {
+                return new Date(b.date) - new Date(a.date)
+            })
+
+            
+            for (let photo of sortedPhotosByDate) {
+                let path = photo.photoPath
+				console.log(photo);
+                // array by reference is not a copy
+                // cause you know speedy speedy scripting lang
+                // doing speedy speedy dumb things
+                photo.served = await this.getPhotoForStream(path, photo.uploaderUserId.identifier)
+
+            }
+
+        },
+
+		  // THIS WILL CALL SERVEPHOTO IN API 
+        async getPhotoForStream(partialPath, uploaderId) {
+            let photoId = partialPath.split('/')[1]
+
+            try {
+                let response = await this.$axios.get(`users/${uploaderId}/photos/${photoId}`,
+                    {
+                        responseType: 'blob',
+                        headers: {
+                            Requestor: localStorage.getItem('userId')
+                        }
+                    })
+
+                let servedPhotoUrl = window.URL.createObjectURL(response.data)
+                return servedPhotoUrl
+            } catch (e) {
+                alert(e)
+            }
+        },
+	
+
+		async getMyStream() {
+			try{
+				let response = await this.$axios.get(`/users/${this.userId}/stream`);
+				this.stream = response.data;
+				console.log(this.stream);
+				this.updateServedStream();
+			} catch(e) {
+				if (e.responde) {
+					alert(e.response.data);
+				} else {
+					alert(e);
+				}
 			}
-			this.loading = false;
-		},
-		
-		doLogout() {
-			localStorage.removeItem('userId');
-			localStorage.removeItem('username');
-			this.$router.push('/login');
-		},
-		
 
-	},
-	mounted() {
-		this.refresh()
+		}
 	}
+	
 }
 </script>
 
@@ -57,22 +97,21 @@ export default {
 		</div>
 
 		<div class="container pt-4 pb-4" style="width: 60%;">
-			<Photo
-				:src="'rei.jpg'"
-				uploader="rei"
-				date="2021-10-10"
-				likes="0"
-				liked="false"
+			<Photo v-for="photo in stream"
+
+				:src="photo.served" 
+                uploader="tb added"
+                :photoId="photo.photoId.identifier"
+                :comments="photo.comments"
+                :uploaderId="photo.uploaderUserId.identifier"
+                :photoOwnerId="photo.uploaderUserId.identifier"
+                :loggedUserId="this.userId"
+                :date="photo.date" 
+                :likes="photo.likeCounter"
+                :liked="photo.likedByCurrentUser" 
+
 			 	/>
 
-			<Photo
-				:src="'rei.jpg'"
-				uploader="rei"
-				date="2021-10-10"
-				likes="0"
-				liked="false"
-			 	/>
-		
 		</div>
 
 		<!-- <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg> -->

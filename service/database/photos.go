@@ -3,7 +3,6 @@ package database
 import (
 	"os"
 	"path/filepath"
-	"sort"
 	"time"
 
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
@@ -133,7 +132,7 @@ func (db *appdbimpl) insertPhotoInTable(photoId string, userId string, date stri
 }
 
 // TODO improve and change sorting order (in frontend sorted will be better)
-func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]structs.Photo, error) { // TODO Note it returns a stream of photos, that needs to be displayed by obtaining info from the structs
+func (db *appdbimpl) getStreamOfPhotos(followerIdsForUser []string, plainRequestorId string) ([]structs.Photo, error) { // TODO Note it returns a stream of photos, that needs to be displayed by obtaining info from the structs
 	// for each follower i should retrieve a (photo slice) in order to build the stream
 	// since i will need to sort the stream by date, i should return a complex struct instead of []string
 	// and the access datas
@@ -141,7 +140,7 @@ func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]str
 	var stream []structs.Photo
 	var tmpPhotos [][]structs.Photo
 	for _, followerId := range followerIdsForUser {
-		photos, err := db.getPhotosByUploaderId(followerId)
+		photos, err := db.getPhotosByUploaderId(followerId, plainRequestorId)
 		if err != nil {
 			return nil, err
 		}
@@ -153,18 +152,6 @@ func (db *appdbimpl) getSortedStreamOfPhotos(followerIdsForUser []string) ([]str
 		stream = append(stream, tmpList...)
 	}
 
-	// sort stream by date, i need to parse date with Time type
-	// TODO
-	sort.SliceStable(stream, func(i int, j int) bool {
-		// FIXME should probably handle errors here
-		// decide in debugging whether or not enabling error
-		// handling here
-		date1, _ := time.Parse(time.RFC3339, stream[i].Date)
-		date2, _ := time.Parse(time.RFC3339, stream[j].Date)
-
-		return date2.Before(date1)
-
-	})
 	// CHECK if stream is sorted and err is actually nil then return err and not nil
 	return stream, nil
 

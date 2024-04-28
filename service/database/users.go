@@ -231,6 +231,7 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, er
 	// first i obtain a followerlist
 	var followerIdList []string
 	followerIdList, err := db.getFollowerList(userId.Id)
+	plainRequestorId := userId.Id
 
 	println("followerIdList: ", followerIdList)
 
@@ -238,7 +239,7 @@ func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, er
 		return nil, err
 	}
 
-	streamOfPhotoStructs, err := db.getSortedStreamOfPhotos(followerIdList)
+	streamOfPhotoStructs, err := db.getStreamOfPhotos(followerIdList, plainRequestorId)
 	if err != nil {
 		return nil, err
 	}

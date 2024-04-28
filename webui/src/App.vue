@@ -7,6 +7,16 @@ export default {
 		if (localStorage.getItem('authorization')) {
 			this.$axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization')
 		}
+	},
+
+	methods: {
+		doLogout() {
+			localStorage.removeItem('userId');
+			localStorage.removeItem('username');
+			this.$router.push('/login');
+		},
+
+
 	}
 }
 </script>

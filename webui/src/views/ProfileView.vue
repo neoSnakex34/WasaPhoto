@@ -89,7 +89,8 @@ export default {
 
             // let tmpServedPhotos = []
             
-            for (let [index, photo] of sortedPhotosByDate.entries()) {
+            // TODO fix as guest
+            for (let photo of sortedPhotosByDate) {
 
                 let path = photo.photoPath
                 // array by reference is not a copy
