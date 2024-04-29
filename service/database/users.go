@@ -91,6 +91,7 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	}
 	// TODO should i check even for err of that queryrow?
 
+	/// TODO instead of checking two times i should return error here to api
 	matched := serviceutilities.CheckRegexNewUsername(newUsername)
 
 	if count == 0 && matched {

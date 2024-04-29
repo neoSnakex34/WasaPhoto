@@ -9,20 +9,20 @@ export default {
             loggedUserId: localStorage.getItem('userId'), // THIS COULD have problems with references
             commentBodyIn: '',
             // comments: [
-            //     /* 
-            //         commentId 
+            //     /*
+            //         commentId
             //         userId // id of commentor
             //         username // username of commentor
-            //         photoId 
+            //         photoId
             //         body
             //         date
             //     */
             // ]
-          
+
         }
     },
     components: {
-        Comment 
+        Comment
     },
     props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'stream', 'comments'], // some ID wont be visualized
 
@@ -33,11 +33,11 @@ export default {
 
             }
         },
-        
+
     },
     methods: {
 
-        
+
 
         toggleDelete() {
             this.delete = !this.delete
@@ -73,7 +73,7 @@ export default {
                 let response = await this.$axios.delete(`/users/${this.uploaderId}/photos/${this.photoId}/likes/${this.likerId}`,
                 {
                     headers: {
-                        
+
                         'Content-Type': 'application/json'
                     }
                 }
@@ -82,7 +82,7 @@ export default {
                 if(response.status === 200){
                     this.$emit('unlike');
                 }
-                
+
             }catch(e){
                 if (e.response.data) {
                     alert(e.response.data)
@@ -123,7 +123,7 @@ export default {
 
                 // Empties the comment field
                 this.commentBodyIn = '';
-                    
+
 
 
             } catch (e) {
@@ -134,21 +134,21 @@ export default {
 
             // empyting the comment field        },
 
-        // TODO implement 
-        async deleteComment(commentId){ 
+        // TODO implement
+        async deleteComment(commentId){
             try {
                 let response = await this.$axios.delete(`/users/${this.uploaderId}/photos/${this.photoId}/comments/${commentId}`, {
                     headers: {
                         requestor: localStorage.getItem('userId')
                     }
-                 
+
                 });
 
                 // SHOULD I CHECK FOR ERRORSc
                 let idx = this.attachedComments.findIndex(comment => comment.commentId.identifier === commentId)
                 this.attachedComments.splice(idx, 1)
 
-                
+
             }catch(e){
                 if (e.response.data) {
                     alert(e.response.data)
@@ -158,15 +158,15 @@ export default {
 
 
             }
-            
+
             // TODO check reactivit
         },
 
     },
 
-  
 
-    
+
+
     mounted() {
         // console.log(this.loggedUserId)
         // alert(this.src)
@@ -182,20 +182,20 @@ export default {
     <div class="d-flex flex-grow-1 pb-2">
         <button v-if="this.delete" @click="$emit('delete-event')" class="d-flex btn btn-danger flex-grow-1 justify-content-center fw-bold">DELETE</button>
     </div>
- 
+
     <div class="card flex-grow-1 ">
-        
-       
+
+
 
         <img :src="src" class="card-img-top" />
 
             <!-- kebab button  v if profile personal (add a check) unused valued should be null in guestProfileView-->
             <button v-if="!guest && !stream" @click="$emit('toggle-delete')" class="position-absolute top-0 end-0 custom-button fw-bold">...</button>
             <!-- <button @click="toggleDelete" class="position-absolute top-0 end-0 custom-button fw-bold">...</button> -->
-           
-   
+
+
         <div class="card-body d-flex flex-column">
-                  
+
 
 
             <div class="d-flex align-items-center justify-content-center justify-content-between pt-2 pb-2"
@@ -203,16 +203,16 @@ export default {
                 <div class="d-flex flex-column justify-content-between">
                     <p class="card-text"><strong>UPLOADER</strong>: {{ this.uploader }}</p>
                     <!-- username href to<strong> profile -->
-                    <p class="card-text"><strong>DATE</strong> {{ this.date }}</p>
+                    <p class="card-text"><strong>DATE</strong>: {{ this.date }}</p>
                     <p class="card-text"><strong>LIKES</strong>: {{ this.likes }}</p>
                     <!-- this should beco<strong>me an icon probably -->
                     <!-- <p class="card-text"><strong>LIKED</strong>: {{ this.liked }}</p> -->
-                    
-                    
+
+
 
                 </div>
-                
-                
+
+
                 <!-- heart icon using imported svgs from folder public  -->
                     <div  style="width: 10%;">
                         <div v-if="!this.liked">
@@ -227,7 +227,7 @@ export default {
                         </div>
                     </div>
 
-                <!--  deprecated, remove 
+                <!--  deprecated, remove
                 <button class="ms-4 d-flex btn rounded-pill btn-primary fw-bold" @click="likePhoto()">Like</button>
                 <button class="d-flex btn rounded-pill btn-danger fw-bold" @click="unlikePhoto()">Unlike</button> -->
 
@@ -243,7 +243,7 @@ export default {
 
     <!-- change accordingly with photo max dimension, must be set-->
     <div class="overflow-auto  pt-2 pb-5 mb-5" style="max-height: 200px;">
-        
+
         <div v-for="comment in sortedComments">
 
             <Comment
@@ -253,7 +253,7 @@ export default {
                 :username="comment.commentingUsername"
                 :body="comment.commentBody"
                 :date="comment.commentDate"
-                
+
                 :loggedUserId="loggedUserId"
                 :photoOwnerId="uploaderId"
             />
@@ -262,20 +262,20 @@ export default {
 
     </div>
 
-    
+
 </template>
 
 <style>
     .custom-button {
-    border: none; 
-    outline: none; 
+    border: none;
+    outline: none;
     color: white;
-   
-    background-color: transparent;  
+
+    background-color: transparent;
     font-size: 40px;
     -webkit-text-stroke : 1px black;
     padding: 5px 30px; /* top bottom; left right */
 }
 
-    
+
 </style>
