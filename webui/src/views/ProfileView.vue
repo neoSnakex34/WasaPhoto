@@ -184,7 +184,7 @@ export default {
 
                     let newPhoto = response.data
                     this.profile.myPhotos.push(newPhoto)
-                    
+                    this.profile.photoCounter++ 
                     await this.updateServedPhotos()
                     console.log(this.profile.myPhotos)
 
@@ -220,8 +220,7 @@ export default {
                 // TODO maybe check for errors?
                 let idx = this.profile.myPhotos.findIndex(p => p.photoId.identifier === id);
                 this.profile.myPhotos.splice(idx, 1)
-                // await this.getUserProfile()
-                // await this.updateServedPhotos()
+                this.profile.photoCounter-- 
 
             } catch (e) {
                 if (e.response.data) {
