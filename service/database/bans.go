@@ -49,6 +49,9 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 			}
 		}
 
+		// TODO
+		// FIXME this should remove all likes and comments of BANNED from BANNER photos only
+		// THEN SHOULD REMOVE ALL LIKES AND COMMENTS OF BANNER FROM BANNED PHOTOS ONLY
 		err = db.removeAllCommentsByUserId(bannedId.Id)
 		if err != nil {
 			return err
