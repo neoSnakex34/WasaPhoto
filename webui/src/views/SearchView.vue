@@ -9,6 +9,11 @@
                 usernames: [],
                 matchingUsers: [],
                 query: "",
+                // those will be used to show/hide buttons
+                // wont be initialized in data for now
+                // requestorHasBanned: false,
+                // isRequestorBanned: false,
+                // requestorHasFollowed: false,
               
             }
         },
@@ -48,8 +53,11 @@
                             'Content-Type': 'application/json'
                         }
                     });
-                    // TODO change
-                    alert("Followed");
+
+                    // find user in matching users with followed id
+                    let followedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === followedId);
+                    followedUserFromQuery.requestorHasFollowed = true;
+
                 } catch(e){
                     // TODO log errors to alreadyfollowed
                     console.log(e);
@@ -65,8 +73,11 @@
                             'Content-Type': 'application/json'
                         }
                     });
-                    // TODO change
-                    alert("Unfollowed");
+                
+                    // find user in matching users with followed id
+                    let followedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === followedId);
+                    followedUserFromQuery.requestorHasFollowed = false;
+                
                 } catch(e){
                     // TODO log errors to alreadyfollowed
                     console.log(e);
@@ -148,12 +159,12 @@
             <div v-if="!entry.isRequestorBanned" class="btn-group"  v-show="entry.showButtons">
 
                 <div v-if="!entry.requestorHasBanned">
-                    <button class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(entry.user.userId.identifier)">Follow</button>
-                    <button class="btn btn-danger fw-bold rounded-pill ms-auto me-3" @click="unfollowUser(entry.user.userId.identifier)" >Unfollow</button>
+                    <button v-if="!entry.requestorHasFollowed" class="btn btn-primary fw-bold rounded-pill ms-auto me-3"  @click="followUser(entry.user.userId.identifier)">Follow</button>
+                    <button v-if="entry.requestorHasFollowed" class="btn btn-danger fw-bold rounded-pill ms-auto me-3" @click="unfollowUser(entry.user.userId.identifier)" >Unfollow</button>
                     <button class="btn btn-secondary fw-bold rounded-pill ms-auto me-3" @click="banUser(entry.user.userId.identifier)">Ban</button>
 
                 </div>
-                <button class="btn btn-success fw-bold rounded-pill ms-auto" @click="unbanUser(entry.user.userId.identifier)">Unban</button>
+                <button v-if="entry.requestorHasBanned" class="btn btn-success fw-bold rounded-pill ms-auto" @click="unbanUser(entry.user.userId.identifier)">Unban</button>
 
             </div>
         </div>

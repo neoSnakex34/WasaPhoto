@@ -27,8 +27,6 @@ func (db *appdbimpl) FollowUser(followerId structs.Identifier, followedId struct
 	if err != nil {
 		return err
 	} else if counter > 0 {
-		// FIXME this is obviously a bug
-		// aaaaaand it is
 		return customErrors.ErrAlreadyFollowing
 	} else if counter == 0 {
 

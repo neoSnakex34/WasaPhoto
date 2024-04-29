@@ -11,8 +11,8 @@ import (
 const Folder string = "/tmp/wasaphoto/photofiles/"
 
 // TODO move folder in service and fix dependencies
-// [ ] IMPORTANT this should be implemented in login also !!!!
-// FIXME
+// [X] IMPORTANT this should be implemented in login also !!!!
+
 func CheckRegexNewUsername(username string) bool {
 
 	log.Println("regex check for username entered")
@@ -51,7 +51,7 @@ func CheckFileType(file []byte) (string, error) {
 		return "png", nil
 
 	}
-	// HANDLE
+	// TODO HANDLE CUSTOM ERROR
 	return "", errors.New("file is not a photo")
 }
 

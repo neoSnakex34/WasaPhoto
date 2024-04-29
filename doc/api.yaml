@@ -590,11 +590,15 @@ components:
         username:
           $ref: "#/components/schemas/UserName"
         isRequestorBanned:
-          description: boolean value that tells if the user is banned by the requestor
+          description: boolean value that tells if user is banned by the requestor
           type: boolean
           example: false
         requestorHasBanned:
-          description: boolean value that tells if the requestor has banned the user
+          description: boolean value that tells if requestor has banned the user
+          type: boolean
+          example: false
+        requestorHasFollowed:
+          description: boolean value that tells if requestor has followed the user
           type: boolean
           example: false
 

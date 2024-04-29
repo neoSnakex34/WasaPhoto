@@ -195,6 +195,7 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 	var username string
 	var isRequestorBanned bool
 	var requestorHasBanned bool
+	var requestorHasFollowed bool
 
 	rows, err := db.c.Query(`SELECT userId, username FROM users WHERE userId != ?`, requestorUserId.Id)
 	if err != nil {
@@ -226,13 +227,19 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 			requestorHasBanned = false
 		}
 
+		requestorHasFollowed, err = db.follows(requestorUserId.Id, userId)
+		if err != nil {
+			return nil, err
+		}
+
 		userFromQueryList = append(userFromQueryList, structs.UserFromQuery{
 			User: structs.User{
 				UserId:   structs.Identifier{Id: userId},
 				Username: username,
 			},
-			IsRequestorBanned:  isRequestorBanned,
-			RequestorHasBanned: requestorHasBanned,
+			IsRequestorBanned:    isRequestorBanned,
+			RequestorHasBanned:   requestorHasBanned,
+			RequestorHasFollowed: requestorHasFollowed,
 		})
 	}
 
