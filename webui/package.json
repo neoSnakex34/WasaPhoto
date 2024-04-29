@@ -2,7 +2,7 @@
 	"name": "teapot",
 	"version": "0.0.0",
 	"scripts": {
-		"dev": "vite --host",
+		"dev": "vite",
 		"build-dev": "vite build --mode development",
 		"build-prod": "vite build --mode production",
 		"build-embed": "vite build --mode production --base=/dashboard/",

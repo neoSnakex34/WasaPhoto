@@ -32,8 +32,11 @@
                     localStorage.setItem('authorization', userId)
                    
                     // [ ] go to homepage (or profile here)
+                    console.log(response)
                     this.$router.push('/home')
                     
+
+
                     this.$axios.defaults.headers.common['Authorization'] = localStorage.getItem('authorization')
                     // alert with the identifier
                     // alert(`Welcome to WasaPHOTO, this is your id: ${userId}`)
@@ -68,10 +71,10 @@
     <p class="h1 mb-2 fw-bold">WasaPHOTO</p>
     <p class="h3 mb-2 fw-bold">LOGIN</p>
     <div class="container mt-4" style ="min-width: 400px; min-height: 50px; width: 50%; height: 60%;">
-      <form class="d-flex flex-column form-signin">
+      <div class="d-flex flex-column">
         <input type="text" title="only lowercase alphanumeric, min3 max12" v-model="username" class="form-control form-control-lg" placeholder="username" style="outline: 2px solid lightblue;">
         <button class="btn btn-primary mt-2 fw-bold btn-lg" @click="doLogin">Let's go</button>
-      </form>
+      </div>
     </div>
   </div>
 

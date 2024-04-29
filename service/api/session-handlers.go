@@ -27,8 +27,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	userId, err := rt.db.DoLogin(username)
 	if errors.Is(customErrors.ErrInvalidRegexUsername, err) {
 		w.WriteHeader(http.StatusBadRequest)
-		// TODO log all the errors in frontend like this
-		// FIXME very important
+
 		w.Write([]byte("INVALID USERNAME: use only lowercase letters and numbers; min 3, max 12 chars."))
 		ctx.Logger.Error("username regular expression not matched")
 		return
