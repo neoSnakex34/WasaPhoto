@@ -466,11 +466,6 @@ func (db *appdbimpl) follows(plainFollowerId string, plainFollowedId string) (bo
 		return false, err
 	}
 
-	// not the prettiest way to handle this
-	if counter > 0 {
-		return true, customErrors.ErrAlreadyFollowing
-	}
-
 	return counter > 0, nil
 
 }
