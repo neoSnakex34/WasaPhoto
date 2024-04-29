@@ -418,44 +418,59 @@ func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Commen
 
 }
 
-func (db *appdbimpl) removeAllCommentsByUserId(plainUserId string) error {
-
-	// check if comments exists
-	var counter int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM comments WHERE userId = ?`, plainUserId).Scan(&counter)
+func (db *appdbimpl) getPhotoIdsByUserId(plainBannedId string) ([]string, error) {
+	var photoIds []string
+	rows, err := db.c.Query(`SELECT photoId FROM photos WHERE userId = ?`, plainBannedId)
 	if err != nil {
-		return err
-	} else if counter == 0 {
-		return nil
+		return nil, err
+	}
+	defer rows.Close() // do i really need this?
+
+	for rows.Next() {
+		var plainPhotoId string
+		err = rows.Scan(&plainPhotoId)
+		if err != nil {
+			return nil, err
+		}
+		photoIds = append(photoIds, plainPhotoId)
 	}
 
-	_, err = db.c.Exec(`DELETE FROM comments WHERE userId = ?`, plainUserId)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+	return photoIds, nil
 }
 
-func (db *appdbimpl) removeAllLikesByUserId(plainUserId string) error {
+// removes all interactions of banner from banned photos (likes and comments)
+// in future can be used to do the same in reverse (banner probably does not desire to see banned interactions)
+func (db *appdbimpl) removeInteractionsByUserId(plainUserId string, plainPhotoIds []string) error {
 
-	// check if likes exists
-	var counter int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ?`, plainUserId).Scan(&counter)
-	if err != nil {
-		return err
-	} else if counter == 0 {
-		return nil
+	// for each photoId
+	for _, photoId := range plainPhotoIds {
+		var counter int
+		// check if comments
+		err := db.c.QueryRow(`SELECT COUNT(*) FROM comments WHERE userId = ? AND photoId = ?`, plainUserId, photoId).Scan(&counter)
+		if err != nil {
+			return err
+		} else if counter > 0 {
+			_, err = db.c.Exec(`DELETE FROM comments WHERE userId = ? AND photoId = ?`, plainUserId, photoId)
+			if err != nil {
+				return err
+			}
+		}
+
+		// check if likes
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, photoId).Scan(&counter)
+		if err != nil {
+			return err
+		} else if counter > 0 {
+			_, err = db.c.Exec(`DELETE FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, photoId)
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
-	_, err = db.c.Exec(`DELETE FROM likes WHERE likerId = ?`, plainUserId)
-	if err != nil {
-		return err
-	}
-
+	log.Println("interactions removed")
 	return nil
-
 }
 
 func (db *appdbimpl) follows(plainFollowerId string, plainFollowedId string) (bool, error) {
