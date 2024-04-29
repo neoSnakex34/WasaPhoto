@@ -13,7 +13,7 @@ export default {
 		doLogout() {
 			localStorage.removeItem('userId');
 			localStorage.removeItem('username');
-			this.$router.push('/login');
+			this.$router.push('/');
 		},
 
 

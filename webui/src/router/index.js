@@ -8,14 +8,14 @@ import AsGuestProfileView from '../views/AsGuestProfileView.vue'
 const router = createRouter({
 	history: createWebHashHistory(import.meta.env.BASE_URL),
 	routes: [
-		{path: '/login', name: 'login', component: Login},
+		{path: '/', name: 'login', component: Login},
 		{path: '/profile', name: 'profile',  component: ProfileView},
 		{path: '/profile/:userId', name: 'asGuestProfile', component: AsGuestProfileView, props: true},
 		{path: '/search', name: 'search', component: SearchView},
 		{path: '/home', component: HomeView},
 		{path: '/link1', component: HomeView},
 		{path: '/link2', component: HomeView},
-		{path: '/', redirect: "/login"},
+		// {path: '/login', redirect: "/"},
 		
 		
 	]
