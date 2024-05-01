@@ -115,7 +115,6 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 // probably i can add a refreshUserProfile function that updates all the counters
 func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) {
 
-	println("profileUserId, requestorUserId: ", profileUserId.Id, requestorUserId.Id)
 	plainUserId := profileUserId.Id
 	plainRequestorUserId := requestorUserId.Id
 	// check requestor banned by profile user
