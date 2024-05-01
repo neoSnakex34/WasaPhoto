@@ -25,7 +25,7 @@ func CheckRegexNewUsername(username string) bool {
 }
 
 func CheckFileType(file []byte) (string, error) {
-	println("len of file: ", len(file))
+
 	if len(file) < 8 {
 		return "", customErrors.ErrInvalidPhotoFile
 	}
