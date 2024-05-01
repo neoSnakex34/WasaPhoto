@@ -183,7 +183,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/Photo"
                 minItems: 0
-                maxItems: 20
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -596,7 +595,7 @@ components:
         requestorHasBanned:
           description: boolean value that tells if requestor has banned the user
           type: boolean
-          example: false
+          example: true 
         requestorHasFollowed:
           description: boolean value that tells if requestor has followed the user
           type: boolean
@@ -646,7 +645,6 @@ components:
           description: list of photos uploaded by the user
           type: array
           minItems: 0
-          maxItems: 20
           items:
             $ref: "#/components/schemas/Photo"
 
