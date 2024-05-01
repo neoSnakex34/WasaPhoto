@@ -1,6 +1,6 @@
 <script>
 export default {
-    // TODO comment id will not be visualized, just used to remove 
+    // comment id will not be visualized, just used to remove 
     props: ["commentingUserId", "commentId", "username", "body", "date", "photoOwnerId", "loggedUserId"], // add others 
     created() {
         console.log(this.commentingUserId + " " + this.body)

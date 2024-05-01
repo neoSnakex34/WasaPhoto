@@ -40,13 +40,13 @@ export default {
         // specific components not to overcomplicate my workflow
         // in a future update this could be generalized
         graphicallyLikeBeforeRefresh(id) {
-            const photo = this.otherProfile.photos.find(p => p.photoId.identifier === id);
+            let photo = this.otherProfile.photos.find(p => p.photoId.identifier === id);
             photo.likeCounter++;
             photo.likedByCurrentUser = true;
         },
 
         graphicallyUnlikeBeforeRefresh(id) {
-            const photo = this.otherProfile.photos.find(p => p.photoId.identifier === id);
+            let photo = this.otherProfile.photos.find(p => p.photoId.identifier === id);
             photo.likeCounter--;
             photo.likedByCurrentUser = false;
         },
@@ -80,7 +80,6 @@ export default {
 
         async updateGuestServedPhotos() {
 
-            // FIXME this should be changed in both profile views
             if (this.otherProfile.photos === null) {
                 this.servedPhotos = []
                 return
@@ -90,29 +89,22 @@ export default {
                 return new Date(b.date) - new Date(a.date)
             })
 
-            // let tmpServedPhotos = []
-            for (let [index, photo] of sortedPhotosByDate.entries()) {
-
+            for (let photo of sortedPhotosByDate) {
                 let path = photo.photoPath
-                sortedPhotosByDate[index].served = await this.getPhoto(path)
-                // tmpServedPhotos.push(await this.getPhoto(path))
-
+                photo.served = await this.getPhoto(path)
             }
-
-            // this.servedPhotos = tmpServedPhotos
 
         },
 
         async getUserProfileAsGuest() {
             try {
 
-                // TODO check if ban works 
+                // simulating this with curl should give an error
                 let response = await this.$axios.get(`/users/${this.userId}/profile`, {
                     headers: {
                         Requestor: localStorage.getItem('userId')
                     }
                 })
-
 
                 this.otherProfile.username = response.data.username
                 // this.otherProfile.userId = response.data.userId.identifier
@@ -120,7 +112,6 @@ export default {
                 this.otherProfile.followingCounter = response.data.followingCounter
                 this.otherProfile.photoCounter = response.data.photoCounter
                 this.otherProfile.photos = response.data.photos
-
 
             } catch (e) {
                 if (e.response.data) {

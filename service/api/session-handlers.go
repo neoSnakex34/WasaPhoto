@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -18,22 +19,21 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	err := json.NewDecoder(r.Body).Decode(&username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("could not fetch username: ", err)
+		ctx.Logger.Error("could not retrieve username: ", err)
 		return
 	}
-
 	defer r.Body.Close()
 
 	userId, err := rt.db.DoLogin(username)
 	if errors.Is(customErrors.ErrInvalidRegexUsername, err) {
 		w.WriteHeader(http.StatusBadRequest)
-
-		w.Write([]byte("INVALID USERNAME: use only lowercase letters and numbers; min 3, max 12 chars."))
 		ctx.Logger.Error("username regular expression not matched")
+		w.Write([]byte("INVALID USERNAME: use only lowercase letters and numbers; min 3, max 12 chars."))
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong with login", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -42,12 +42,14 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
+	log.Println("User logged in successfully")
+
 }
 
-// FIXME LIMIT DISPLAY TO 20 in db side or here, will ease frontend and respect api design
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := structs.Identifier{Id: ps.ByName("userId")}
@@ -65,7 +67,6 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// FIXME specialize errors
 	photos, err := rt.db.GetMyStream(userId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -73,11 +74,16 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	println("photos: ", photos)
+	err = json.NewEncoder(w).Encode(photos)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
-	w.WriteHeader(http.StatusOK)
-	ctx.Logger.Info("stream retrieved")
-	json.NewEncoder(w).Encode(photos)
+	// w.WriteHeader(http.StatusOK)
+	log.Println("stream retrieved")
 
 }
 
@@ -98,7 +104,9 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// TODO not found handle?
+	// not found would be returned from server request in the
+	// unfortunate case in which user is deleted before accessing profile
+	// for now i will not handle that here
 
 	profile, err := rt.db.GetUserProfile(profileUserId, requestorUserId)
 	if err != nil {
@@ -107,8 +115,15 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	ctx.Logger.Info("profile retrieved")
-	json.NewEncoder(w).Encode(profile)
+	err = json.NewEncoder(w).Encode(profile)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
+	// commented out cause is flagged as superfluos at runtime
+	// w.WriteHeader(http.StatusOK)
+	log.Println("profile retrieved")
 }

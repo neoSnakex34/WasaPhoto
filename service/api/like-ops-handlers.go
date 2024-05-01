@@ -1,19 +1,17 @@
 package api
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/neoSnakex34/WasaPhoto/service/api/reqcontext"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
-	"github.com/sirupsen/logrus"
 )
 
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	photoId := structs.Identifier{Id: ps.ByName("photoId")}
 	likerId := structs.Identifier{Id: ps.ByName("likerId")}
-
-	logrus.Info("requested photoId: ", photoId.Id)
 
 	if photoId.Id == "" || likerId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -21,10 +19,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	// TODO handle banned like
 	authorization := r.Header.Get("Authorization")
-	println("authorization: ", authorization)
-	println("likerId: ", likerId.Id)
 
 	if likerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
@@ -42,7 +37,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	w.WriteHeader(http.StatusOK)
-	ctx.Logger.Info("photo liked successfully")
+	log.Println("Photo liked successfully")
 }
 
 func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -55,7 +50,6 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// TODO handle banned unlike
 	authorization := r.Header.Get("Authorization")
 	if likerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
@@ -67,13 +61,11 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	err := rt.db.UnlikePhoto(likerId, photoId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		// TODO: all errors will be sent to frontned like that
-		errMsg := "500: " + err.Error()
-		w.Write([]byte(errMsg))
 		ctx.Logger.Error("an error occured while unliking the photo: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	ctx.Logger.Info("photo unliked successfully")
+	log.Println("Photo unliked successfully")
 }

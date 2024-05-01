@@ -1,8 +1,5 @@
 package database
 
-// [x] generaliziong validId may have led to a series of bugs in users.go, is anything is broken go check dependencies
-// between the two files
-
 import (
 	"database/sql"
 	"errors"
@@ -18,9 +15,7 @@ import (
 
 // as stated in api.yaml the identifier is a string of lenght 11 @X000000000
 // actor will be mode of the id (U P C)
-// not sure if this needs to be exported
-// FIXME ^^^^
-func GenerateIdentifier(actor string) (structs.Identifier, error) {
+func generateIdentifier(actor string) (structs.Identifier, error) {
 	const lenght = 9
 	const validChars = "0123456789"
 	var actorChar string
@@ -61,8 +56,6 @@ func (db *appdbimpl) checkBan(plainBannerId string, plainBannedId string) error 
 	var counter int
 
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, plainBannerId, plainBannedId).Scan(&counter)
-	println("in checkban check ")
-	println("counter: ", counter)
 
 	if err != nil {
 		return err
@@ -76,20 +69,7 @@ func (db *appdbimpl) checkBan(plainBannerId string, plainBannedId string) error 
 
 // mode can be U P or C any other is invalid (capital letters only)
 func (db *appdbimpl) validId(id string, mode string) (bool, error) {
-	// FIXME since single char are unicode byte
-	// even if i am sure that those are utf8 1byte chars
-	// it is probably better to check them using the appropriate comparator
 
-	// FIXME this is a check thhat works only if the id already exists
-	// if mode != "N" {
-	// 	var idMode string = string(id[1])
-
-	// 	// first check is modecheck is mode is matched we proceed else we abort
-	// 	if idMode != mode {
-	// 		return false, invalidIdMode
-	// 	}
-
-	// }
 	var count int
 	var err error = nil
 
@@ -119,8 +99,6 @@ func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 	return false, customErrors.ErrInvalidId
 }
 
-// TODO important
-// FIXME pass those as plain ids instead
 func (db *appdbimpl) getUploaderByPhotoId(photoId structs.Identifier) (structs.Identifier, error) {
 	var plainUploaderId string
 
@@ -235,9 +213,6 @@ func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) 
 	var date string
 
 	err := db.c.QueryRow(`SELECT date FROM photos WHERE photoId = ?`, plainPhotoId).Scan(&date)
-	// FIXME manage errors
-	// TODO change
-	// error no rows
 	if errors.Is(err, sql.ErrNoRows) {
 		return "", nil
 	} else if err != nil {
@@ -250,7 +225,6 @@ func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) 
 func (db *appdbimpl) getNumberOfLikedByPhotoId(plainPhotoId string) (int, error) {
 	var likeCounter int
 	err := db.c.QueryRow(`SELECT COUNT(likerId) FROM likes WHERE photoId = ?`, plainPhotoId).Scan(&likeCounter)
-	// FIXME manage custom error here
 	if err != nil {
 		return 0, err
 	}
@@ -261,7 +235,6 @@ func (db *appdbimpl) getLikedByUserId(plainUserId string, plainphotoId string) (
 	var counter int
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, plainphotoId).Scan(&counter)
 	if err != nil {
-		println("an error occured while checking photolikedbycurrentid")
 		return false, err
 	}
 	return counter > 0, nil
@@ -285,7 +258,6 @@ func (db *appdbimpl) getFollowingCounterByUserId(plainUserId string) (int, error
 	return following, err
 }
 
-// FIXME let it return a slice of Photo with metadatas when retrieving profile in frontend
 func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestorUserId string) (int, []structs.Photo, error) {
 
 	path := Folder + plainUserId + "/"
@@ -342,7 +314,6 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 		}
 
 		comments, err := db.getCommentsByPhotoId(plainPhotoId)
-		// TODO manage errors
 		if err != nil {
 			log.Println("error in getting comments from db")
 			return 0, nil, err
@@ -369,7 +340,6 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 
 	}
 
-	// logrus.Info("comments: ", photos[0].Comments)
 	return photoCount, photos, nil
 }
 
@@ -378,7 +348,6 @@ func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Commen
 	var Comments []structs.Comment
 
 	rows, err := db.c.Query(`SELECT commentId, userId, body, date FROM comments WHERE photoId = ?`, plainPhotoId)
-	// TODO manage errors
 	if err != nil {
 		return nil, err
 	}
@@ -424,7 +393,7 @@ func (db *appdbimpl) getPhotoIdsByUserId(plainBannedId string) ([]string, error)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close() // do i really need this?
+	defer rows.Close()
 
 	for rows.Next() {
 		var plainPhotoId string

@@ -7,7 +7,6 @@ info:
   version: 1.0.2
 
 servers:
-  # TODO change accordingly
   - url: http://localhost:3000
 
 tags:
@@ -64,7 +63,7 @@ paths:
   /users:
     get:
       security:
-        - bearerAuth: []
+      - bearerAuth: []
       tags:
         - User
       summary: retrieves all users
@@ -119,8 +118,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  # FIXME use put for updating and return 201 and post for creating and return 200
-  # this should be modified in service too if you decide to do it
   /users/{userId}/username:
     description: username specific field of the user, can be set or updated
     parameters:
@@ -145,11 +142,6 @@ paths:
       responses:
         "204":
           description: username set succesfully
-          # description: username changed succesfully
-          # content:
-          #   application/json:
-          #     schema:
-          #       $ref: "#/components/schemas/User"
 
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -191,12 +183,10 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  #TODO should i specialize ids in followerId ecc???
   /users/{userId}/followers/{followerId}:
     parameters:
       - $ref: "#/components/parameters/userId" #followed by followerId
       - $ref: "#/components/parameters/followerId" #followed
-      #TODO manage names and other attributes if necessary
 
     put:
       security:
@@ -204,12 +194,11 @@ paths:
       tags:
         - Follow
       summary: follow a user
-      #TODO change this to be used as a collection of followers (ids stored)
+      
       description: the action of following a user y from user x
       operationId: followUser
 
       responses:
-        #TODO maybe change response type and retrieve userId of the followed
         "204":
           description: user followed succesfully
         "400":
@@ -248,18 +237,12 @@ paths:
       tags:
         - Ban
       summary: ban a user
-      #TODO i shouls probably implements something to retrieve id from username and modularize it...
       description: the action of banning a user y from user x return username of banned user
       operationId: banUser
 
       responses:
-        "201":
+        "204":
           description: user banned succesfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserName"
-            #JUMP BAN
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -302,7 +285,6 @@ paths:
       requestBody:
         description: the file of the photo to be uploaded
         content:
-          # TODO WARNING
           image/png:
             schema:
               $ref: "#/components/schemas/PhotoFile"

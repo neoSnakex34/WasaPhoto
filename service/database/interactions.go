@@ -11,7 +11,6 @@ import (
 // IMPORTANT likeid = userid of linkingUser;
 
 // ======= comments operations
-// FIXME add comments to comments list in photo struct
 func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) {
 
 	var isValidId bool = false
@@ -26,7 +25,6 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 		return structs.Comment{}, err
 	}
 
-	// TODO be sure this is the right order to check
 	// check ban
 	err = db.checkBan(userUploaderId.Id, requestorUserId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {
@@ -37,7 +35,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 	for !isValidId && err == nil {
 
-		newCommentId, err = GenerateIdentifier("C")
+		newCommentId, err = generateIdentifier("C")
 		if err != nil {
 			return structs.Comment{}, err
 		}
@@ -58,9 +56,6 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 		return structs.Comment{}, err
 	}
 
-	// TODO this structs returned when commenting or uploading photos can be useful for debug purposes but since thy are not
-	// used directly here they will allocate useless memory
-	// i should remove those return statements and just return err or nil
 	commentingUsername, err := db.getCommenterUsernameByCommentingId(requestorUserId.Id)
 	if err != nil {
 		return structs.Comment{}, err
@@ -77,7 +72,6 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 	return newComment, nil
 }
 
-// TODO make this an external function removeComment to maintain the consistency
 func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
 
 	// THOSE CHECKS ARE KINDA OVERKILL SINCE  if a user is banned won't be able to see the photo
@@ -93,11 +87,9 @@ func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
 		return err
 	}
 
-	// TODO be sure this is the right order to check
-	// check ban
 	err = db.checkBan(uploaderId.Id, commenterId.Id)
 	if errors.Is(err, customErrors.ErrIsBanned) {
-		return err // TODO log
+		return err
 	} else if err != nil {
 		return err
 	}
@@ -133,7 +125,6 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 
 	// check ban
 	err = db.checkBan(uploaderId.Id, userId.Id)
-	// FIXME try to make this a lil more fancy...
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		return err
 	} else if err != nil {
@@ -142,10 +133,7 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 
 	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
 	if err == nil && !photoIsLiked {
-		// TODO add like
 		err = db.addLike(userId.Id, photoId.Id)
-		// if err now is nil will be returned nil at the end of the function
-		// TODO check this really happens
 	}
 	return err
 }

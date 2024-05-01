@@ -132,9 +132,6 @@ export default {
             }
         },
 
-            // empyting the comment field        },
-
-        // TODO implement
         async deleteComment(commentId){
             try {
                 let response = await this.$axios.delete(`/users/${this.uploaderId}/photos/${this.photoId}/comments/${commentId}`, {
@@ -159,7 +156,6 @@ export default {
 
             }
 
-            // TODO check reactivit
         },
 
     },

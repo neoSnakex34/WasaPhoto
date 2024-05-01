@@ -1,7 +1,6 @@
 package serviceutilities
 
 import (
-	"errors"
 	"log"
 	"regexp"
 
@@ -9,9 +8,6 @@ import (
 )
 
 const Folder string = "/tmp/wasaphoto/photofiles/"
-
-// TODO move folder in service and fix dependencies
-// [X] IMPORTANT this should be implemented in login also !!!!
 
 func CheckRegexNewUsername(username string) bool {
 
@@ -31,9 +27,9 @@ func CheckRegexNewUsername(username string) bool {
 func CheckFileType(file []byte) (string, error) {
 	println("len of file: ", len(file))
 	if len(file) < 8 {
-		// TODO handle this error
-		return "", errors.New("file is too small to be a photo")
+		return "", customErrors.ErrInvalidPhotoFile
 	}
+
 	switch {
 	case file[0] == 0xFF &&
 		file[1] == 0xD8 &&
@@ -51,8 +47,8 @@ func CheckFileType(file []byte) (string, error) {
 		return "png", nil
 
 	}
-	// TODO HANDLE CUSTOM ERROR
-	return "", errors.New("file is not a photo")
+
+	return "", customErrors.ErrInvalidPhotoFile
 }
 
 func GetPhotoPath(partialPath string) (string, error) {

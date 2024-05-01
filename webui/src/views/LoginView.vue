@@ -31,7 +31,6 @@
                     localStorage.setItem('username', this.username)
                     localStorage.setItem('authorization', userId)
                    
-                    // [ ] go to homepage (or profile here)
                     console.log(response)
                     this.$router.push('/home')
                     
@@ -44,19 +43,13 @@
                     
 
                 } catch(e) {
-                  // TODO check other errors
                     if (e.response.data) {
                         this.errMsg = `${e.response.data}`
-                        // alert(this.errMsg)
-                    } else{alert (e)}
+                    } else {alert (e)}
                   }
             }
             },
         
-          
-            mounted(){
-                // TODO check what does mounted do 
-            }
     }
 </script>
 

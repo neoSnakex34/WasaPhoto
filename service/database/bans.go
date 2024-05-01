@@ -10,9 +10,8 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 	var counter int
 	var err error
 
-	// TODO this shouls be a function utility
 	// check if user is arleady banned
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM bans WHERE bannerId = ? AND bannedId = ?`, bannerId.Id, bannedId.Id).Scan(&counter)
+	err = db.checkBan(bannerId.Id, bannedId.Id)
 
 	if err != nil {
 		return err
@@ -55,9 +54,8 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 		}
 
 		if len(bannedPhotoIds) != 0 {
-			// TODO
 			// [ ] this should remove all likes and comments of BANNED from BANNER photos
-			// [x] REMOVE ALL LIKES AND COMMENTS OF BANNER FROM BANNED PHOTOS ONLY
+			// should decide to implement or not
 			err = db.removeInteractionsByUserId(bannerId.Id, bannedPhotoIds)
 			if err != nil {
 				return err

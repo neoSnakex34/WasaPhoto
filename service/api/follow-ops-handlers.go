@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -12,11 +13,8 @@ import (
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	// FIXME try to achieve better consistency in using identifier over strings or vice versa
 	var followerId structs.Identifier
 	var followedId structs.Identifier
-
-	//TODO SHOULD I CHECK HTTP METHOD?
 
 	followerId = structs.Identifier{Id: ps.ByName("followerId")}
 	followedId = structs.Identifier{Id: ps.ByName("userId")}
@@ -29,13 +27,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	authorization := r.Header.Get("Authorization")
 
-	println("authorization in followUser: ", authorization)
-	println("followerId in followUser: ", followerId.Id)
-
 	if followerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
-		// TODO check if this is enough as a ban check or i need to add another
 		ctx.Logger.Error("user is not allowed to follow")
+		w.Write([]byte("User is not allowed to follow"))
 		return
 	}
 
@@ -44,15 +39,17 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if errors.Is(err, customErrors.ErrAlreadyFollowing) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("user is already following")
+		w.Write([]byte("User is already following"))
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while following user: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	// TODO check other errors
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
+	log.Println("User followed successfully")
 
 }
 
@@ -74,6 +71,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	if followerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to unfollow")
+		w.Write([]byte("User is not allowed to unfollow"))
 		return
 	}
 
@@ -81,14 +79,16 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	if errors.Is(err, customErrors.ErrNotFollowing) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("user is not following")
+		w.Write([]byte("User is not following"))
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while unfollowing user: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	// TODO check other errors
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
+	log.Println("User unfollowed successfully")
 
 }

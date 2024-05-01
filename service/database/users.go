@@ -1,22 +1,15 @@
 package database
 
-// FIXME most likely everything inside a struct must be unpacked to be used successfully in queries, i have to handle it
-// TODO the fixme just above was checked and now everything i use except return statement in dologin is a plain string (instead of a wrapper struct)
-// doing such thing is useful in queries but since those structs are useful
 import (
 	"database/sql"
 	"errors"
 	"log"
 
-	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/api/service-utilities"
 	customErrors "github.com/neoSnakex34/WasaPhoto/service/custom-errors"
+	serviceutilities "github.com/neoSnakex34/WasaPhoto/service/service-utilities"
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// TODO i dont think that using errors to mask others is a good idea in debugging
-// implement those only if you did enough testing
-// var LoginError = errors.New("an error occured during login")
-// FIXME log error in console in order to unmask badrequest ecc in apis
 func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 
 	var userId string
@@ -41,16 +34,10 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		for (!idIsValid) && (err == nil) {
 			idIsValid, err = db.validId(userId, "U")
 
-			// println("id: ", userId)
-
-			// TODO warning with this assignation, it could break everything
-			tmpId, _ := GenerateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
-
-			// println("tmpId: ", tmpId.Id)
+			tmpId, _ := generateIdentifier("U") // here error can be ignored since we are automatically using a valid actor
 
 			userId = tmpId.Id
 
-			// println("userId: ", userId)
 		}
 
 		if err != nil {
@@ -61,12 +48,8 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		// that it has been verified in the for (while) loop on line 38
 		log.Println(userId, " ", username)
 
-		// [ ] GIVEN that here will be called setMyUsername regex check will be done after generating id, it is not slow but neither is
-		// efficient or clean
-		// i should modify that
 		err = db.SetMyUserName(username, userId, "N")
-		// added this check cause it would login with invalid id in frontend
-		// resulting in a brocken  backend
+
 		if err != nil {
 			return structs.Identifier{}, err
 		}
@@ -85,13 +68,15 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	// if user is already signed MODE = U i need to update by id
 
 	//  i check if newUsername is taken
-	db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
-	if count > 0 { // cannot check with err (count will always return something)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE username = ?`, newUsername).Scan(&count)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 { // cannot check with err (count will always return something) i just checked err for the query
 		return customErrors.ErrAlreadyTakenUsername
 	}
-	// TODO should i check even for err of that queryrow?
 
-	/// TODO instead of checking two times i should return error here to api
 	matched := serviceutilities.CheckRegexNewUsername(newUsername)
 
 	if count == 0 && matched {
@@ -119,14 +104,10 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 			return err
 
 		default:
-			// FIXME add custom error
-			return errors.New("error in parsing mode or invalid mode for userame operation")
-
+			return customErrors.ErrInvalidIdentifierMode
 		}
 
 	}
-
-	// FIXME add custom error or other cheks
 
 	return nil
 }
@@ -141,7 +122,7 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	err := db.checkBan(plainUserId, plainRequestorUserId)
 
 	if errors.Is(err, customErrors.ErrIsBanned) {
-		log.Println("requestor is banned by user") // TODO log this in api
+		log.Println("requestor is banned by user")
 		return structs.UserProfile{}, err
 	} else if err != nil {
 		return structs.UserProfile{}, err
@@ -189,6 +170,7 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	return profileRetrieved, nil
 }
 
+// is it a security vulnerability? even though no real auth is performed nor needed here
 func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.UserFromQuery, error) {
 
 	var userFromQueryList []structs.UserFromQuery
@@ -247,7 +229,6 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 	return userFromQueryList, nil
 }
 
-// TODO sort photosbydate
 func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, error) {
 
 	// first i obtain a followerlist
@@ -280,7 +261,6 @@ func (db *appdbimpl) createUser(username string, userId string) error {
 	return err
 }
 
-// TODO generalize for any id MAYBE
 func (db *appdbimpl) checkUserExists(username string) (bool, string, error) {
 	var userInTable bool
 	// var userId structs.Identifier = structs.Identifier{}

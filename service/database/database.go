@@ -33,17 +33,17 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// FIXME change signatures to match implemented ones, check openapi for consistency
 // AppDatabase is the high level interface for the DB
 // methods are exported ones, hence they are written with capital first letter
 type AppDatabase interface {
-	DoLogin(username string) (structs.Identifier, error)                // done // TODO wrap string in identifier ecc and use accessory funcs
-	SetMyUserName(newUsername string, userId string, mode string) error // done // TODO as for dologin
+	DoLogin(username string) (structs.Identifier, error)                // done
+	SetMyUserName(newUsername string, userId string, mode string) error // done
 
 	GetUserList(requestorUserId structs.Identifier) ([]structs.UserFromQuery, error)                                  // done
 	GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) // done
@@ -59,7 +59,7 @@ type AppDatabase interface {
 	RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error                          // done
 
 	CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) // done
-	UncommentPhoto(commentId structs.Identifier) error                                                                          // done // FIXME  since the commentid is unique one does not need photoId, but i need to grand permissions only to commentuser and commentor to remove one                                                                        // done
+	UncommentPhoto(commentId structs.Identifier) error                                                                          // done
 
 	LikePhoto(userId structs.Identifier, photoId structs.Identifier) error   // done
 	UnlikePhoto(userId structs.Identifier, photoId structs.Identifier) error // done
@@ -132,8 +132,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY (photoId) REFERENCES photos(photoId) ON DELETE CASCADE
 		)`
 
-		// TODO this would be executed one by one with dedicated errors probably
-		// TODO check if i need to check for errors even here (function returns error if something goes wrong)
 		runCreateQueries(db, userTable, followerTable, bansTable, photoTable, likeTable, commentTable)
 
 	}
@@ -144,13 +142,14 @@ func New(db *sql.DB) (AppDatabase, error) {
 }
 
 func runCreateQueries(db *sql.DB, queries ...string) error {
+	// this is easy to scale but be w	ary not to use fmtSprintf for queries
+	// to avoid sql injection vulnerabilities
 	for _, query := range queries {
 		println("creating table: ", strings.Split(query, " ")[2])
 		_, err := db.Exec(query)
 
-		// TODO change this
 		if err != nil {
-			println("error creating table: ", query, err)
+			log.Println("error creating table: ", query, err)
 			return err
 		}
 	}

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -14,7 +15,6 @@ import (
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	requestorUserId := structs.Identifier{Id: r.Header.Get("Requestor")}
-	// TODO check requestor is not banned
 	photoId := structs.Identifier{Id: ps.ByName("photoId")}
 
 	if requestorUserId.Id == "" || photoId.Id == "" {
@@ -27,6 +27,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	if requestorUserId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to comment photo") // not logged in
+		w.Write([]byte("User is not allowed to comment photo"))
 		return
 	}
 
@@ -40,22 +41,29 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	commentBody := commentBodyReq.Body
 
-	// TODO fix this, check return for consistency etc etc
 	comment, err := rt.db.CommentPhoto(photoId, requestorUserId, commentBody)
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is banned and cannot comment photo")
+		w.Write([]byte("User is banned and cannot comment photo"))
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while commenting the photo: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	ctx.Logger.Info("photo commented successfully")
+	log.Println("Photo commented successfully")
+	err = json.NewEncoder(w).Encode(comment)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error(err)
+		w.Write([]byte(err.Error()))
+		return
+	}
 
-	json.NewEncoder(w).Encode(comment)
+	// w.WriteHeader(http.StatusCreated)
 
 }
 
@@ -73,6 +81,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	if requestorUserId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to uncomment photo") // not logged in
+		w.Write([]byte("User is not allowed to uncomment photo"))
 		return
 	}
 
@@ -80,10 +89,11 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while uncommenting the photo: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	ctx.Logger.Info("photo uncommented successfully")
+	log.Println("Photo uncommented successfully")
 
 }

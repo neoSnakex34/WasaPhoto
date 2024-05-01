@@ -14,8 +14,6 @@ const Folder string = "/tmp/wasaphoto/photofiles/"
 // generate the identifier for the photo
 // save the photofile path in the database
 // save the photo in the database and create a new photo struct
-// TODO decide when to use photostruct and comment struct in interactions
-// FIXME will fronted give backend uploadphoto the file as a byte stream?
 func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier, format string) (structs.Photo, error) {
 
 	var isValidId bool = false
@@ -26,7 +24,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	// generate a new photo valid id
 	for !isValidId && err == nil {
 
-		newPhotoId, err = GenerateIdentifier("P")
+		newPhotoId, err = generateIdentifier("P")
 		if err != nil {
 			return structs.Photo{}, err
 		}
@@ -69,8 +67,6 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 	return newPhoto, err // or nil directly
 }
 
-// [ ] check you built the path correctly
-// maybe add a little func to build it
 func (db *appdbimpl) RemovePhoto(photoId structs.Identifier, userId structs.Identifier) error {
 	removedPhotoId := photoId.Id
 	removerUserId := userId.Id
@@ -131,8 +127,7 @@ func (db *appdbimpl) insertPhotoInTable(photoId string, userId string, date stri
 	return err
 }
 
-// TODO improve and change sorting order (in frontend sorted will be better)
-func (db *appdbimpl) getStreamOfPhotos(followerIdsForUser []string, plainRequestorId string) ([]structs.Photo, error) { // TODO Note it returns a stream of photos, that needs to be displayed by obtaining info from the structs
+func (db *appdbimpl) getStreamOfPhotos(followerIdsForUser []string, plainRequestorId string) ([]structs.Photo, error) {
 	// for each follower i should retrieve a (photo slice) in order to build the stream
 	// since i will need to sort the stream by date, i should return a complex struct instead of []string
 	// and the access datas
@@ -152,7 +147,6 @@ func (db *appdbimpl) getStreamOfPhotos(followerIdsForUser []string, plainRequest
 		stream = append(stream, tmpList...)
 	}
 
-	// CHECK if stream is sorted and err is actually nil then return err and not nil
 	return stream, nil
 
 }

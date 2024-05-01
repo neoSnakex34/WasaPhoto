@@ -2,8 +2,6 @@ package customerrors
 
 import "errors"
 
-// FIXME check errors new in other files and use them here
-
 var ErrAlreadyTakenUsername = errors.New("username already taken")
 var ErrInvalidRegexUsername = errors.New("invalid username")
 var ErrCriticDuplicatedId = errors.New("duplicated id multiple actors with the same id")
@@ -24,3 +22,5 @@ var ErrInvalidIdMode = errors.New("invalid id mode")
 var ErrInvalidId = errors.New("invalid id")
 
 var ErrInvalidPhotoPath = errors.New("invalid photo path")
+var ErrInvalidPhotoFile = errors.New("invalid file or unsupported photo Format")
+var ErrInvalidIdentifierMode = errors.New("invalid identifier mode can only creater U P C ids")

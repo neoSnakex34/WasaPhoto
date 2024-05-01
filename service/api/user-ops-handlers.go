@@ -12,7 +12,6 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// stream username in U mode (only mode available plain via api; dologin calls only for n mode) set and getprofile
 func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	// PLEASE NOTE that this will call setMyUsername with mode U
@@ -45,13 +44,10 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	// defer r.Body.Close()
+	defer r.Body.Close()
 
 	log.Println("newUsername: ", newUsername)
 
-	// [x]check new username is valid (unicity will be checked in db, is it a good idea? )
-	// TODO ERRORS if name exists
-	// now call db to set username
 	err = rt.db.SetMyUserName(newUsername, userId, "U")
 	if errors.Is(err, customErrors.ErrInvalidRegexUsername) {
 		w.WriteHeader(http.StatusBadRequest)
@@ -65,21 +61,25 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
+	w.WriteHeader(http.StatusNoContent)
+	log.Println("username set successfully")
 }
 
-func (rt *_router) getListOfUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getUserList(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// retrieve by header the requestor
 	reqId := r.Header.Get("Requestor")
 
-	// TODO log that in frontend
 	if reqId == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("requestor id has not been provided")
 		return
 	}
+
 	authorization := r.Header.Get("Authorization")
 	if authorization != reqId {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to get list of users")
+		w.Write([]byte("user is not allowed to get list of users"))
 		return
 	}
 
@@ -87,9 +87,19 @@ func (rt *_router) getListOfUsers(w http.ResponseWriter, r *http.Request, ps htt
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occurred during db calls in getting list of users: ", err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	json.NewEncoder(w).Encode(users)
+	err = json.NewEncoder(w).Encode(users)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("an error occurred during encoding list of users: ", err)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	// w.WriteHeader(http.StatusOK)
+	log.Println("list of users retrieved successfully")
 
 }

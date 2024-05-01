@@ -15,7 +15,7 @@ func (rt *_router) Handler() http.Handler {
 
 	// user related routes
 	rt.router.PUT("/users/:userId/username", rt.wrap(rt.setMyUsername))
-	rt.router.GET("/users", rt.wrap(rt.getListOfUsers))
+	rt.router.GET("/users", rt.wrap(rt.getUserList))
 
 	// userProfile and stream related routes
 	rt.router.GET("/users/:userId/profile", rt.wrap(rt.getUserProfile))
@@ -26,7 +26,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/:userId/bans/:bannerId", rt.wrap(rt.unbanUser))
 
 	// // follow related routes
-	rt.router.PUT("/users/:userId/followers/:followerId", rt.wrap(rt.followUser)) // FIXME follows should be better as followers
+	rt.router.PUT("/users/:userId/followers/:followerId", rt.wrap(rt.followUser))
 	rt.router.DELETE("/users/:userId/followers/:followerId", rt.wrap(rt.unfollowUser))
 
 	// // photo related routes
@@ -36,8 +36,6 @@ func (rt *_router) Handler() http.Handler {
 
 	// // comment related routes
 	// userid is the uploader user id
-	// TODO custom header will ease this mess dunno if it is a good idea tho
-	// FIXME
 	rt.router.POST("/users/:userId/photos/:photoId/comments", rt.wrap(rt.commentPhoto))
 	rt.router.DELETE("/users/:userId/photos/:photoId/comments/:commentId", rt.wrap(rt.uncommentPhoto))
 

@@ -45,7 +45,7 @@ export default {
         graphicallyLikeBeforeRefresh(id) {
             
             // find will always be true and return the right obj cause photoId is unique
-            const photo = this.profile.myPhotos.find(p => p.photoId.identifier === id);
+            let photo = this.profile.myPhotos.find(p => p.photoId.identifier === id);
             // on refresh likes will be retrieved from backend
             photo.likeCounter++;
             // will also set liked 
@@ -53,7 +53,7 @@ export default {
         },
 
         graphicallyUnlikeBeforeRefresh(id) {
-            const photo = this.profile.myPhotos.find(p => p.photoId.identifier === id);
+            let photo = this.profile.myPhotos.find(p => p.photoId.identifier === id);
             photo.likeCounter--;
             photo.likedByCurrentUser = false;
         },
@@ -87,9 +87,6 @@ export default {
                 return new Date(b.date) - new Date(a.date)
             })
 
-            // let tmpServedPhotos = []
-            
-            // TODO fix as guest
             for (let photo of sortedPhotosByDate) {
 
                 let path = photo.photoPath
@@ -100,7 +97,6 @@ export default {
 
             }
 
-            // this.servedPhotos = tmpServedPhotos
         },
 
         async getUserProfile() {
@@ -214,21 +210,20 @@ export default {
                     });
 
                 this.toggleDeleteButton();
-              
 
-
-                // TODO maybe check for errors?
                 let idx = this.profile.myPhotos.findIndex(p => p.photoId.identifier === id);
                 this.profile.myPhotos.splice(idx, 1)
                 this.profile.photoCounter-- 
 
             } catch (e) {
-                if (e.response.data) {
+                
+                if (e.response) {
                     alert(e.response.data)
                 } else {
-                alert(e)
+                    alert(e)
                 }
             }
+            
         },
 
         // THIS WILL CALL SERVEPHOTO IN API 

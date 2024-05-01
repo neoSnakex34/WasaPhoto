@@ -44,8 +44,7 @@ type Comment struct {
 	CommentingUsername string     `json:"commentingUsername"` // commenter username not saved directly in db but obtained via db utilities
 	PhotoId            Identifier `json:"photoId"`
 	Body               string     `json:"commentBody"`
-	Date               string     `json:"commentDate"` // FIXME this should be changed in commentdate
-	//TODO manage others
+	Date               string     `json:"commentDate"`
 }
 
 // BodyRequest ... request body for a comment

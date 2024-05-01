@@ -35,8 +35,13 @@
                 } else {
                     this.matchingUsers = this.usersFromQuery.filter(userObj => userObj.user.username.startsWith(this.query.toLowerCase()))
                     console.log(this.matchingUsers);
-
+                    
+                    if (this.matchingUsers.length === 0){
+                        alert("No users found");
                     }
+                }
+
+                
 
             } catch(e){
                     console.log(e);
@@ -59,9 +64,11 @@
                     followedUserFromQuery.requestorHasFollowed = true;
 
                 } catch(e){
-                    // TODO log errors to alreadyfollowed
-                    console.log(e);
-                    alert("Error");
+                    if (e.response) {
+                        alert(e.response.data)
+                    } else {
+                        alert(e)
+                    }
                 }
             },
 
@@ -79,8 +86,11 @@
                     followedUserFromQuery.requestorHasFollowed = false;
                 
                 } catch(e){
-                    // TODO log errors to alreadyfollowed
-                    console.log(e);
+                   if(e.response){
+                        alert(e.response.data)
+                    } else {
+                        alert(e)
+                    }
                 }
 
         },
@@ -98,11 +108,14 @@
                     // find user in matching users with banned id
                     let bannedUserFromQuery = this.matchingUsers.find(ufq => ufq.user.userId.identifier === bannedId);
                     bannedUserFromQuery.requestorHasBanned = true;
-                    
+                    // since ban will remove follow
+                    bannedUserFromQuery.requestorHasFollowed = false; 
                 } catch(e){
-                    // TODO log errors to alreadyfollowed
-                    console.log(e);
-                    alert("Error");
+                    if(e.response){
+                        alert(e.response.data)
+                    } else {
+                        alert(e)
+                    }
                 }
         },
 
@@ -121,9 +134,11 @@
                     ubannedUserFromQuery.requestorHasBanned = false;
 
                 } catch(e){
-                    // TODO log errors to alreadyfollowed
-                    console.log(e);
-                    alert("Error");
+                    if(e.response){
+                        alert(e.response.data)
+                    } else {
+                        alert(e)
+                    }
                 }
         },
     }

@@ -22,8 +22,7 @@ export default {
 
 			graphicallyLikeBeforeRefresh(id) {
 
-				// TODO change in all const or all let variables
-				const photo = this.stream.find(p => p.photoId.identifier === id);
+				let photo = this.stream.find(p => p.photoId.identifier === id);
 				// on refresh likes will be retrieved from backend
 				photo.likeCounter++;
 				// will also set liked 
@@ -31,7 +30,7 @@ export default {
 			},
 
 			graphicallyUnlikeBeforeRefresh(id) {
-				const photo = this.stream.find(p => p.photoId.identifier === id);
+				let photo = this.stream.find(p => p.photoId.identifier === id);
 				photo.likeCounter--;
 				photo.likedByCurrentUser = false;
 			},
