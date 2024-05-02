@@ -64,7 +64,7 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	var count int
 	var valid bool = false
 
-	//  if user is new one MODE = N i need to do inser
+	// if user is new one MODE = N i need to do inser
 	// if user is already signed MODE = U i need to update by id
 
 	//  i check if newUsername is taken
@@ -233,6 +233,10 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 			RequestorHasFollowed: requestorHasFollowed,
 		})
 	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 
 	return userFromQueryList, nil
 }
@@ -240,13 +244,12 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 func (db *appdbimpl) GetMyStream(userId structs.Identifier) ([]structs.Photo, error) {
 
 	// first i obtain a followerlist
-	var followerIdList []string
 	followerIdList, err := db.getFollowerList(userId.Id)
-	plainRequestorId := userId.Id
-
 	if err != nil {
 		return nil, err
 	}
+
+	plainRequestorId := userId.Id
 
 	streamOfPhotoStructs, err := db.getStreamOfPhotos(followerIdList, plainRequestorId)
 	if err != nil {

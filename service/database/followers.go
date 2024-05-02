@@ -94,6 +94,10 @@ func (db *appdbimpl) getFollowerList(followedId string) ([]string, error) {
 		}
 		followerList = append(followerList, followerId)
 	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 
 	return followerList, nil
 

@@ -12,11 +12,9 @@ import (
 )
 
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var bannerId structs.Identifier
-	var bannedId structs.Identifier
 
-	bannerId = structs.Identifier{Id: ps.ByName("bannerId")}
-	bannedId = structs.Identifier{Id: ps.ByName("userId")}
+	bannerId := structs.Identifier{Id: ps.ByName("bannerId")}
+	bannedId := structs.Identifier{Id: ps.ByName("userId")}
 
 	if bannerId.Id == "" || bannedId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -60,11 +58,8 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var bannerId structs.Identifier
-	var bannedId structs.Identifier
-
-	bannerId = structs.Identifier{Id: ps.ByName("bannerId")}
-	bannedId = structs.Identifier{Id: ps.ByName("userId")}
+	bannerId := structs.Identifier{Id: ps.ByName("bannerId")}
+	bannedId := structs.Identifier{Id: ps.ByName("userId")}
 
 	if bannerId.Id == "" || bannedId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)

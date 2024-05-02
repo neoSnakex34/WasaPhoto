@@ -145,7 +145,7 @@ func runCreateQueries(db *sql.DB, queries ...string) error {
 	// this is easy to scale but be w	ary not to use fmtSprintf for queries
 	// to avoid sql injection vulnerabilities
 	for _, query := range queries {
-		println("creating table: ", strings.Split(query, " ")[2])
+		log.Println("creating table: ", strings.Split(query, " ")[2])
 		_, err := db.Exec(query)
 
 		if err != nil {

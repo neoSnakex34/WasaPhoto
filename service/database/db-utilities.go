@@ -170,7 +170,7 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 			return nil, err
 		}
 
-		//splitting the path to get the partial one
+		// splitting the path to get the partial one
 		photoPath := strings.Split(completePhotoPath, "/photofiles/")[1]
 
 		likeCounter, err := db.getNumberOfLikedByPhotoId(plainPhotoId)
@@ -208,8 +208,12 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 		}
 		photos = append(photos, photo)
 	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 
-	return photos, err
+	return photos, nil
 }
 
 func (db *appdbimpl) getPhotoDateByPhotoId(plainPhotoId string) (string, error) {
@@ -388,6 +392,10 @@ func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Commen
 		Comments = append(Comments, comment)
 
 	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
 
 	return Comments, nil
 
@@ -408,6 +416,10 @@ func (db *appdbimpl) getPhotoIdsByUserId(plainBannedId string) ([]string, error)
 			return nil, err
 		}
 		photoIds = append(photoIds, plainPhotoId)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return photoIds, nil

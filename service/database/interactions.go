@@ -13,11 +13,10 @@ import (
 // ======= comments operations
 func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestorUserId structs.Identifier, body string) (structs.Comment, error) {
 
-	var isValidId bool = false
+	var isValidId bool = false // i need it as false REMEMBER THIS
 	// photoId and userId are already verified when firstly created, note that unmasking the use of a function like this
 	// may lead to some serious bugs if someone manages to use CommentPhoto with an invalid id
 	var newCommentId structs.Identifier
-	var err error
 
 	// check ban
 	userUploaderId, err := db.getUploaderByPhotoId(commentedPhotoId)
@@ -35,14 +34,16 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 	for !isValidId && err == nil {
 
-		newCommentId, err = generateIdentifier("C")
+		newCommentId, err := generateIdentifier("C")
 		if err != nil {
 			return structs.Comment{}, err
 		}
 		isValidId, err = db.validId(newCommentId.Id, "C")
-
+		if err != nil {
+			return structs.Comment{}, err
+		}
 	}
-	// could accumulate errs from validId
+
 	if err != nil {
 		return structs.Comment{}, err
 	}
@@ -114,9 +115,6 @@ func (db *appdbimpl) removeComment(commentId string) error {
 // ======= likes operations
 func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identifier) error {
 
-	var photoIsLiked bool
-	var err error
-
 	// retrieve uploader of the photo
 	uploaderId, err := db.getUploaderByPhotoId(photoId)
 	if err != nil {
@@ -131,7 +129,7 @@ func (db *appdbimpl) LikePhoto(userId structs.Identifier, photoId structs.Identi
 		return err
 	}
 
-	photoIsLiked, err = db.alreadyLiked(userId.Id, photoId.Id)
+	photoIsLiked, err := db.alreadyLiked(userId.Id, photoId.Id)
 	if err == nil && !photoIsLiked {
 		err = db.addLike(userId.Id, photoId.Id)
 	}

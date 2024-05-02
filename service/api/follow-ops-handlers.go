@@ -13,11 +13,8 @@ import (
 
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var followerId structs.Identifier
-	var followedId structs.Identifier
-
-	followerId = structs.Identifier{Id: ps.ByName("followerId")}
-	followedId = structs.Identifier{Id: ps.ByName("userId")}
+	followerId := structs.Identifier{Id: ps.ByName("followerId")}
+	followedId := structs.Identifier{Id: ps.ByName("userId")}
 
 	if followerId.Id == "" || followedId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -64,11 +61,8 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var followerId structs.Identifier
-	var followedId structs.Identifier
-
-	followerId = structs.Identifier{Id: ps.ByName("followerId")}
-	followedId = structs.Identifier{Id: ps.ByName("userId")}
+	followerId := structs.Identifier{Id: ps.ByName("followerId")}
+	followedId := structs.Identifier{Id: ps.ByName("userId")}
 
 	if followerId.Id == "" || followedId.Id == "" {
 		w.WriteHeader(http.StatusBadRequest)
