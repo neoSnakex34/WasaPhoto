@@ -35,7 +35,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while reading the photo file: ", err)
-		w.Write([]byte("an error when attempting to read photofile"))
+		_, err = w.Write([]byte("an error when attempting to read photofile"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -43,7 +46,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("photo file is not a valid image format")
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -52,7 +58,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if len(photoFile) > maxSize {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("photo file is too big, max size is 10MB")
-		w.Write([]byte("file size exceeds limit, max size is 10MB"))
+		_, err = w.Write([]byte("file size exceeds limit, max size is 10MB"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -61,7 +70,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while uploading photo: ", err)
-		w.Write([]byte("an error occured while uploading photo"))
+		_, err = w.Write([]byte("an error occured while uploading photo"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -70,7 +82,10 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -129,7 +144,10 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	if requestorId != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to view photo")
-		w.Write([]byte("could not serve photo, user is not allowed to view photo"))
+		_, err := w.Write([]byte("could not serve photo, user is not allowed to view photo"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -137,7 +155,10 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while getting photo path: ", err)
-		w.Write([]byte("an error occured while getting photo path"))
+		_, err = w.Write([]byte("an error occured while getting photo path"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 

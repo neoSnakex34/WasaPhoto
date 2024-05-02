@@ -76,15 +76,18 @@ paths:
             application/json:
               schema:
                 type: array
+                description: array of users with extra info retrieved from query
                 items:
                   $ref: "#/components/schemas/UserFromQuery"
                 minItems: 0
+                maxItems: 1000 # i don't want to include this check in implementation... the only limit should be server limit or display page, i MUST check for all users...
+
 
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
           $ref: "#/components/responses/Forbidden"
-    
+
         "500":
           $ref: "#/components/responses/InternalServerError"
 
@@ -161,7 +164,7 @@ paths:
         - User
       summary: retrieves the stream of a user
       description: |-
-        returns personal stream of photos for the user 
+        returns personal stream of photos for the user
         parameters
       operationId: getMyStream
       responses:
@@ -171,10 +174,11 @@ paths:
             application/json:
               schema:
                 type: array
-                description: list of photos in the stream 
+                description: list of photos in the stream
                 items:
                   $ref: "#/components/schemas/Photo"
                 minItems: 0
+                maxItems: 1000 # just as an example
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -194,7 +198,7 @@ paths:
       tags:
         - Follow
       summary: follow a user
-      
+
       description: the action of following a user y from user x
       operationId: followUser
 
@@ -294,13 +298,13 @@ paths:
         required: true
 
       responses:
-        "200":
+        "201":
           description: photo uploaded succesfully
-          content: 
+          content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Photo"
-        
+
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -384,7 +388,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Comment"
-                
+
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -515,7 +519,7 @@ components:
       name: bannerId
       in: path
       required: true
-    
+
     photoId:
       description: identifier for a photo
       schema:
@@ -545,10 +549,9 @@ components:
       title: identifier
       description: alphanumerical identifier for a resource
       type: string
-      readOnly: true
-      #consider specializing it
       pattern: "^@[A-Z][0-9]{9}$"
       example: "@U000000001"
+      readOnly: true
       minLength: 11
       maxLength: 11
 
@@ -560,12 +563,12 @@ components:
       pattern: "^[a-z0-9]*?$"
       minLength: 3
       maxLength: 12
-      
+
     UserFromQuery:
       title: userFromQuery
-      description: resulting user from a query in a serchbox 
+      description: resulting user from a query in a serchbox
       type: object
-      properties: 
+      properties:
         userId:
           $ref: "#/components/schemas/Identifier"
         username:
@@ -577,7 +580,7 @@ components:
         requestorHasBanned:
           description: boolean value that tells if requestor has banned the user
           type: boolean
-          example: true 
+          example: true
         requestorHasFollowed:
           description: boolean value that tells if requestor has followed the user
           type: boolean
@@ -627,6 +630,7 @@ components:
           description: list of photos uploaded by the user
           type: array
           minItems: 0
+          maxItems: 1000 # as stated before i dont want to check this in backend, i want to display them all like instagram does, checks should only be used for structural limitations, but my design idea is to show them all (since it's a demo they would never be more than, let's say 100 photos MAX)
           items:
             $ref: "#/components/schemas/Photo"
 
@@ -639,12 +643,16 @@ components:
         path:
           description: position in filesystem for a file
           type: string
-          example: "/tmp/wasaphoto/photofiles/rei.jpg"
+          minLength: 53
+          maxLength: 53 # fixed position in filesystem change accordingly
+            #pattern omitted
+          example: "/tmp/wasaphoto/photofiles/@U000111222/@P222333444.jpg"
 
         file:
           description: the actual file of the photo
           type: string
           format: binary
+          pattern: "^.?" #since it is a binary string [byte array]
           minLength: 8 # to fit check for pngs header
           maxLength: 10485760 #binary 10 megs (2 power of 20 times 10)
 
@@ -659,10 +667,10 @@ components:
         # uploader user id
         uploaderUserId:
           $ref: "#/components/schemas/Identifier"
-        
+
         uploaderUsername:
           $ref: "#/components/schemas/UserName"
-        
+
         likes:
           description: number of likes the photo has recieved (represented by userId that liked the photo)
           type: integer
@@ -676,10 +684,11 @@ components:
         comments:
           description: comments attached to the photo, made by users
           type: array
-          minItems: 0  
+          minItems: 0
+          maxItems: 100 # as stated above just for validator ecc, all comments must be displayed, additional logic checks would be made once one decides to scale app
           items:
             $ref: "#/components/schemas/Comment"
-        
+
         commentsCounter:
           description: number of comments attached to the photo
           type: integer
@@ -689,6 +698,7 @@ components:
           description: date of uploading
           type: string
           format: date-time
+          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
           example: "2021-05-12T09:00:00Z"
           minLength: 20
           maxLength: 20
@@ -725,6 +735,7 @@ components:
         date:
           description: date of the comment
           type: string
+          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
           format: date-time
           example: "2023-12-12T09:00:00Z"
           minLength: 20

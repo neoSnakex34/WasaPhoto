@@ -28,7 +28,10 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	if bannerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to ban")
-		w.Write([]byte("User is not allowed to ban"))
+		_, err := w.Write([]byte("User is not allowed to ban"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -36,12 +39,18 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	if errors.Is(err, customErrors.ErrAlreadyBanned) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("user is already banned")
-		w.Write([]byte("User is already banned"))
+		_, err = w.Write([]byte("User is already banned"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while banning user")
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -78,12 +87,18 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	if errors.Is(err, customErrors.ErrNotBanned) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("user is not banned")
-		w.Write([]byte("User is not banned"))
+		_, err := w.Write([]byte("User is not banned"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while unbanning user: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 

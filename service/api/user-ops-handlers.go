@@ -52,12 +52,18 @@ func (rt *_router) setMyUsername(w http.ResponseWriter, r *http.Request, ps http
 	if errors.Is(err, customErrors.ErrInvalidRegexUsername) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("new username is not valid: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occurred during db calls in setting username: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -79,7 +85,10 @@ func (rt *_router) getUserList(w http.ResponseWriter, r *http.Request, ps httpro
 	if authorization != reqId {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to get list of users")
-		w.Write([]byte("user is not allowed to get list of users"))
+		_, err := w.Write([]byte("user is not allowed to get list of users"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -87,7 +96,10 @@ func (rt *_router) getUserList(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occurred during db calls in getting list of users: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -95,7 +107,10 @@ func (rt *_router) getUserList(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occurred during encoding list of users: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 

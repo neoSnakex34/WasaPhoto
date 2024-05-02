@@ -28,12 +28,18 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	if errors.Is(customErrors.ErrInvalidRegexUsername, err) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("username regular expression not matched")
-		w.Write([]byte("INVALID USERNAME: use only lowercase letters and numbers; min 3, max 12 chars."))
+		_, err = w.Write([]byte("INVALID USERNAME: use only lowercase letters and numbers; min 3, max 12 chars."))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong with login", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -42,7 +48,10 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -78,7 +87,10 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -111,7 +123,10 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -119,7 +134,10 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 

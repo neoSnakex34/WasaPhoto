@@ -30,7 +30,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if followerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to follow")
-		w.Write([]byte("User is not allowed to follow"))
+		_, err := w.Write([]byte("User is not allowed to follow"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -39,12 +42,18 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if errors.Is(err, customErrors.ErrAlreadyFollowing) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("user is already following")
-		w.Write([]byte("User is already following"))
+		_, err = w.Write([]byte("User is already following"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while following user: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -71,7 +80,10 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	if followerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed to unfollow")
-		w.Write([]byte("User is not allowed to unfollow"))
+		_, err := w.Write([]byte("User is not allowed to unfollow"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
@@ -79,12 +91,18 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	if errors.Is(err, customErrors.ErrNotFollowing) {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("user is not following")
-		w.Write([]byte("User is not following"))
+		_, err = w.Write([]byte("User is not following"))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("an error occured while unfollowing user: ", err)
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			ctx.Logger.Error("an error occurred while writing response: ", err)
+		}
 		return
 	}
 
