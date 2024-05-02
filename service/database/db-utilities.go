@@ -459,3 +459,15 @@ func (db *appdbimpl) follows(plainFollowerId string, plainFollowedId string) (bo
 	return counter > 0, nil
 
 }
+
+func (db *appdbimpl) checkUserExistsById(plainUserId string) error {
+	var counter int
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM users WHERE userId = ?`, plainUserId).Scan(&counter)
+	if err != nil {
+		return err
+	} else if counter == 0 {
+		return customErrors.ErrUserNotFound
+	}
+
+	return nil
+}

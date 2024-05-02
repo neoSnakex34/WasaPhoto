@@ -116,9 +116,19 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorUserId structs.Identifier) (structs.UserProfile, error) {
 
 	plainUserId := profileUserId.Id
+	// check user exists in db
+	err := db.checkUserExistsById(plainUserId)
+	if errors.Is(err, customErrors.ErrUserNotFound) {
+		log.Println("user not found")
+		return structs.UserProfile{}, err
+	} else if err != nil {
+		return structs.UserProfile{}, err
+	}
+
 	plainRequestorUserId := requestorUserId.Id
+
 	// check requestor banned by profile user
-	err := db.checkBan(plainUserId, plainRequestorUserId)
+	err = db.checkBan(plainUserId, plainRequestorUserId)
 
 	if errors.Is(err, customErrors.ErrIsBanned) {
 		log.Println("requestor is banned by user")

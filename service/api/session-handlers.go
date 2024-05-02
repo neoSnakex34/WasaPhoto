@@ -107,11 +107,11 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	// not found would be returned from server request in the
 	// unfortunate case in which user is deleted before accessing profile
 	// for now i will not handle that here
-
 	profile, err := rt.db.GetUserProfile(profileUserId, requestorUserId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error(err)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
