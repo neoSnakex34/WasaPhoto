@@ -53,14 +53,14 @@ export default {
                 // array by reference is not a copy
                 // cause you know speedy speedy scripting lang
                 // doing speedy speedy dumb things
-                photo.served = await this.getPhotoForStream(path, photo.uploaderUserId.identifier)
+                photo.served = await this.servePhoto(path, photo.uploaderUserId.identifier)
 
             }
 
         },
 
 		  // THIS WILL CALL SERVEPHOTO IN API 
-        async getPhotoForStream(partialPath, uploaderId) {
+        async servePhoto(partialPath, uploaderId) {
             let photoId = partialPath.split('/')[1]
 
             try {
@@ -112,7 +112,7 @@ export default {
 		</div>
 
 		<div class="container pt-4 pb-4" style="width: 60%;">
-			<Photo v-for="photo in stream"
+			<Photo v-for="photo in stream" :key="photo.photoId.identifier"
 
 				@like="graphicallyLikeBeforeRefresh(photo.photoId.identifier)"
                 @unlike="graphicallyUnlikeBeforeRefresh(photo.photoId.identifier)"

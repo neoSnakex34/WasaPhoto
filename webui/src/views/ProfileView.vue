@@ -93,7 +93,7 @@ export default {
                 // array by reference is not a copy
                 // cause you know speedy speedy scripting lang
                 // doing speedy speedy dumb things
-                photo.served = await this.getPhoto(path)
+                photo.served = await this.servePhoto(path)
 
             }
 
@@ -137,7 +137,7 @@ export default {
             }
         },
 
-        async setMyUsername(newUsername) {
+        async setMyUserName(newUsername) {
             try {
                 let response = await this.$axios.put(`/users/${this.profile.userId}/username`,
                     JSON.stringify(newUsername),
@@ -227,7 +227,7 @@ export default {
         },
 
         // THIS WILL CALL SERVEPHOTO IN API 
-        async getPhoto(partialPath) {
+        async servePhoto(partialPath) {
             let photoId = partialPath.split('/')[1]
 
             try {
@@ -249,7 +249,7 @@ export default {
         toggleEditing(newUsername) {
             if ((this.clicked) && (newUsername !== "")){
 
-                this.setMyUsername(newUsername)
+                this.setMyUserName(newUsername)
             }
             // alert(this.username)
             this.clicked = !this.clicked

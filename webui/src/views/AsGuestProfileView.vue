@@ -26,9 +26,8 @@ export default {
         }
     },
 
-    async created() {
-        
-        await this.getUserProfileAsGuest()
+    async created() { 
+        await this.getUserProfileAsGuest() // NOTE FOR CORRECTION those are getUserProfile API func just a little filtered
         await this.updateGuestServedPhotos()
     },
 
@@ -53,7 +52,7 @@ export default {
 
         // in a future update this couls be generalized
         // THIS WILL CALL SERVEPHOTO IN API 
-        async getPhoto(partialPath) {
+        async servePhoto(partialPath) {
 
             let photoId = partialPath.split('/')[1]
 
@@ -91,7 +90,7 @@ export default {
 
             for (let photo of sortedPhotosByDate) {
                 let path = photo.photoPath
-                photo.served = await this.getPhoto(path)
+                photo.served = await this.servePhoto(path)
             }
 
         },

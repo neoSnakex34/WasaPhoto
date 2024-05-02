@@ -243,7 +243,7 @@ export default {
     <!-- change accordingly with photo max dimension, must be set-->
     <div class="overflow-auto  pt-2 pb-5 mb-5" style="max-height: 200px;">
 
-        <div v-for="comment in sortedComments">
+        <div v-for = "comment in sortedComments" :key = "comment.commentId.identifier">
 
             <Comment
                 @delete-comment-event = "deleteComment"

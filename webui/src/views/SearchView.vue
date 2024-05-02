@@ -7,7 +7,6 @@
                 matchingUsers: [],
                 userId: localStorage.getItem('userId'),
                 usernames: [],
-                matchingUsers: [],
                 query: "",
                 // those will be used to show/hide buttons
                 // wont be initialized in data for now
@@ -19,7 +18,7 @@
         },
 
         methods: {
-            async searchUser(){
+            async getUserList(){ // PLEASE NOTE differently from the backend this getUserList func will filter users
                 try{
                     let response = await this.$axios.get("/users", { 
                     headers: {
@@ -153,14 +152,14 @@
     <div class="container" style="width: 90%;">
         <div class="input-group rounded d-flex align-items-center">
             <input v-model="query" class="form-control form-control-lg" type="text" placeholder="search by username"/>
-            <button class="btn btn-outline-primary btn-lg fw-bold" type="button" @click="searchUser">Search</button>
+            <button class="btn btn-outline-primary btn-lg fw-bold" type="button" @click="getUserList">Search</button>
         </div>
 
     </div>
     <div class="container pt-1" style="height: 500px; width: 80%">
         <!-- add a condition in script for excluding banned user -->
         <div class="border-bottom pt-3 pb-3 d-flex justify-content-between align-items-center"
-             v-for="entry in matchingUsers" 
+             v-for="entry in matchingUsers" :key="entry.user.userId.identifier" 
              @mouseenter="entry.showButtons = true"
              @mouseleave="entry.showButtons = false"
              
