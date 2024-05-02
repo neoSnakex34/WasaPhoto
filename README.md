@@ -1,50 +1,16 @@
-#  a WiP of my WASAPhoto
+# Source code for neoSnakex34's WASAPhoto  
 
+## What am I looking at? 
 
-## Project structure
+This is a project made during my WASA (web and software architecture) course. 
+It aims to provide an experience similar to those you can have in photo sharing social networks. 
+WASAPhoto (graphically *WasaPHOTO*) is a single page WebApp implementing a **REST** API. 
 
-* `cmd/` contains all executables; Go programs here should only do "executable-stuff", like reading options from the CLI/env, etc.
-	* `cmd/healthcheck` is an example of a daemon for checking the health of servers daemons; useful when the hypervisor is not providing HTTP readiness/liveness probes (e.g., Docker engine)
-	* `cmd/webapi` contains an example of a web API server daemon
-* `demo/` contains a demo config file
-* `doc/` contains the documentation (usually, for APIs, this means an OpenAPI file)
-* `service/` has all packages for implementing project-specific functionalities
-	* `service/api` contains an example of an API server
-	* `service/globaltime` contains a wrapper package for `time.Time` (useful in unit testing)
-* `vendor/` is managed by Go, and contains a copy of all dependencies
-* `webui/` is an example of a web frontend in Vue.js; it includes:
-	* Bootstrap JavaScript framework
-	* a customized version of "Bootstrap dashboard" template
-	* feather icons as SVG
-	* Go code for release embedding
+* **OPENAPI** specs can be found at `doc/api.yaml`.
+* API implementation and Core (BACKEND) features are implemented using **Golang** and can be found in `service/`.
+* Users will use API functions through a UI (FRONTEND) made with **Vue.js**, aesthetically appealing and easy to use. Source found in `webui`. 
+* Deployment is made using **Docker** containers. See the `Dockerfile.*` in root.
 
-Other project files include:
-* `open-npm.sh` starts a new (temporary) container using `node:lts` image for safe web frontend development (you don't want to use `npm` in your system, do you?)
-
-## Go vendoring
-
-This project uses [Go Vendoring](https://go.dev/ref/mod#vendoring). You must use `go mod vendor` after changing some dependency (`go get` or `go mod tidy`) and add all files under `vendor/` directory in your commit.
-
-For more information about vendoring:
-
-* https://go.dev/ref/mod#vendoring
-* https://www.ardanlabs.com/blog/2020/04/modules-06-vendoring.html
-
-## Node/NPM vendoring
-
-This repository contains the `webui/node_modules` directory with all dependencies for Vue.JS. You should commit the content of that directory and both `package.json` and `package-lock.json`.
-
-## How to set up a new project from this template
-
-You need to:
-
-* Change the Go module path to your module path in `go.mod`, `go.sum`, and in `*.go` files around the project
-* Rewrite the API documentation `doc/api.yaml`
-* If no web frontend is expected, remove `webui` and `cmd/webapi/register-webui.go`
-* If no cronjobs or health checks are needed, remove them from `cmd/`
-* Update top/package comment inside `cmd/webapi/main.go` to reflect the actual project usage, goal, and general info
-* Update the code in `run()` function (`cmd/webapi/main.go`) to connect to databases or external resources
-* Write API code inside `service/api`, and create any further package inside `service/` (or subdirectories)
 
 ## How to build
 
@@ -79,5 +45,26 @@ If you want to launch the WebUI, open a new tab and launch:
 ./open-npm.sh
 # (here you're inside the NPM container)
 npm run dev
+```
+
+## How to run using docker images 
+
+* Firstly you should build the images: 
+
+```shell
+docker build -t wasaphoto-backend:latest -f Dockerfile.backend .
+```
+
+```shell
+docker build -t wasaphoto-frontend:latest -f Dockerfile.frontend .
+```
+
+* Then you can run them _(changing flags if you need, rm will delete everything after you exit the container [suitable for a demo])_
+```shell
+docker run -it --rm -p 3000:3000 wasaphoto-backend:latest
+```
+
+```shell
+docker run -it --rm -p 8081:80 wasaphoto-frontend:latest
 ```
 
