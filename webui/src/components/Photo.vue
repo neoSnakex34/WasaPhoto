@@ -9,7 +9,7 @@ export default {
             loggedUserId: localStorage.getItem('userId'), // THIS COULD have problems with references
             commentBodyIn: '',
             mutableCommentsCounter: this.commentsCounter,
-            mutableDelete: this.delete
+            // mutableDelete: this.delete
             // comments: [
             //     /*
             //         commentId
@@ -39,12 +39,6 @@ export default {
 
     },
     methods: {
-
-
-
-        toggleDelete() {
-            this.mutableDelete = !this.mutableDelete
-        },
 
         async likePhoto() {
             try {
@@ -178,7 +172,7 @@ export default {
 <template>
 
     <div class="d-flex flex-grow-1 pb-2">
-        <button v-if="this.mutableDelete" @click="$emit('delete-event')" class="d-flex btn btn-danger flex-grow-1 justify-content-center fw-bold">DELETE</button>
+        <button v-if="this.delete" @click="$emit('delete-event')" class="d-flex btn btn-danger flex-grow-1 justify-content-center fw-bold">DELETE</button>
     </div>
 
     <div class="card flex-grow-1 ">

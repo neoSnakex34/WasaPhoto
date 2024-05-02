@@ -34,7 +34,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 
 	for !isValidId && err == nil {
 
-		newCommentId, err := generateIdentifier("C")
+		newCommentId, err = generateIdentifier("C")
 		if err != nil {
 			return structs.Comment{}, err
 		}
