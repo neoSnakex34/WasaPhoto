@@ -21,8 +21,6 @@ func (db *appdbimpl) FollowUser(followerId structs.Identifier, followedId struct
 
 	err = db.c.QueryRow(`SELECT COUNT(*) FROM followers WHERE followerId = ? AND followedId = ?`, followerId.Id, followedId.Id).Scan(&counter)
 
-	println("counter: ", counter)
-
 	if err != nil {
 		return err
 	} else if counter > 0 {

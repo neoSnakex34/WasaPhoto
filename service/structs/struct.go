@@ -32,6 +32,7 @@ type Photo struct {
 	UploaderUsername   string     `json:"uploaderUsername"`
 	LikeCounter        int        `json:"likeCounter"`
 	Comments           []Comment  `json:"comments"`
+	CommentsCounter    int        `json:"commentsCounter"`
 	LikedByCurrentUser bool       `json:"likedByCurrentUser"`
 	Date               string     `json:"date"`
 	PhotoPath          string     `json:"photoPath"` // in openapi this is represented as photofile

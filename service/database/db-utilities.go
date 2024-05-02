@@ -183,6 +183,8 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 			return nil, err
 		}
 
+		commentsCounter := len(comments)
+
 		likedByCurrentUser, err := db.getLikedByUserId(plainRequestorId, plainPhotoId)
 		if err != nil {
 			return nil, err
@@ -199,6 +201,7 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 			UploaderUsername:   uploaderUsername,
 			LikeCounter:        likeCounter,
 			Comments:           comments,
+			CommentsCounter:    commentsCounter,
 			LikedByCurrentUser: likedByCurrentUser,
 			Date:               date,
 			PhotoPath:          photoPath,
@@ -319,6 +322,8 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 			return 0, nil, err
 		}
 
+		commentsCounter := len(comments)
+
 		uploaderUsername, err = db.getUsernameByUserId(plainUserId)
 		if err != nil {
 			log.Println("error in getting username from db")
@@ -331,6 +336,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 			UploaderUsername:   uploaderUsername,
 			LikeCounter:        likeCounter,
 			Comments:           comments,
+			CommentsCounter:    commentsCounter,
 			LikedByCurrentUser: liked,
 			Date:               photoDate,
 			PhotoPath:          photoPath,

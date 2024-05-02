@@ -53,6 +53,7 @@ func (db *appdbimpl) UploadPhoto(file []byte, upoloaderUserId structs.Identifier
 		UploaderUserId:     upoloaderUserId,
 		LikeCounter:        0,
 		Comments:           []structs.Comment{},
+		CommentsCounter:    0,
 		LikedByCurrentUser: false,
 		Date:               date,
 		PhotoPath:          uploaderId + "/" + newPhotoId.Id + "." + format, // needs to be partial for frontend

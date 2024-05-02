@@ -175,6 +175,7 @@ export default {
                 :photoId="photo.photoId.identifier"
                 :uploaderId="photo.uploaderUserId.identifier"
                 :comments="photo.comments"
+                :commentsCounter="photo.commentsCounter"
                 :photoOwnerId="photo.uploaderUserId.identifier"
                 :date="photo.date" 
                 :likes="photo.likeCounter"

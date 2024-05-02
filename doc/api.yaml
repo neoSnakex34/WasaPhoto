@@ -676,10 +676,14 @@ components:
         comments:
           description: comments attached to the photo, made by users
           type: array
-          minItems: 0
-          maxItems: 20 # not for real use, just as an example
+          minItems: 0  
           items:
             $ref: "#/components/schemas/Comment"
+        
+        commentsCounter:
+          description: number of comments attached to the photo
+          type: integer
+          example: 4
 
         date:
           description: date of uploading

@@ -8,6 +8,7 @@ export default {
             likerId: localStorage.getItem('userId'),
             loggedUserId: localStorage.getItem('userId'), // THIS COULD have problems with references
             commentBodyIn: '',
+            mutableCommentsCounter: this.commentsCounter
             // comments: [
             //     /*
             //         commentId
@@ -24,7 +25,7 @@ export default {
     components: {
         Comment
     },
-    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'stream', 'comments'], // some ID wont be visualized
+    props: ['src', 'uploader', 'uploaderId', 'date', 'likes', 'liked', 'photoId', 'delete', 'guest', 'stream', 'comments', 'commentsCounter'], // some ID wont be visualized
 
     computed: {
           sortedComments() {
@@ -111,7 +112,6 @@ export default {
                     })
 
                 let comment = response.data
-
                 // add comment to the list of comments
 
 
@@ -123,7 +123,7 @@ export default {
 
                 // Empties the comment field
                 this.commentBodyIn = '';
-
+                this.mutableCommentsCounter++
 
 
             } catch (e) {
@@ -144,7 +144,7 @@ export default {
                 // SHOULD I CHECK FOR ERRORSc
                 let idx = this.attachedComments.findIndex(comment => comment.commentId.identifier === commentId)
                 this.attachedComments.splice(idx, 1)
-
+                this.mutableCommentsCounter--
 
             }catch(e){
                 if (e.response.data) {
@@ -201,6 +201,7 @@ export default {
                     <!-- username href to<strong> profile -->
                     <p class="card-text"><strong>DATE</strong>: {{ this.date }}</p>
                     <p class="card-text"><strong>LIKES</strong>: {{ this.likes }}</p>
+                    <p class="card-text"><strong>COMMENTS</strong>: {{ this.mutableCommentsCounter }}</p>
                     <!-- this should beco<strong>me an icon probably -->
                     <!-- <p class="card-text"><strong>LIKED</strong>: {{ this.liked }}</p> -->
 

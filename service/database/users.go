@@ -191,7 +191,6 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 		}
 
 		err = db.checkBan(userId, requestorUserId.Id)
-		println("err: ", err)
 		if errors.Is(err, customErrors.ErrIsBanned) {
 			isRequestorBanned = true
 		} else if err != nil {
