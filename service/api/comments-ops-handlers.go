@@ -55,7 +55,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while commenting the photo: ", err)
+		ctx.Logger.Error("an error occurred while commenting the photo: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
@@ -103,7 +103,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	err := rt.db.UncommentPhoto(commentId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while uncommenting the photo: ", err)
+		ctx.Logger.Error("an error occurred while uncommenting the photo: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)

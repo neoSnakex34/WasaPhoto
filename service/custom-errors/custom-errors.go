@@ -23,5 +23,5 @@ var ErrInvalidId = errors.New("invalid id")
 
 var ErrInvalidPhotoPath = errors.New("invalid photo path")
 var ErrInvalidPhotoFile = errors.New("invalid file or unsupported photo Format")
-var ErrInvalidIdentifierMode = errors.New("invalid identifier mode can only creater U P C ids")
+var ErrInvalidIdentifierMode = errors.New("invalid identifier mode can only create U P C ids")
 var ErrUserNotFound = errors.New("user not found")

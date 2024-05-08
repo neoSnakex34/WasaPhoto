@@ -32,7 +32,7 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 		return structs.Comment{}, err
 	}
 
-	for !isValidId && err == nil {
+	for !isValidId {
 
 		newCommentId, err = generateIdentifier("C")
 		if err != nil {
@@ -42,10 +42,6 @@ func (db *appdbimpl) CommentPhoto(commentedPhotoId structs.Identifier, requestor
 		if err != nil {
 			return structs.Comment{}, err
 		}
-	}
-
-	if err != nil {
-		return structs.Comment{}, err
 	}
 
 	// get current date (always validid loop)
@@ -77,7 +73,7 @@ func (db *appdbimpl) UncommentPhoto(commentId structs.Identifier) error {
 
 	// THOSE CHECKS ARE KINDA OVERKILL SINCE  if a user is banned won't be able to see the photo
 
-	// get uplader id
+	// get uploader id
 	uploaderId, err := db.getUploaderByCommentId(commentId)
 	if err != nil {
 		return err

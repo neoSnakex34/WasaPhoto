@@ -46,7 +46,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while following user: ", err)
+		ctx.Logger.Error("an error occurred while following user: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
@@ -92,7 +92,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while unfollowing user: ", err)
+		ctx.Logger.Error("an error occurred while unfollowing user: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)

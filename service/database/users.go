@@ -28,7 +28,7 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		log.Println("user exist")
 		return structs.Identifier{Id: userId}, nil
 
-	} else if !exist {
+	} else {
 
 		// loop until a valid user or error is found
 		for (!idIsValid) && (err == nil) {
@@ -64,7 +64,7 @@ func (db *appdbimpl) SetMyUserName(newUsername string, userId string, mode strin
 	var count int
 	var valid bool = false
 
-	// if user is new one MODE = N i need to do inser
+	// if user is new one MODE = N i need to do insert
 	// if user is already signed MODE = U i need to update by id
 
 	//  i check if newUsername is taken

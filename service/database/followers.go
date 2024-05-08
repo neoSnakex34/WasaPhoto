@@ -10,7 +10,7 @@ import (
 func (db *appdbimpl) FollowUser(followerId structs.Identifier, followedId structs.Identifier) error {
 	var counter int
 
-	// check if user is arleady followed by userId
+	// check if user is already followed by userId
 	err := db.checkBan(followedId.Id, followerId.Id) // opposite of following
 	// err := db.checkBan(followedId.Id, followerId.Id) // opposite of following
 	if errors.Is(err, customErrors.ErrIsBanned) {
@@ -31,7 +31,7 @@ func (db *appdbimpl) FollowUser(followerId structs.Identifier, followedId struct
 		err = db.addFollow(followerId.Id, followedId.Id)
 
 		if err != nil {
-			// if this is not hit it will return nil at end of function than user is succesfully
+			// if this is not hit it will return nil at end of function than user is successfully
 			return err
 		}
 	}

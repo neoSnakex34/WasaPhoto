@@ -23,7 +23,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	if likerId.Id != authorization {
 		w.WriteHeader(http.StatusForbidden)
-		ctx.Logger.Error("user is not allowed to like photo") // not loggeed in
+		ctx.Logger.Error("user is not allowed to like photo") // not logged in
 		_, err := w.Write([]byte("User is not allowed to like photo"))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
@@ -34,7 +34,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	err := rt.db.LikePhoto(likerId, photoId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while liking the photo: ", err)
+		ctx.Logger.Error("an error occurred while liking the photo: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
@@ -70,7 +70,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	err := rt.db.UnlikePhoto(likerId, photoId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while unliking the photo: ", err)
+		ctx.Logger.Error("an error occurred while unliking the photo: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)

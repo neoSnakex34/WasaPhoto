@@ -141,7 +141,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// commented out cause is flagged as superfluos at runtime
+	// commented out cause is flagged as superfluous at runtime
 	// w.WriteHeader(http.StatusOK)
 	log.Println("profile retrieved")
 }

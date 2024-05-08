@@ -44,7 +44,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while banning user")
+		ctx.Logger.Error("an error occurred while banning user")
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
@@ -89,7 +89,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while unbanning user: ", err)
+		ctx.Logger.Error("an error occurred while unbanning user: ", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)

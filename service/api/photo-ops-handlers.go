@@ -34,7 +34,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	photoFile, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while reading the photo file: ", err)
+		ctx.Logger.Error("an error occurred while reading the photo file: ", err)
 		_, err = w.Write([]byte("an error when attempting to read photofile"))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
@@ -69,8 +69,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	newPhoto, err := rt.db.UploadPhoto(photoFile, userId, format)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while uploading photo: ", err)
-		_, err = w.Write([]byte("an error occured while uploading photo"))
+		ctx.Logger.Error("an error occurred while uploading photo: ", err)
+		_, err = w.Write([]byte("an error occurred while uploading photo"))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
 		}
@@ -118,7 +118,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	} else if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while deleting photo: ", err)
+		ctx.Logger.Error("an error occurred while deleting photo: ", err)
 		return
 	}
 
@@ -154,8 +154,8 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 	photoPath, err := serviceutilities.GetPhotoPath(userId + "/" + photoId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("an error occured while getting photo path: ", err)
-		_, err = w.Write([]byte("an error occured while getting photo path"))
+		ctx.Logger.Error("an error occurred while getting photo path: ", err)
+		_, err = w.Write([]byte("an error occurred while getting photo path"))
 		if err != nil {
 			ctx.Logger.Error("an error occurred while writing response: ", err)
 		}

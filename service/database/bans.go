@@ -7,61 +7,58 @@ import (
 
 func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Identifier) error {
 
-	var counter int
 	var err error
 
-	// check if user is arleady banned
+	// check if user is already banned
 	err = db.checkBan(bannerId.Id, bannedId.Id)
 
 	if err != nil {
 		return err
-	} else if counter > 0 {
-		return customErrors.ErrAlreadyBanned
-	} else if counter == 0 { // redundand check just to be paranoid
-		// here i ban
-		err = db.addBan(bannerId.Id, bannedId.Id)
+	}
+	// redundant check just to be paranoid
+	// here i ban
+	err = db.addBan(bannerId.Id, bannedId.Id)
+	if err != nil {
+		return err
+	}
+
+	userFollowsBanned, err := db.follows(bannerId.Id, bannedId.Id)
+	if err != nil {
+		return err
+	}
+
+	bannedFollowsUser, err := db.follows(bannedId.Id, bannerId.Id)
+	if err != nil {
+		return err
+	}
+
+	if userFollowsBanned {
+		err = db.removeFollow(bannerId.Id, bannedId.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	if bannedFollowsUser {
+		err = db.removeFollow(bannedId.Id, bannerId.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	bannedPhotoIds, err := db.getPhotoIdsByUserId(bannedId.Id)
+	if err != nil {
+		return err
+	}
+
+	if len(bannedPhotoIds) != 0 {
+		// [ ] this should remove all likes and comments of BANNED from BANNER photos
+		// should decide to implement or not
+		err = db.removeInteractionsByUserId(bannerId.Id, bannedPhotoIds)
 		if err != nil {
 			return err
 		}
 
-		userFollowsBanned, err := db.follows(bannerId.Id, bannedId.Id)
-		if err != nil {
-			return err
-		}
-
-		bannedFollowsUser, err := db.follows(bannedId.Id, bannerId.Id)
-		if err != nil {
-			return err
-		}
-
-		if userFollowsBanned {
-			err = db.removeFollow(bannerId.Id, bannedId.Id)
-			if err != nil {
-				return err
-			}
-		}
-
-		if bannedFollowsUser {
-			err = db.removeFollow(bannedId.Id, bannerId.Id)
-			if err != nil {
-				return err
-			}
-		}
-
-		bannedPhotoIds, err := db.getPhotoIdsByUserId(bannedId.Id)
-		if err != nil {
-			return err
-		}
-
-		if len(bannedPhotoIds) != 0 {
-			// [ ] this should remove all likes and comments of BANNED from BANNER photos
-			// should decide to implement or not
-			err = db.removeInteractionsByUserId(bannerId.Id, bannedPhotoIds)
-			if err != nil {
-				return err
-			}
-
-		}
 	}
 
 	return nil

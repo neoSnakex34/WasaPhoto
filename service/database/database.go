@@ -87,7 +87,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		userTable := `CREATE TABLE users (
 			userId VARCHAR(11) NOT NULL PRIMARY KEY,
 			username VARCHAR(18) NOT NULL UNIQUE
-		
+
 			)`
 
 		followerTable := `CREATE TABLE followers (
@@ -103,21 +103,21 @@ func New(db *sql.DB) (AppDatabase, error) {
 			bannedId VARCHAR(11) NOT NULL,
 			PRIMARY KEY (bannerId, bannedId),
 			FOREIGN KEY (bannerId) REFERENCES users(userId),
-			FOREIGN KEY (bannedId) REFERENCES users(userId)	
+			FOREIGN KEY (bannedId) REFERENCES users(userId)
 		)`
 
 		photoTable := `CREATE TABLE photos (
-			photoId VARCHAR(11) NOT NULL PRIMARY KEY, 
-			userId VARCHAR(11) NOT NULL, 
-			photoPath TEXT, 
-			date TEXT, 
+			photoId VARCHAR(11) NOT NULL PRIMARY KEY,
+			userId VARCHAR(11) NOT NULL,
+			photoPath TEXT,
+			date TEXT,
 			FOREIGN KEY (userId) REFERENCES users(userId)
 		)`
 
 		likeTable := `CREATE TABLE likes (
 			likerId VARCHAR(11) NOT NULL,
 			photoId VARCHAR(11) NOT NULL,
-			FOREIGN KEY (likerId) REFERENCES users(userId) 
+			FOREIGN KEY (likerId) REFERENCES users(userId)
 			FOREIGN KEY (photoId) REFERENCES photos(photoId) ON DELETE CASCADE
 			PRIMARY KEY (likerId, photoId)
 		)`
@@ -126,14 +126,16 @@ func New(db *sql.DB) (AppDatabase, error) {
 			commentId VARCHAR(11) NOT NULL PRIMARY KEY,
 			userId VARCHAR(11) NOT NULL,
 			photoId VARCHAR(11) NOT NULL,
-			body TEXT, 
+			body TEXT,
 			date TEXT,
 			FOREIGN KEY (userId) REFERENCES users(userId),
 			FOREIGN KEY (photoId) REFERENCES photos(photoId) ON DELETE CASCADE
 		)`
 
-		runCreateQueries(db, userTable, followerTable, bansTable, photoTable, likeTable, commentTable)
-
+		err = runCreateQueries(db, userTable, followerTable, bansTable, photoTable, likeTable, commentTable)
+		if err != nil {
+			log.Println("Error creating tables")
+		}
 	}
 
 	return &appdbimpl{

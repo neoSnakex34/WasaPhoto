@@ -13,10 +13,10 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// as stated in api.yaml the identifier is a string of lenght 11 @X000000000
+// as stated in api.yaml the identifier is a string of length 11 @X000000000
 // actor will be mode of the id (U P C)
 func generateIdentifier(actor string) (structs.Identifier, error) {
-	const lenght = 9
+	const length = 9
 	const validChars = "0123456789"
 	var actorChar string
 
@@ -38,7 +38,7 @@ func generateIdentifier(actor string) (structs.Identifier, error) {
 	rand.Seed(time.Now().UnixNano())
 
 	// had a look online for this, check if it can be improved
-	randomChunk := make([]byte, lenght)
+	randomChunk := make([]byte, length)
 	for i := range randomChunk {
 		randomChunk[i] = validChars[rand.Intn(len(validChars))]
 	}
@@ -164,7 +164,7 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 	defer rows.Close()
 
 	for rows.Next() {
-		// user id is the same for all photos at every call, but for now is re assigned
+		// user id is the same for all photos at every call, but for now is re-assigned
 		err = rows.Scan(&plainPhotoId, &plainUploaderId, &date, &completePhotoPath)
 		if err != nil {
 			return nil, err
@@ -238,9 +238,9 @@ func (db *appdbimpl) getNumberOfLikedByPhotoId(plainPhotoId string) (int, error)
 	return likeCounter, nil
 }
 
-func (db *appdbimpl) getLikedByUserId(plainUserId string, plainphotoId string) (bool, error) {
+func (db *appdbimpl) getLikedByUserId(plainUserId string, plainPhotoId string) (bool, error) {
 	var counter int
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, plainphotoId).Scan(&counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM likes WHERE likerId = ? AND photoId = ?`, plainUserId, plainPhotoId).Scan(&counter)
 	if err != nil {
 		return false, err
 	}
@@ -353,7 +353,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 	return photoCount, photos, nil
 }
 
-// id will be plain cause it is passed as plain
+// id will be plain 'cause it is passed as plain
 func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Comment, error) {
 	var Comments []structs.Comment
 
