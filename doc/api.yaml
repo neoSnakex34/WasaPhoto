@@ -26,7 +26,7 @@ tags:
     description: endpoints for like related operations
 
 paths:
-  /session:
+  /login:
     post:
       security:
         - bearerAuth: []
