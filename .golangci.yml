@@ -1,0 +1,16 @@
+run:
+  go: '1.17'
+linters:
+  enable:
+    - 'errcheck'
+    - 'gosimple'
+    - 'govet'
+    - 'ineffassign'
+    - 'staticcheck'
+    - 'unused'
+    - 'bodyclose'
+    - 'errname'
+    - 'goconst'
+    - 'gocritic'
+    - 'prealloc'
+    - 'rowserrcheck'

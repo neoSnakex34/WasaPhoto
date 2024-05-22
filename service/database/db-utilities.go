@@ -71,7 +71,7 @@ func (db *appdbimpl) checkBan(plainBannerId string, plainBannedId string) error 
 func (db *appdbimpl) validId(id string, mode string) (bool, error) {
 
 	var count int
-	var err error = nil
+	var err error
 
 	// here we check if the id is present in the table for the respective mode
 	switch mode {

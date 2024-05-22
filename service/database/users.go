@@ -271,24 +271,36 @@ func (db *appdbimpl) createUser(username string, userId string) error {
 }
 
 func (db *appdbimpl) checkUserExists(username string) (bool, string, error) {
-	var userInTable bool
+	// TODO remove assignation
+	// var userInTable bool
 	// var userId structs.Identifier = structs.Identifier{}
 	var id string
 	// first we check if user is in the database querying his row (given that username is unique)
 	err := db.c.QueryRow(`SELECT userId FROM users WHERE username = ?`, username).Scan(&id)
 
-	if errors.Is(err, sql.ErrNoRows) {
-		userInTable = false
-		err = nil // else it will fail control in next function, very important to be checked !
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, "", nil
+		} else {
+			return false, "", err
 
-	} else if err != nil {
-		return false, id, err
+		}
 	} else {
-		// so the user exist
-		// todo this could be prone to bugs, if something goes south check it out
-		userInTable = true
-		// userId = structs.Identifier{Id: id}
+		return true, id, nil
 	}
 
-	return userInTable, id, nil
+	// if errors.Is(err, sql.ErrNoRows) {
+	// 	userInTable = false
+	// 	err = nil // else it will fail control in next function, very important to be checked !
+
+	// } else if err != nil {
+	// 	return false, id, err
+	// } else {
+	// 	// so the user exist
+	// 	// todo this could be prone to bugs, if something goes south check it out
+	// 	userInTable = true
+	// 	// userId = structs.Identifier{Id: id}
+	// }
+
+	// return userInTable, id, nil
 }

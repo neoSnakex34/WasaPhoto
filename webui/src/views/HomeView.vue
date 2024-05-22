@@ -87,7 +87,7 @@ export default {
 				console.log(this.stream);
 				this.updateServedStream();
 			} catch(e) {
-				if (e.responde) {
+				if (e.response) {
 					alert(e.response.data);
 				} else {
 					alert(e);
