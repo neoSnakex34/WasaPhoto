@@ -178,7 +178,7 @@ func (db *appdbimpl) getPhotosByUploaderId(plainUploaderId string, plainRequesto
 			return nil, err
 		}
 
-		comments, err := db.getCommentsByPhotoId(plainPhotoId)
+		comments, err := db.getCommentsByPhotoId(plainPhotoId, plainRequestorId)
 		if err != nil {
 			return nil, err
 		}
@@ -320,7 +320,7 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 			return 0, nil, err
 		}
 
-		comments, err := db.getCommentsByPhotoId(plainPhotoId)
+		comments, err := db.getCommentsByPhotoId(plainPhotoId, plainRequestorUserId)
 		if err != nil {
 			log.Println("error in getting comments from db")
 			return 0, nil, err
@@ -354,10 +354,15 @@ func (db *appdbimpl) getPhotosAndInfoByUserId(plainUserId string, plainRequestor
 }
 
 // id will be plain 'cause it is passed as plain
-func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string) ([]structs.Comment, error) {
+func (db *appdbimpl) getCommentsByPhotoId(plainPhotoId string, plainRequestorId string) ([]structs.Comment, error) {
 	var Comments []structs.Comment
 
-	rows, err := db.c.Query(`SELECT commentId, userId, body, date FROM comments WHERE photoId = ?`, plainPhotoId)
+	rows, err := db.c.Query(`SELECT commentId, userId, body, date FROM comments WHERE photoId = ? 
+						     AND NOT EXISTS (
+								SELECT 1
+								FROM bans
+								WHERE bannerId = comments.userId
+								AND bannedId = ? )`, plainPhotoId, plainRequestorId)
 	if err != nil {
 		return nil, err
 	}

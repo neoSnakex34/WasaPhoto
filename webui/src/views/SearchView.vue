@@ -167,7 +167,7 @@
             <!-- add href to profile -->
             
             <router-link v-if="!entry.isRequestorBanned && !entry.requestorHasBanned" :to="`/profile/${encodeURIComponent(entry.user.userId.identifier)}`" style="font-size: large;"><strong>{{ entry.user.username }}</strong></router-link>
-            <div v-if="entry.isRequestorBanned" class="disabled" style="font-size: large;">{{ entry.user.username }}</div>
+            <div v-if="entry.isRequestorBanned" class="disabled" style="font-size: large;">banned</div>
             <div v-if="entry.requestorHasBanned" class="disabled" style="font-size: large;">{{ entry.user.username }}</div>
 
             <div v-if="!entry.isRequestorBanned" class="btn-group"  v-show="entry.showButtons">
