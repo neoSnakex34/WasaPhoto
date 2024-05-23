@@ -179,7 +179,8 @@ func (db *appdbimpl) GetUserProfile(profileUserId structs.Identifier, requestorU
 	return profileRetrieved, nil
 }
 
-// is it a security vulnerability? even though no real auth is performed nor needed here
+// NOTE after the evaluation change in getUserFromQuery (don't do it now cause it can break endpoints)
+// may recieving all users from a query be a security vulnerability? even though no real auth is performed nor needed here
 func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.UserFromQuery, error) {
 
 	var userFromQueryList []structs.UserFromQuery
@@ -189,7 +190,11 @@ func (db *appdbimpl) GetUserList(requestorUserId structs.Identifier) ([]structs.
 	var requestorHasBanned bool
 	var requestorHasFollowed bool
 
-	rows, err := db.c.Query(`SELECT userId, username FROM users WHERE userId != ?`, requestorUserId.Id)
+	rows, err := db.c.Query(`SELECT userId, username FROM users WHERE userId != ?
+							AND NOT EXISTS (
+							SELECT 1 FROM bans
+							WHERE bannerId = users.userId
+							AND bannedId = ?)`, requestorUserId.Id, requestorUserId.Id)
 	if err != nil {
 		return nil, err
 	}
