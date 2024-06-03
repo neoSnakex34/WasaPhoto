@@ -15,7 +15,7 @@ func (db *appdbimpl) BanUser(bannerId structs.Identifier, bannedId structs.Ident
 	if err != nil {
 		return err
 	}
-	// redundant check just to be paranoid
+
 	// here i ban
 	err = db.addBan(bannerId.Id, bannedId.Id)
 	if err != nil {

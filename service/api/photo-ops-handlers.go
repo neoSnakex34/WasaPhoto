@@ -89,7 +89,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// w.WriteHeader(http.StatusOK)
 	log.Println("Photo uploaded successfully")
 }
 

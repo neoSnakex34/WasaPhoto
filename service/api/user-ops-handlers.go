@@ -114,7 +114,6 @@ func (rt *_router) getUserList(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// w.WriteHeader(http.StatusOK)
 	log.Println("list of users retrieved successfully")
 
 }

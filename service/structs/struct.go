@@ -38,7 +38,6 @@ type Photo struct {
 	PhotoPath          string     `json:"photoPath"` // in openapi this is represented as photofile
 }
 
-// HANDLE THIS TAGS
 type Comment struct {
 	CommentId          Identifier `json:"commentId"`
 	CommentingUserId   Identifier `json:"commentingUserId"`   // commenter id

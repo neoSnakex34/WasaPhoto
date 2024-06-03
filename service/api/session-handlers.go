@@ -94,7 +94,6 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// w.WriteHeader(http.StatusOK)
 	log.Println("stream retrieved")
 
 }
@@ -141,7 +140,5 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// commented out cause is flagged as superfluous at runtime
-	// w.WriteHeader(http.StatusOK)
 	log.Println("profile retrieved")
 }

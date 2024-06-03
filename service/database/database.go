@@ -144,7 +144,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 }
 
 func runCreateQueries(db *sql.DB, queries ...string) error {
-	// this is easy to scale but be w	ary not to use fmtSprintf for queries
+	// this is easy to scale but be wary not to use fmtSprintf for queries
 	// to avoid sql injection vulnerabilities
 	for _, query := range queries {
 		log.Println("creating table: ", strings.Split(query, " ")[2])
