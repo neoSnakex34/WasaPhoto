@@ -129,9 +129,12 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	userId := ps.ByName("userId") // user is the photo owner, requestor can be different if guest to a profile or in stream
-	photoId := ps.ByName("photoId")
+	userId := ps.ByName("userId")   // user is the photo owner, requestor can be different if guest to a profile or in stream
+	photoId := ps.ByName("photoId") // FIXME the id contains even the extensiin, this needs to be checked cause variable name is not consistent as is
 	requestorId := r.Header.Get("Requestor")
+
+	println("userId: ", userId)
+	println("photoId: ", photoId)
 
 	if userId == "" || photoId == "" {
 		w.WriteHeader(http.StatusBadRequest)
