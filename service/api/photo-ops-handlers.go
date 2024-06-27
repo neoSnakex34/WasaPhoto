@@ -14,6 +14,7 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
+// TODO ABSOLUTELY consider sanitizing inputs
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := structs.Identifier{Id: ps.ByName("userId")}
@@ -160,6 +161,6 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 		}
 		return
 	}
-
+	log.Println("path: ", photoPath)
 	http.ServeFile(w, r, photoPath)
 }
