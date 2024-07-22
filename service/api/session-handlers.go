@@ -140,5 +140,6 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// status ok is automatically written
 	log.Println("profile retrieved")
 }

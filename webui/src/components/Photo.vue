@@ -9,18 +9,6 @@ export default {
             loggedUserId: localStorage.getItem('userId'), // THIS COULD have problems with references
             commentBodyIn: '',
             mutableCommentsCounter: this.commentsCounter,
-            // mutableDelete: this.delete
-            // comments: [
-            //     /*
-            //         commentId
-            //         userId // id of commentor
-            //         username // username of commentor
-            //         photoId
-            //         body
-            //         date
-            //     */
-            // ]
-
         }
     },
     components: {
@@ -45,13 +33,14 @@ export default {
                 let response = await this.$axios.put(`/users/${this.uploaderId}/photos/${this.photoId}/likes/${this.likerId}`,
                     {
                         headers: {
+                            // Check backend for authorization ? 
                             // Authorization: localStorage.getItem('authorization'),
                             'Content-Type': 'application/json'
                         }
                     }
 
                 )
-                if (response.status === 200) {
+                if (response.status === 204) {
                     this.$emit('like');
                 }
                 // this.likes++
@@ -76,7 +65,7 @@ export default {
                 }
                 )
 
-                if(response.status === 200){
+                if(response.status === 204){
                     this.$emit('unlike');
                 }
 
@@ -137,7 +126,7 @@ export default {
 
                 });
 
-                // SHOULD I CHECK FOR ERRORSc
+                // SHOULD I CHECK FOR ERRORS
                 let idx = this.attachedComments.findIndex(comment => comment.commentId.identifier === commentId)
                 this.attachedComments.splice(idx, 1)
                 this.mutableCommentsCounter--
@@ -160,8 +149,6 @@ export default {
 
 
     mounted() {
-        // console.log(this.loggedUserId)
-        // alert(this.src)
     },
 
 }
@@ -194,12 +181,10 @@ export default {
                 style="width: 60%; margin: auto;">
                 <div class="d-flex flex-column justify-content-between">
                     <p class="card-text"><strong>UPLOADER</strong>: {{ this.uploader }}</p>
-                    <!-- username href to<strong> profile -->
+                    
                     <p class="card-text"><strong>DATE</strong>: {{ this.date }}</p>
                     <p class="card-text"><strong>LIKES</strong>: {{ this.likes }}</p>
                     <p class="card-text"><strong>COMMENTS</strong>: {{ this.mutableCommentsCounter }}</p>
-                    <!-- this should beco<strong>me an icon probably -->
-                    <!-- <p class="card-text"><strong>LIKED</strong>: {{ this.liked }}</p> -->
 
 
 
@@ -219,10 +204,6 @@ export default {
                             </svg>
                         </div>
                     </div>
-
-                <!--  deprecated, remove
-                <button class="ms-4 d-flex btn rounded-pill btn-primary fw-bold" @click="likePhoto()">Like</button>
-                <button class="d-flex btn rounded-pill btn-danger fw-bold" @click="unlikePhoto()">Unlike</button> -->
 
             </div>
         </div>

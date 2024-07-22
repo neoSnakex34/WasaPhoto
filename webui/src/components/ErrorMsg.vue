@@ -6,8 +6,6 @@ export default {
 			this.$emit('update:msg', null);
 		},
 	}
-	
-	
 }
 
 </script>
@@ -15,9 +13,7 @@ export default {
 <template>
 	<div class="alert alert-danger" role="alert">
 		{{ msg }}
-	
 	</div>
-
 </template>
 
 <style>

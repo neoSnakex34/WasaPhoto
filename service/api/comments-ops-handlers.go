@@ -63,7 +63,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	log.Println("Photo commented successfully")
 	err = json.NewEncoder(w).Encode(comment)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -74,6 +73,9 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		}
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
+	log.Println("Photo commented successfully")
 
 }
 
@@ -109,7 +111,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
 	log.Println("Photo uncommented successfully")
 
 }

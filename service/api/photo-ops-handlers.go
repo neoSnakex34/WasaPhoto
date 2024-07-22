@@ -14,7 +14,6 @@ import (
 	"github.com/neoSnakex34/WasaPhoto/service/structs"
 )
 
-// TODO ABSOLUTELY consider sanitizing inputs
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := structs.Identifier{Id: ps.ByName("userId")}
@@ -90,6 +89,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	// automatically written
+	// w.WriteHeader(http.StatusCreated)
 	log.Println("Photo uploaded successfully")
 }
 
@@ -129,12 +130,9 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	userId := ps.ByName("userId")   // user is the photo owner, requestor can be different if guest to a profile or in stream
-	photoId := ps.ByName("photoId") // FIXME the id contains even the extensiin, this needs to be checked cause variable name is not consistent as is
+	userId := ps.ByName("userId") // user is the photo owner, requestor can be different if guest to a profile or in stream
+	photoId := ps.ByName("photoId")
 	requestorId := r.Header.Get("Requestor")
-
-	println("userId: ", userId)
-	println("photoId: ", photoId)
 
 	if userId == "" || photoId == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -164,6 +162,8 @@ func (rt *_router) servePhoto(w http.ResponseWriter, r *http.Request, ps httprou
 		}
 		return
 	}
-	log.Println("path: ", photoPath)
+
+	// this probably includes status created [to be checked]
 	http.ServeFile(w, r, photoPath)
+
 }

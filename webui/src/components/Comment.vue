@@ -4,8 +4,6 @@ export default {
     props: ["commentingUserId", "commentId", "username", "body", "date", "photoOwnerId", "loggedUserId"], // add others 
     created() {
         console.log(this.commentingUserId + " " + this.body)
-
-        // console.log(this.loggedUserId)
     }
 }
 
